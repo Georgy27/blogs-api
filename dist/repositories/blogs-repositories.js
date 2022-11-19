@@ -23,6 +23,12 @@ exports.blogsRepository = {
         });
         return getBlog;
     },
+    updateBlog(blog, name, description, websiteUrl) {
+        blog.name = name;
+        blog.description = description;
+        blog.websiteUrl = websiteUrl;
+        return blog;
+    },
     deleteBlog(id) {
         const getDeletedBlog = exports.blogs.find((blog) => {
             return blog.id === id;

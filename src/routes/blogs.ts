@@ -19,7 +19,7 @@ const descriptionValidation = body("description")
 const websiteValidation = body("websiteUrl")
   .isLength({ max: 100 })
   .matches(
-    " ^https://([a-zA-Z0-9_-]+\\.)+[a-zA-Z0-9_-]+(\\/[a-zA-Z0-9_-]+)*\\/?$"
+    "^https://([a-zA-Z0-9_-]+\\.)+[a-zA-Z0-9_-]+(\\/[a-zA-Z0-9_-]+)*\\/?$"
   );
 
 // routes
@@ -50,7 +50,6 @@ blogsRouter.post(
 
 blogsRouter.get("/:id", (req: Request, res: Response) => {
   const blogId = req.params.id;
-
   const getBlog = blogsRepository.findBlog(blogId);
 
   if (!getBlog) {
@@ -60,13 +59,36 @@ blogsRouter.get("/:id", (req: Request, res: Response) => {
   }
 });
 
-blogsRouter.put("/:id", (req: Request, res: Response) => {});
+blogsRouter.put(
+  "/:id",
+  basicAuthMiddleware,
+  nameValidation,
+  descriptionValidation,
+  websiteValidation,
+  inputValidationMiddleware,
+  (req: Request, res: Response) => {
+    const blogId = req.params.id;
+    const { name, description, websiteUrl } = req.body;
+    const getBlog = blogsRepository.findBlog(blogId);
+
+    if (!getBlog) {
+      return res.sendStatus(404);
+    } else {
+      const getUpdatedBlog = blogsRepository.updateBlog(
+        getBlog,
+        name,
+        description,
+        websiteUrl
+      );
+      return res.sendStatus(204);
+    }
+  }
+);
 blogsRouter.delete(
   "/:id",
   basicAuthMiddleware,
   (req: Request, res: Response) => {
     const blogId = req.params.id;
-
     const getDeletedBlog = blogsRepository.deleteBlog(blogId);
 
     if (!getDeletedBlog) {

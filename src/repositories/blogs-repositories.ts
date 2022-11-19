@@ -28,6 +28,17 @@ export const blogsRepository = {
     });
     return getBlog;
   },
+  updateBlog(
+    blog: IBlogs,
+    name: string,
+    description: string,
+    websiteUrl: string
+  ) {
+    blog.name = name;
+    blog.description = description;
+    blog.websiteUrl = websiteUrl;
+    return blog;
+  },
   deleteBlog(id: string) {
     const getDeletedBlog = blogs.find((blog) => {
       return blog.id === id;
