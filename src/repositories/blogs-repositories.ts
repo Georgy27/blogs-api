@@ -40,9 +40,13 @@ export const blogsRepository = {
     return blog;
   },
   deleteBlog(id: string) {
-    const getDeletedBlog = blogs.find((blog) => {
-      return blog.id === id;
+    const getDeletedBlog = blogs.filter((blog) => {
+      return blog.id !== id;
     });
-    return getDeletedBlog;
+    blogs = getDeletedBlog;
+    return blogs;
+  },
+  clearBlogs() {
+    blogs = [];
   },
 };

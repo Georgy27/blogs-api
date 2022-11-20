@@ -7,11 +7,13 @@ exports.app = void 0;
 const express_1 = __importDefault(require("express"));
 const blogs_1 = require("./routes/blogs");
 const posts_1 = require("./routes/posts");
+const testing_1 = require("./routes/testing");
 exports.app = (0, express_1.default)();
 const port = 3000;
 // app.use()
 exports.app.use(express_1.default.json());
 // routes
+exports.app.use("/testing/all-data", testing_1.testingRouter);
 exports.app.use("/blogs", blogs_1.blogsRouter);
 exports.app.use("/posts", posts_1.postsRouter);
 exports.app.listen(port, () => {

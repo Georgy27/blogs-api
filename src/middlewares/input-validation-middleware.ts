@@ -8,7 +8,16 @@ export const inputValidationMiddleware = (
 ) => {
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
-    return res.status(400).send({ errorsMessages: errors.array() });
+    const customErrorsMessages: { message: string; field: string }[] = [];
+
+    errors.array({ onlyFirstError: true }).forEach((err) => {
+      const { value, msg, param, location } = err;
+      customErrorsMessages.push({
+        message: msg,
+        field: param,
+      });
+    });
+    return res.status(400).send({ errorsMessages: customErrorsMessages });
   } else {
     next();
   }

@@ -10,7 +10,8 @@ const nameValidation = body("name")
   .isString()
   .trim()
   .notEmpty()
-  .isLength({ max: 15 });
+  .isLength({ max: 15 })
+  .withMessage("name can not be longer than 15 characters");
 const descriptionValidation = body("description")
   .isString()
   .trim()
@@ -35,7 +36,14 @@ blogsRouter.post(
   descriptionValidation,
   websiteValidation,
   inputValidationMiddleware,
-  (req: Request, res: Response) => {
+  (
+    req: Request<
+      {},
+      {},
+      { name: string; description: string; websiteUrl: string }
+    >,
+    res: Response
+  ) => {
     const { name, description, websiteUrl } = req.body;
 
     const createBlog = blogsRepository.createBlog(
@@ -48,7 +56,7 @@ blogsRouter.post(
   }
 );
 
-blogsRouter.get("/:id", (req: Request, res: Response) => {
+blogsRouter.get("/:id", (req: Request<{ id: string }>, res: Response) => {
   const blogId = req.params.id;
   const getBlog = blogsRepository.findBlog(blogId);
 
@@ -66,7 +74,14 @@ blogsRouter.put(
   descriptionValidation,
   websiteValidation,
   inputValidationMiddleware,
-  (req: Request, res: Response) => {
+  (
+    req: Request<
+      { id: string },
+      {},
+      { name: string; description: string; websiteUrl: string }
+    >,
+    res: Response
+  ) => {
     const blogId = req.params.id;
     const { name, description, websiteUrl } = req.body;
     const getBlog = blogsRepository.findBlog(blogId);
@@ -87,13 +102,14 @@ blogsRouter.put(
 blogsRouter.delete(
   "/:id",
   basicAuthMiddleware,
-  (req: Request, res: Response) => {
+  (req: Request<{ id: string }>, res: Response) => {
     const blogId = req.params.id;
-    const getDeletedBlog = blogsRepository.deleteBlog(blogId);
+    const getBlog = blogsRepository.findBlog(blogId);
 
-    if (!getDeletedBlog) {
+    if (!getBlog) {
       return res.sendStatus(404);
     } else {
+      const getDeletedBlog = blogsRepository.deleteBlog(blogId);
       return res.sendStatus(204);
     }
   }

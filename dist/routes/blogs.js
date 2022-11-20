@@ -12,7 +12,8 @@ const nameValidation = (0, express_validator_1.body)("name")
     .isString()
     .trim()
     .notEmpty()
-    .isLength({ max: 15 });
+    .isLength({ max: 15 })
+    .withMessage("name can not be longer than 15 characters");
 const descriptionValidation = (0, express_validator_1.body)("description")
     .isString()
     .trim()
@@ -55,11 +56,12 @@ exports.blogsRouter.put("/:id", basic_auth_middleware_1.basicAuthMiddleware, nam
 });
 exports.blogsRouter.delete("/:id", basic_auth_middleware_1.basicAuthMiddleware, (req, res) => {
     const blogId = req.params.id;
-    const getDeletedBlog = blogs_repositories_1.blogsRepository.deleteBlog(blogId);
-    if (!getDeletedBlog) {
+    const getBlog = blogs_repositories_1.blogsRepository.findBlog(blogId);
+    if (!getBlog) {
         return res.sendStatus(404);
     }
     else {
+        const getDeletedBlog = blogs_repositories_1.blogsRepository.deleteBlog(blogId);
         return res.sendStatus(204);
     }
 });
