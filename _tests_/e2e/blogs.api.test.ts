@@ -6,10 +6,6 @@ const productPayload = {
   description: "Just regular Bob's blog",
   websiteUrl: "https://it-incubator.io",
 };
-const userPayload = {
-  username: "admin",
-  password: "qwerty",
-};
 
 describe("/blogs", () => {
   beforeAll(async () => {

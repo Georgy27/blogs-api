@@ -19,10 +19,6 @@ const productPayload = {
     description: "Just regular Bob's blog",
     websiteUrl: "https://it-incubator.io",
 };
-const userPayload = {
-    username: "admin",
-    password: "qwerty",
-};
 describe("/blogs", () => {
     beforeAll(() => __awaiter(void 0, void 0, void 0, function* () {
         yield (0, supertest_1.default)(src_1.app).delete("/testing/all-data");
