@@ -33,6 +33,32 @@ export const postsRepository = {
     posts.push(newPost);
     return newPost;
   },
+  findPost(id: string) {
+    const getPost = posts.find((post) => {
+      return post.id === id;
+    });
+    return getPost;
+  },
+  updatePost(
+    post: IPosts,
+    title: string,
+    shortDescription: string,
+    content: string,
+    blogId: string
+  ) {
+    post.title = title;
+    post.shortDescription = shortDescription;
+    post.content = content;
+    post.blogId = blogId;
+    return post;
+  },
+  deletePost(id: string) {
+    const getDeletedPost = posts.filter((post) => {
+      return post.id !== id;
+    });
+    posts = getDeletedPost;
+    return posts;
+  },
   clearPosts() {
     posts = [];
   },

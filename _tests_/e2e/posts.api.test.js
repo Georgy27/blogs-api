@@ -27,4 +27,58 @@ describe("/posts", () => {
     it("should return 200 and an empty array", () => __awaiter(void 0, void 0, void 0, function* () {
         yield (0, supertest_1.default)(src_1.app).get("/posts").expect(200, []);
     }));
+    // POST
+    it("shouldn't create a new post when the user is not logged in ", () => __awaiter(void 0, void 0, void 0, function* () {
+        yield (0, supertest_1.default)(src_1.app).post("/posts").send(productPayload).expect(401);
+    }));
+    it("shouldn't create a new post when the data is missing", () => __awaiter(void 0, void 0, void 0, function* () {
+        yield (0, supertest_1.default)(src_1.app)
+            .post("/posts")
+            .set("Authorization", `Basic YWRtaW46cXdlcnR5`)
+            .send(productPayload)
+            .expect(400, {
+            errorsMessages: [{ message: "Invalid value", field: "blogId" }],
+        });
+    }));
+    it("shouldn't create a new post when the data is incorrect", () => __awaiter(void 0, void 0, void 0, function* () {
+        yield (0, supertest_1.default)(src_1.app)
+            .post("/posts")
+            .set("Authorization", `Basic YWRtaW46cXdlcnR5`)
+            .send(Object.assign(Object.assign({}, productPayload), { title: null, blogId: 123 }))
+            .expect(400, {
+            errorsMessages: [
+                { message: "Invalid value", field: "title" },
+                { message: "Invalid value", field: "blogId" },
+            ],
+        });
+    }));
+    let createdBlog = null;
+    it("should create a new blog when the data is correct", () => __awaiter(void 0, void 0, void 0, function* () {
+        const createdResponse = yield (0, supertest_1.default)(src_1.app)
+            .post("/blogs")
+            .set("Authorization", `Basic YWRtaW46cXdlcnR5`)
+            .send({
+            name: "Bob",
+            description: "Just regular Bob's blog",
+            websiteUrl: "https://it-incubator.io",
+        })
+            .expect(201);
+        createdBlog = createdResponse.body;
+        expect(createdBlog).toEqual({
+            id: expect.any(String),
+            name: "Bob",
+            description: "Just regular Bob's blog",
+            websiteUrl: "https://it-incubator.io",
+        });
+    }));
+    let createdPost = null;
+    it("should create a new post when the data is correct", () => __awaiter(void 0, void 0, void 0, function* () {
+        const createdResponse = yield (0, supertest_1.default)(src_1.app)
+            .post("/posts")
+            .set("Authorization", `Basic YWRtaW46cXdlcnR5`)
+            .send(Object.assign(Object.assign({}, productPayload), { blogId: createdBlog.id }))
+            .expect(201);
+        createdPost = createdResponse.body;
+        expect(createdPost).toEqual(Object.assign(Object.assign({ id: expect.any(String) }, productPayload), { blogId: createdBlog.id, blogName: createdBlog.name }));
+    }));
 });

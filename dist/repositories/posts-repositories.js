@@ -19,6 +19,26 @@ exports.postsRepository = {
         posts.push(newPost);
         return newPost;
     },
+    findPost(id) {
+        const getPost = posts.find((post) => {
+            return post.id === id;
+        });
+        return getPost;
+    },
+    updatePost(post, title, shortDescription, content, blogId) {
+        post.title = title;
+        post.shortDescription = shortDescription;
+        post.content = content;
+        post.blogId = blogId;
+        return post;
+    },
+    deletePost(id) {
+        const getDeletedPost = posts.filter((post) => {
+            return post.id !== id;
+        });
+        posts = getDeletedPost;
+        return posts;
+    },
     clearPosts() {
         posts = [];
     },

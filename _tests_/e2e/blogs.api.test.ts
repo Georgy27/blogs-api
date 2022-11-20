@@ -52,6 +52,7 @@ describe("/blogs", () => {
         ],
       });
   });
+
   let createdBlog: any = null;
   it("should create a new blog when the data is correct", async () => {
     const createdResponse = await request(app)
