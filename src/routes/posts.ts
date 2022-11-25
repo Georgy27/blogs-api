@@ -1,8 +1,8 @@
 import { Request, Response, Router } from "express";
 import addDays from "date-fns/addDays";
 import { body } from "express-validator";
-import { postsRepository } from "../repositories/posts-repositories";
-import { blogsRepository } from "../repositories/blogs-repositories";
+import { postsRepository } from "../repositories/posts-db-repository";
+import { blogsRepository } from "../repositories/blogs-db-repository";
 import { basicAuthMiddleware } from "../middlewares/basic-auth-middleware";
 import { inputValidationMiddleware } from "../middlewares/input-validation-middleware";
 export const postsRouter = Router({});
@@ -25,8 +25,8 @@ const contentValidation = body("content")
   .isLength({ max: 1000 });
 const blogIdValidation = body("blogId")
   .isString()
-  .custom((blogId) => {
-    const findBlogWithId = blogsRepository.findBlog(blogId);
+  .custom(async (blogId) => {
+    const findBlogWithId = await blogsRepository.findBlog(blogId);
 
     if (!findBlogWithId) {
       throw new Error("blog with this id does not exist in the DB");
@@ -36,8 +36,8 @@ const blogIdValidation = body("blogId")
   });
 
 // routes
-postsRouter.get("/", (req: Request, res: Response) => {
-  const allPosts = postsRepository.findPosts();
+postsRouter.get("/", async (req: Request, res: Response) => {
+  const allPosts = await postsRepository.findPosts();
   res.status(200).send(allPosts);
 });
 postsRouter.post(
@@ -48,7 +48,7 @@ postsRouter.post(
   contentValidation,
   blogIdValidation,
   inputValidationMiddleware,
-  (
+  async (
     req: Request<
       {},
       {},
@@ -62,21 +62,26 @@ postsRouter.post(
     res: Response
   ) => {
     const { title, shortDescription, content, blogId } = req.body;
-    const getBlogName = blogsRepository.findBlog(blogId)?.name;
-    const createPost = postsRepository.createPost(
+    const blog = await blogsRepository.findBlog(blogId);
+
+    if (!blog) {
+      return res.sendStatus(404);
+    }
+
+    const createPost = await postsRepository.createPost(
       title,
       shortDescription,
       content,
       blogId,
-      getBlogName as string
+      blog.name
     );
 
     return res.status(201).send(createPost);
   }
 );
-postsRouter.get("/:id", (req: Request<{ id: string }>, res: Response) => {
+postsRouter.get("/:id", async (req: Request<{ id: string }>, res: Response) => {
   const postId = req.params.id;
-  const getPost = postsRepository.findPost(postId);
+  const getPost = await postsRepository.findPost(postId);
 
   if (!getPost) {
     return res.sendStatus(404);
@@ -92,7 +97,7 @@ postsRouter.put(
   contentValidation,
   blogIdValidation,
   inputValidationMiddleware,
-  (
+  async (
     req: Request<
       { id: string },
       {},
@@ -107,35 +112,32 @@ postsRouter.put(
   ) => {
     const postId = req.params.id;
     const { title, shortDescription, content, blogId } = req.body;
-    const getPost = postsRepository.findPost(postId);
-    // const getBlogName = blogsRepository.findBlog(blogId)?.name;
 
-    if (!getPost) {
+    const getUpdatedPost = await postsRepository.updatePost(
+      postId,
+      title,
+      shortDescription,
+      content,
+      blogId
+    );
+
+    if (!getUpdatedPost) {
       return res.sendStatus(404);
-    } else {
-      const getUpdatedPost = postsRepository.updatePost(
-        getPost,
-        title,
-        shortDescription,
-        content,
-        blogId
-      );
-      return res.sendStatus(204);
     }
+    return res.sendStatus(204);
   }
 );
 postsRouter.delete(
   "/:id",
   basicAuthMiddleware,
-  (req: Request<{ id: string }>, res: Response) => {
+  async (req: Request<{ id: string }>, res: Response) => {
     const postId = req.params.id;
-    const getPost = postsRepository.findPost(postId);
 
-    if (!getPost) {
+    const getDeletedPost = await postsRepository.deletePost(postId);
+
+    if (!getDeletedPost) {
       return res.sendStatus(404);
-    } else {
-      const getDeletedPost = postsRepository.deletePost(postId);
-      return res.sendStatus(204);
     }
+    return res.sendStatus(204);
   }
 );

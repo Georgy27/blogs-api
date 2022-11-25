@@ -1,6 +1,6 @@
 import { Request, Response, Router } from "express";
-import { body, validationResult } from "express-validator";
-import { blogsRepository } from "../repositories/blogs-repositories";
+import { body } from "express-validator";
+import { blogsRepository } from "../repositories/blogs-db-repository";
 import { basicAuthMiddleware } from "../middlewares/basic-auth-middleware";
 import { inputValidationMiddleware } from "../middlewares/input-validation-middleware";
 export const blogsRouter = Router({});
@@ -24,8 +24,8 @@ const websiteValidation = body("websiteUrl")
   );
 
 // routes
-blogsRouter.get("/", (req: Request, res: Response) => {
-  const allBlogs = blogsRepository.findBlogs();
+blogsRouter.get("/", async (req: Request, res: Response) => {
+  const allBlogs = await blogsRepository.findBlogs();
   res.status(200).send(allBlogs);
 });
 
@@ -36,7 +36,7 @@ blogsRouter.post(
   descriptionValidation,
   websiteValidation,
   inputValidationMiddleware,
-  (
+  async (
     req: Request<
       {},
       {},
@@ -46,7 +46,7 @@ blogsRouter.post(
   ) => {
     const { name, description, websiteUrl } = req.body;
 
-    const createBlog = blogsRepository.createBlog(
+    const createBlog = await blogsRepository.createBlog(
       name,
       description,
       websiteUrl
@@ -56,9 +56,9 @@ blogsRouter.post(
   }
 );
 
-blogsRouter.get("/:id", (req: Request<{ id: string }>, res: Response) => {
+blogsRouter.get("/:id", async (req: Request<{ id: string }>, res: Response) => {
   const blogId = req.params.id;
-  const getBlog = blogsRepository.findBlog(blogId);
+  const getBlog = await blogsRepository.findBlog(blogId);
 
   if (!getBlog) {
     return res.sendStatus(404);
@@ -74,7 +74,7 @@ blogsRouter.put(
   descriptionValidation,
   websiteValidation,
   inputValidationMiddleware,
-  (
+  async (
     req: Request<
       { id: string },
       {},
@@ -84,33 +84,30 @@ blogsRouter.put(
   ) => {
     const blogId = req.params.id;
     const { name, description, websiteUrl } = req.body;
-    const getBlog = blogsRepository.findBlog(blogId);
-
-    if (!getBlog) {
+    const getUpdatedBlog = await blogsRepository.updateBlog(
+      blogId,
+      name,
+      description,
+      websiteUrl
+    );
+    if (!getUpdatedBlog) {
       return res.sendStatus(404);
-    } else {
-      const getUpdatedBlog = blogsRepository.updateBlog(
-        getBlog,
-        name,
-        description,
-        websiteUrl
-      );
-      return res.sendStatus(204);
     }
+    return res.sendStatus(204);
   }
 );
 blogsRouter.delete(
   "/:id",
   basicAuthMiddleware,
-  (req: Request<{ id: string }>, res: Response) => {
+  async (req: Request<{ id: string }>, res: Response) => {
     const blogId = req.params.id;
-    const getBlog = blogsRepository.findBlog(blogId);
 
-    if (!getBlog) {
+    const getDeletedBlog = await blogsRepository.deleteBlog(blogId);
+
+    if (!getDeletedBlog) {
       return res.sendStatus(404);
-    } else {
-      const getDeletedBlog = blogsRepository.deleteBlog(blogId);
-      return res.sendStatus(204);
     }
+
+    return res.sendStatus(204);
   }
 );
