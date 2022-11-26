@@ -66,7 +66,6 @@ describe("/blogs", () => {
       id: expect.any(String),
       ...productPayload,
       createdAt: expect.any(String),
-      _id: expect.any(String),
     });
   });
 

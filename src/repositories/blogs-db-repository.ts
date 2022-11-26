@@ -25,7 +25,7 @@ export const blogsRepository = {
       websiteUrl: websiteUrl,
       createdAt: new Date().toISOString(),
     };
-    await blogsCollection.insertOne(newBlog);
+    await blogsCollection.insertOne({ ...newBlog });
     return newBlog;
   },
   async findBlog(id: string): Promise<IBlogs | null> {

@@ -69,6 +69,7 @@ describe("/posts", () => {
             name: "Bob",
             description: "Just regular Bob's blog",
             websiteUrl: "https://it-incubator.io",
+            createdAt: expect.any(String),
         });
     }));
     let createdPost = null;
@@ -79,6 +80,6 @@ describe("/posts", () => {
             .send(Object.assign(Object.assign({}, productPayload), { blogId: createdBlog.id }))
             .expect(201);
         createdPost = createdResponse.body;
-        expect(createdPost).toEqual(Object.assign(Object.assign({ id: expect.any(String) }, productPayload), { blogId: createdBlog.id, blogName: createdBlog.name }));
+        expect(createdPost).toEqual(Object.assign(Object.assign({ id: expect.any(String) }, productPayload), { blogId: createdBlog.id, blogName: createdBlog.name, createdAt: expect.any(String) }));
     }));
 });

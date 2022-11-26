@@ -68,7 +68,7 @@ describe("/blogs", () => {
             .send(productPayload)
             .expect(201);
         createdBlog = createdResponse.body;
-        expect(createdBlog).toEqual(Object.assign(Object.assign({ id: expect.any(String) }, productPayload), { createdAt: expect.any(String), _id: expect.any(String) }));
+        expect(createdBlog).toEqual(Object.assign(Object.assign({ id: expect.any(String) }, productPayload), { createdAt: expect.any(String) }));
     }));
     // PUT
     it("shouldn't update a blog when the data is incorrect", () => __awaiter(void 0, void 0, void 0, function* () {

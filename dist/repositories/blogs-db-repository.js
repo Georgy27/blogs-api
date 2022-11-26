@@ -27,7 +27,7 @@ exports.blogsRepository = {
                 websiteUrl: websiteUrl,
                 createdAt: new Date().toISOString(),
             };
-            yield db_1.blogsCollection.insertOne(newBlog);
+            yield db_1.blogsCollection.insertOne(Object.assign({}, newBlog));
             return newBlog;
         });
     },

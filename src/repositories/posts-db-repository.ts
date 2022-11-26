@@ -31,7 +31,7 @@ export const postsRepository = {
       blogName: blogName,
       createdAt: new Date().toISOString(),
     };
-    await postsCollection.insertOne(newPost);
+    await postsCollection.insertOne({ ...newPost });
     return newPost;
   },
   async findPost(id: string) {

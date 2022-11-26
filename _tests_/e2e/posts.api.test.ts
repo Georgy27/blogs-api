@@ -68,6 +68,7 @@ describe("/posts", () => {
       name: "Bob",
       description: "Just regular Bob's blog",
       websiteUrl: "https://it-incubator.io",
+      createdAt: expect.any(String),
     });
   });
 
@@ -89,6 +90,7 @@ describe("/posts", () => {
       ...productPayload,
       blogId: createdBlog.id,
       blogName: createdBlog.name,
+      createdAt: expect.any(String),
     });
   });
 });
