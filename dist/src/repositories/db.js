@@ -50,7 +50,7 @@ function runDb() {
             // Connect the client to the server
             yield client.connect();
             // Establish and verify connection
-            yield client.db("learning").command({ ping: 1 });
+            // await client.db("learning").command({ ping: 1 });
             console.log("Connected successfully to mongo server");
         }
         catch (_a) {

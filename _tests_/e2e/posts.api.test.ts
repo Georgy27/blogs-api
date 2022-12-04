@@ -15,7 +15,15 @@ describe("/posts", () => {
 
   // GET
   it("should return 200 and an empty array", async () => {
-    await request(app).get("/posts").expect(200, []);
+    await request(app)
+      .get("/posts")
+      .expect(200, {
+        pagesCount: 0,
+        page: 1,
+        pageSize: 10,
+        totalCount: 0,
+        items: [],
+      });
   });
 
   // POST

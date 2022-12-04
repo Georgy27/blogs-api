@@ -9,15 +9,10 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.blogsRepository = void 0;
+exports.blogsService = void 0;
 const crypto_1 = require("crypto");
-const db_1 = require("./db");
-exports.blogsRepository = {
-    findBlogs() {
-        return __awaiter(this, void 0, void 0, function* () {
-            return db_1.blogsCollection.find({}, { projection: { _id: false } }).toArray();
-        });
-    },
+const blogs_db_repository_1 = require("../repositories/blogs-db-repository");
+exports.blogsService = {
     createBlog(name, description, websiteUrl) {
         return __awaiter(this, void 0, void 0, function* () {
             const newBlog = {
@@ -27,33 +22,17 @@ exports.blogsRepository = {
                 websiteUrl: websiteUrl,
                 createdAt: new Date().toISOString(),
             };
-            yield db_1.blogsCollection.insertOne(Object.assign({}, newBlog));
-            return newBlog;
-        });
-    },
-    findBlog(id) {
-        return __awaiter(this, void 0, void 0, function* () {
-            const blog = yield db_1.blogsCollection.findOne({ id }, { projection: { _id: false } });
-            return blog;
+            return blogs_db_repository_1.blogsRepository.createBlog(newBlog);
         });
     },
     updateBlog(blogId, name, description, websiteUrl) {
         return __awaiter(this, void 0, void 0, function* () {
-            const result = yield db_1.blogsCollection.updateOne({ id: blogId }, {
-                $set: { name, description, websiteUrl },
-            });
-            return result.matchedCount === 1;
+            return blogs_db_repository_1.blogsRepository.updateBlog(blogId, name, description, websiteUrl);
         });
     },
     deleteBlog(id) {
         return __awaiter(this, void 0, void 0, function* () {
-            const result = yield db_1.blogsCollection.deleteOne({ id });
-            return result.deletedCount === 1;
-        });
-    },
-    clearBlogs() {
-        return __awaiter(this, void 0, void 0, function* () {
-            yield db_1.blogsCollection.deleteMany({});
+            return blogs_db_repository_1.blogsRepository.deleteBlog(id);
         });
     },
 };

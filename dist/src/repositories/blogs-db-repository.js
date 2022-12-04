@@ -9,55 +9,32 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.blogsRepository = exports.blogs = void 0;
-const crypto_1 = require("crypto");
-exports.blogs = [];
+exports.blogsRepository = void 0;
+const db_1 = require("./db");
 exports.blogsRepository = {
-    findBlogs() {
+    createBlog(newBlog) {
         return __awaiter(this, void 0, void 0, function* () {
-            return exports.blogs;
-        });
-    },
-    createBlog(name, description, websiteUrl) {
-        return __awaiter(this, void 0, void 0, function* () {
-            const newBlog = {
-                id: (0, crypto_1.randomUUID)(),
-                name: name,
-                description: description,
-                websiteUrl: websiteUrl,
-            };
-            exports.blogs.push(newBlog);
+            yield db_1.blogsCollection.insertOne(Object.assign({}, newBlog));
             return newBlog;
         });
     },
-    findBlog(id) {
+    updateBlog(blogId, name, description, websiteUrl) {
         return __awaiter(this, void 0, void 0, function* () {
-            const getBlog = exports.blogs.find((blog) => {
-                return blog.id === id;
+            const result = yield db_1.blogsCollection.updateOne({ id: blogId }, {
+                $set: { name, description, websiteUrl },
             });
-            return getBlog;
-        });
-    },
-    updateBlog(blog, name, description, websiteUrl) {
-        return __awaiter(this, void 0, void 0, function* () {
-            blog.name = name;
-            blog.description = description;
-            blog.websiteUrl = websiteUrl;
-            return blog;
+            return result.matchedCount === 1;
         });
     },
     deleteBlog(id) {
         return __awaiter(this, void 0, void 0, function* () {
-            const getDeletedBlog = exports.blogs.filter((blog) => {
-                return blog.id !== id;
-            });
-            exports.blogs = getDeletedBlog;
-            return exports.blogs;
+            const result = yield db_1.blogsCollection.deleteOne({ id });
+            return result.deletedCount === 1;
         });
     },
     clearBlogs() {
         return __awaiter(this, void 0, void 0, function* () {
-            exports.blogs = [];
+            yield db_1.blogsCollection.deleteMany({});
         });
     },
 };

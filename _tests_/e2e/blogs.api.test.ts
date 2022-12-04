@@ -14,7 +14,13 @@ describe("/blogs", () => {
 
   // GET
   it("should return 200 and an empty array", async () => {
-    await request(app).get("/blogs").expect(200, []);
+    await request(app).get("/blogs").expect(200, {
+      pagesCount: 0,
+      page: 1,
+      pageSize: 10,
+      totalCount: 0,
+      items: [],
+    });
   });
   // GET:ID
   it("should return 404 if the blog doesnt exist", async () => {
@@ -117,6 +123,14 @@ describe("/blogs", () => {
 
     await request(app).get(`/blogs/${createdBlog.id}`).expect(404);
 
-    await request(app).get("/blogs").expect(200, []);
+    await request(app)
+      .get("/blogs")
+      .expect(200, {
+        pagesCount: 0,
+        page: 1,
+        pageSize: 10,
+        totalCount: 0,
+        items: [],
+      });
   });
 });

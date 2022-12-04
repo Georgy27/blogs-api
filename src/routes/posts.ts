@@ -1,10 +1,13 @@
 import { Request, Response, Router } from "express";
 import addDays from "date-fns/addDays";
-import { body } from "express-validator";
+import { body, query } from "express-validator";
 import { postsRepository } from "../repositories/posts-db-repository";
 import { blogsRepository } from "../repositories/blogs-db-repository";
 import { basicAuthMiddleware } from "../middlewares/basic-auth-middleware";
 import { inputValidationMiddleware } from "../middlewares/input-validation-middleware";
+import { blogsQueryRepository } from "../repositories/blogs-db-query-repository";
+import { postsService } from "../domain/posts-service";
+import { postsQueryRepository } from "../repositories/posts-db-query-repository";
 export const postsRouter = Router({});
 
 // middlewares
@@ -26,7 +29,7 @@ const contentValidation = body("content")
 const blogIdValidation = body("blogId")
   .isString()
   .custom(async (blogId) => {
-    const findBlogWithId = await blogsRepository.findBlog(blogId);
+    const findBlogWithId = await blogsQueryRepository.findBlog(blogId);
 
     if (!findBlogWithId) {
       throw new Error("blog with this id does not exist in the DB");
@@ -34,12 +37,40 @@ const blogIdValidation = body("blogId")
       return true;
     }
   });
-
+const pageNumberValidation = query("pageNumber").toInt().default(1);
+const pageSize = query("pageSize").toInt().default(10);
+const sortBy = query("sortBy").default("createdAt");
 // routes
-postsRouter.get("/", async (req: Request, res: Response) => {
-  const allPosts = await postsRepository.findPosts();
-  res.status(200).send(allPosts);
-});
+postsRouter.get(
+  "/",
+  pageSize,
+  sortBy,
+  pageNumberValidation,
+  async (
+    req: Request<
+      {},
+      {},
+      {},
+      {
+        sortBy: string;
+        sortDirection: string | null | undefined;
+        pageSize: number;
+        pageNumber: number;
+      }
+    >,
+    res: Response
+  ) => {
+    const { sortBy, sortDirection } = req.query;
+    const { pageSize, pageNumber } = req.query;
+    const allPosts = await postsQueryRepository.findPosts(
+      pageNumber,
+      pageSize,
+      sortBy,
+      sortDirection
+    );
+    res.status(200).send(allPosts);
+  }
+);
 postsRouter.post(
   "/",
   basicAuthMiddleware,
@@ -62,13 +93,13 @@ postsRouter.post(
     res: Response
   ) => {
     const { title, shortDescription, content, blogId } = req.body;
-    const blog = await blogsRepository.findBlog(blogId);
+    const blog = await blogsQueryRepository.findBlog(blogId);
 
     if (!blog) {
       return res.sendStatus(404);
     }
 
-    const createPost = await postsRepository.createPost(
+    const createPost = await postsService.createPost(
       title,
       shortDescription,
       content,
@@ -81,7 +112,7 @@ postsRouter.post(
 );
 postsRouter.get("/:id", async (req: Request<{ id: string }>, res: Response) => {
   const postId = req.params.id;
-  const getPost = await postsRepository.findPost(postId);
+  const getPost = await postsQueryRepository.findPost(postId);
 
   if (!getPost) {
     return res.sendStatus(404);
@@ -112,8 +143,7 @@ postsRouter.put(
   ) => {
     const postId = req.params.id;
     const { title, shortDescription, content, blogId } = req.body;
-
-    const getUpdatedPost = await postsRepository.updatePost(
+    const getUpdatedPost = await postsService.updatePost(
       postId,
       title,
       shortDescription,
@@ -132,8 +162,7 @@ postsRouter.delete(
   basicAuthMiddleware,
   async (req: Request<{ id: string }>, res: Response) => {
     const postId = req.params.id;
-
-    const getDeletedPost = await postsRepository.deletePost(postId);
+    const getDeletedPost = await postsService.deletePost(postId);
 
     if (!getDeletedPost) {
       return res.sendStatus(404);

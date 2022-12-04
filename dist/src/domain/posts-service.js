@@ -9,15 +9,10 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.postsRepository = void 0;
+exports.postsService = void 0;
 const crypto_1 = require("crypto");
-let posts = [];
-exports.postsRepository = {
-    findPosts() {
-        return __awaiter(this, void 0, void 0, function* () {
-            return posts;
-        });
-    },
+const posts_db_repository_1 = require("../repositories/posts-db-repository");
+exports.postsService = {
     createPost(title, shortDescription, content, blogId, blogName) {
         return __awaiter(this, void 0, void 0, function* () {
             const newPost = {
@@ -27,40 +22,19 @@ exports.postsRepository = {
                 content: content,
                 blogId: blogId,
                 blogName: blogName,
+                createdAt: new Date().toISOString(),
             };
-            posts.push(newPost);
-            return newPost;
+            return posts_db_repository_1.postsRepository.createPost(newPost);
         });
     },
-    findPost(id) {
+    updatePost(postId, title, shortDescription, content, blogId) {
         return __awaiter(this, void 0, void 0, function* () {
-            const getPost = posts.find((post) => {
-                return post.id === id;
-            });
-            return getPost;
-        });
-    },
-    updatePost(post, title, shortDescription, content, blogId) {
-        return __awaiter(this, void 0, void 0, function* () {
-            post.title = title;
-            post.shortDescription = shortDescription;
-            post.content = content;
-            post.blogId = blogId;
-            return post;
+            return posts_db_repository_1.postsRepository.updatePost(postId, title, shortDescription, content, blogId);
         });
     },
     deletePost(id) {
         return __awaiter(this, void 0, void 0, function* () {
-            const getDeletedPost = posts.filter((post) => {
-                return post.id !== id;
-            });
-            posts = getDeletedPost;
-            return posts;
-        });
-    },
-    clearPosts() {
-        return __awaiter(this, void 0, void 0, function* () {
-            posts = [];
+            return posts_db_repository_1.postsRepository.deletePost(id);
         });
     },
 };

@@ -10,57 +10,31 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.postsRepository = void 0;
-const crypto_1 = require("crypto");
-let posts = [];
+const db_1 = require("./db");
 exports.postsRepository = {
-    findPosts() {
+    createPost(newPost) {
         return __awaiter(this, void 0, void 0, function* () {
-            return posts;
-        });
-    },
-    createPost(title, shortDescription, content, blogId, blogName) {
-        return __awaiter(this, void 0, void 0, function* () {
-            const newPost = {
-                id: (0, crypto_1.randomUUID)(),
-                title: title,
-                shortDescription: shortDescription,
-                content: content,
-                blogId: blogId,
-                blogName: blogName,
-            };
-            posts.push(newPost);
+            yield db_1.postsCollection.insertOne(Object.assign({}, newPost));
             return newPost;
         });
     },
-    findPost(id) {
+    updatePost(postId, title, shortDescription, content, blogId) {
         return __awaiter(this, void 0, void 0, function* () {
-            const getPost = posts.find((post) => {
-                return post.id === id;
+            const result = yield db_1.postsCollection.updateOne({ id: postId }, {
+                $set: { title, shortDescription, content, blogId },
             });
-            return getPost;
-        });
-    },
-    updatePost(post, title, shortDescription, content, blogId) {
-        return __awaiter(this, void 0, void 0, function* () {
-            post.title = title;
-            post.shortDescription = shortDescription;
-            post.content = content;
-            post.blogId = blogId;
-            return post;
+            return result.matchedCount === 1;
         });
     },
     deletePost(id) {
         return __awaiter(this, void 0, void 0, function* () {
-            const getDeletedPost = posts.filter((post) => {
-                return post.id !== id;
-            });
-            posts = getDeletedPost;
-            return posts;
+            const result = yield db_1.postsCollection.deleteOne({ id });
+            return result.deletedCount === 1;
         });
     },
     clearPosts() {
         return __awaiter(this, void 0, void 0, function* () {
-            posts = [];
+            yield db_1.postsCollection.deleteMany({});
         });
     },
 };

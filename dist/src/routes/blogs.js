@@ -12,9 +12,10 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.blogsRouter = void 0;
 const express_1 = require("express");
 const express_validator_1 = require("express-validator");
-const blogs_db_repository_1 = require("../repositories/blogs-db-repository");
 const basic_auth_middleware_1 = require("../middlewares/basic-auth-middleware");
 const input_validation_middleware_1 = require("../middlewares/input-validation-middleware");
+const blogs_service_1 = require("../domain/blogs-service");
+const blogs_db_query_repository_1 = require("../repositories/blogs-db-query-repository");
 exports.blogsRouter = (0, express_1.Router)({});
 // middlewares
 const nameValidation = (0, express_validator_1.body)("name")
@@ -31,19 +32,27 @@ const descriptionValidation = (0, express_validator_1.body)("description")
 const websiteValidation = (0, express_validator_1.body)("websiteUrl")
     .isLength({ max: 100 })
     .matches("^https://([a-zA-Z0-9_-]+\\.)+[a-zA-Z0-9_-]+(\\/[a-zA-Z0-9_-]+)*\\/?$");
+const pageNumberValidation = (0, express_validator_1.query)("pageNumber").toInt().default(1);
+const pageSize = (0, express_validator_1.query)("pageSize").toInt().default(10);
+const sortBy = (0, express_validator_1.query)("sortBy").default("createdAt");
+// const sortDirection = query("sortDirection");
+// const searchNameTerm = query("searchNameTerm").default(null);
 // routes
-exports.blogsRouter.get("/", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    const allBlogs = yield blogs_db_repository_1.blogsRepository.findBlogs();
+exports.blogsRouter.get("/", pageSize, sortBy, pageNumberValidation, (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    const { searchNameTerm, sortBy, sortDirection } = req.query;
+    const { pageSize, pageNumber } = req.query;
+    console.log(searchNameTerm);
+    const allBlogs = yield blogs_db_query_repository_1.blogsQueryRepository.findBlogs(searchNameTerm, pageSize, sortBy, pageNumber, sortDirection);
     res.status(200).send(allBlogs);
 }));
 exports.blogsRouter.post("/", basic_auth_middleware_1.basicAuthMiddleware, nameValidation, descriptionValidation, websiteValidation, input_validation_middleware_1.inputValidationMiddleware, (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const { name, description, websiteUrl } = req.body;
-    const createBlog = yield blogs_db_repository_1.blogsRepository.createBlog(name, description, websiteUrl);
+    const createBlog = yield blogs_service_1.blogsService.createBlog(name, description, websiteUrl);
     return res.status(201).send(createBlog);
 }));
 exports.blogsRouter.get("/:id", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const blogId = req.params.id;
-    const getBlog = yield blogs_db_repository_1.blogsRepository.findBlog(blogId);
+    const getBlog = yield blogs_db_query_repository_1.blogsQueryRepository.findBlog(blogId);
     if (!getBlog) {
         return res.sendStatus(404);
     }
@@ -54,7 +63,7 @@ exports.blogsRouter.get("/:id", (req, res) => __awaiter(void 0, void 0, void 0, 
 exports.blogsRouter.put("/:id", basic_auth_middleware_1.basicAuthMiddleware, nameValidation, descriptionValidation, websiteValidation, input_validation_middleware_1.inputValidationMiddleware, (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const blogId = req.params.id;
     const { name, description, websiteUrl } = req.body;
-    const getUpdatedBlog = yield blogs_db_repository_1.blogsRepository.updateBlog(blogId, name, description, websiteUrl);
+    const getUpdatedBlog = yield blogs_service_1.blogsService.updateBlog(blogId, name, description, websiteUrl);
     if (!getUpdatedBlog) {
         return res.sendStatus(404);
     }
@@ -62,7 +71,7 @@ exports.blogsRouter.put("/:id", basic_auth_middleware_1.basicAuthMiddleware, nam
 }));
 exports.blogsRouter.delete("/:id", basic_auth_middleware_1.basicAuthMiddleware, (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const blogId = req.params.id;
-    const getDeletedBlog = yield blogs_db_repository_1.blogsRepository.deleteBlog(blogId);
+    const getDeletedBlog = yield blogs_service_1.blogsService.deleteBlog(blogId);
     if (!getDeletedBlog) {
         return res.sendStatus(404);
     }

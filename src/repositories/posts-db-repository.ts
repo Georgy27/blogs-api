@@ -12,34 +12,9 @@ export interface IPosts {
 }
 
 export const postsRepository = {
-  async findPosts() {
-    return postsCollection.find({}, { projection: { _id: false } }).toArray();
-  },
-  async createPost(
-    title: string,
-    shortDescription: string,
-    content: string,
-    blogId: string,
-    blogName: string
-  ) {
-    const newPost = {
-      id: randomUUID(),
-      title: title,
-      shortDescription: shortDescription,
-      content: content,
-      blogId: blogId,
-      blogName: blogName,
-      createdAt: new Date().toISOString(),
-    };
+  async createPost(newPost: IPosts): Promise<IPosts> {
     await postsCollection.insertOne({ ...newPost });
     return newPost;
-  },
-  async findPost(id: string) {
-    const post = await postsCollection.findOne(
-      { id },
-      { projection: { _id: false } }
-    );
-    return post;
   },
   async updatePost(
     postId: string,
