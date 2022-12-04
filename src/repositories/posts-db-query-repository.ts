@@ -23,19 +23,26 @@ export const postsQueryRepository = {
     pageNumber: number,
     pageSize: number,
     sortBy: string,
-    sortDirection: string | undefined | null
+    sortDirection: string | undefined | null,
+    blogId?: string
   ): Promise<IPosts> {
+    const filter: any = {};
+
+    if (blogId) {
+      filter.blogId = { $regex: blogId };
+    }
+    console.log(filter);
     const posts: IPost[] = await postsCollection
-      .find({}, { projection: { _id: false } })
+      .find(filter, { projection: { _id: false } })
       .sort({ [sortBy]: sortDirection === "asc" ? 1 : -1 })
       .skip((pageNumber - 1) * pageSize)
       .limit(pageSize)
       .toArray();
     const numberOfPosts = await postsCollection.count(
-      {},
+      { filter },
       { skip: (pageNumber - 1) * pageSize, limit: pageSize }
     );
-
+    console.log(posts);
     return {
       pagesCount: Math.ceil(numberOfPosts / pageSize),
       page: pageNumber,

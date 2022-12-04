@@ -11,22 +11,22 @@ import { postsQueryRepository } from "../repositories/posts-db-query-repository"
 export const postsRouter = Router({});
 
 // middlewares
-const titleValidation = body("title")
+export const titleValidation = body("title")
   .isString()
   .trim()
   .notEmpty()
   .isLength({ max: 30 });
-const shortDescriptionValidation = body("shortDescription")
+export const shortDescriptionValidation = body("shortDescription")
   .isString()
   .trim()
   .notEmpty()
   .isLength({ max: 100 });
-const contentValidation = body("content")
+export const contentValidation = body("content")
   .isString()
   .trim()
   .notEmpty()
   .isLength({ max: 1000 });
-const blogIdValidation = body("blogId")
+export const blogIdValidation = body("blogId")
   .isString()
   .custom(async (blogId) => {
     const findBlogWithId = await blogsQueryRepository.findBlog(blogId);

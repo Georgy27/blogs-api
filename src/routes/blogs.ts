@@ -5,6 +5,14 @@ import { basicAuthMiddleware } from "../middlewares/basic-auth-middleware";
 import { inputValidationMiddleware } from "../middlewares/input-validation-middleware";
 import { blogsService } from "../domain/blogs-service";
 import { blogsQueryRepository } from "../repositories/blogs-db-query-repository";
+import {
+  blogIdValidation,
+  contentValidation,
+  shortDescriptionValidation,
+  titleValidation,
+} from "./posts";
+import { postsService } from "../domain/posts-service";
+import { postsQueryRepository } from "../repositories/posts-db-query-repository";
 export const blogsRouter = Router({});
 
 // middlewares
@@ -65,6 +73,45 @@ blogsRouter.get(
   }
 );
 
+// returns all posts for specified blog
+blogsRouter.get(
+  "/:blogId/posts",
+  pageSize,
+  sortBy,
+  pageNumberValidation,
+  async (
+    req: Request<
+      { blogId: string },
+      {},
+      {},
+      {
+        sortBy: string;
+        sortDirection: string | null | undefined;
+        pageSize: number;
+        pageNumber: number;
+      }
+    >,
+    res: Response
+  ) => {
+    const { sortBy, sortDirection } = req.query;
+    const { pageSize, pageNumber } = req.query;
+    const blogId = req.params.blogId;
+    const getBlogById = await blogsQueryRepository.findBlog(blogId);
+
+    if (!getBlogById) {
+      return res.sendStatus(404);
+    }
+    const allPostsWithId = await postsQueryRepository.findPosts(
+      pageNumber,
+      pageSize,
+      sortBy,
+      sortDirection,
+      blogId
+    );
+    res.status(200).send(allPostsWithId);
+  }
+);
+
 blogsRouter.post(
   "/",
   basicAuthMiddleware,
@@ -89,6 +136,45 @@ blogsRouter.post(
     );
 
     return res.status(201).send(createBlog);
+  }
+);
+// creates new post for specific route
+blogsRouter.post(
+  "/:blogId/posts",
+  basicAuthMiddleware,
+  titleValidation,
+  shortDescriptionValidation,
+  contentValidation,
+  inputValidationMiddleware,
+  async (
+    req: Request<
+      { blogId: string },
+      {},
+      {
+        title: string;
+        shortDescription: string;
+        content: string;
+      }
+    >,
+    res: Response
+  ) => {
+    const { title, shortDescription, content } = req.body;
+    const blogId = req.params.blogId;
+    const blog = await blogsQueryRepository.findBlog(blogId);
+
+    if (!blog) {
+      return res.sendStatus(404);
+    }
+
+    const createPost = await postsService.createPost(
+      title,
+      shortDescription,
+      content,
+      blogId,
+      blog.name
+    );
+
+    return res.status(201).send(createPost);
   }
 );
 

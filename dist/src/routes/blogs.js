@@ -16,6 +16,9 @@ const basic_auth_middleware_1 = require("../middlewares/basic-auth-middleware");
 const input_validation_middleware_1 = require("../middlewares/input-validation-middleware");
 const blogs_service_1 = require("../domain/blogs-service");
 const blogs_db_query_repository_1 = require("../repositories/blogs-db-query-repository");
+const posts_1 = require("./posts");
+const posts_service_1 = require("../domain/posts-service");
+const posts_db_query_repository_1 = require("../repositories/posts-db-query-repository");
 exports.blogsRouter = (0, express_1.Router)({});
 // middlewares
 const nameValidation = (0, express_validator_1.body)("name")
@@ -45,10 +48,33 @@ exports.blogsRouter.get("/", pageSize, sortBy, pageNumberValidation, (req, res) 
     const allBlogs = yield blogs_db_query_repository_1.blogsQueryRepository.findBlogs(searchNameTerm, pageSize, sortBy, pageNumber, sortDirection);
     res.status(200).send(allBlogs);
 }));
+// returns all posts for specified blog
+exports.blogsRouter.get("/:blogId/posts", pageSize, sortBy, pageNumberValidation, (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    const { sortBy, sortDirection } = req.query;
+    const { pageSize, pageNumber } = req.query;
+    const blogId = req.params.blogId;
+    const getBlogById = yield blogs_db_query_repository_1.blogsQueryRepository.findBlog(blogId);
+    if (!getBlogById) {
+        return res.sendStatus(404);
+    }
+    const allPostsWithId = yield posts_db_query_repository_1.postsQueryRepository.findPosts(pageNumber, pageSize, sortBy, sortDirection, blogId);
+    res.status(200).send(allPostsWithId);
+}));
 exports.blogsRouter.post("/", basic_auth_middleware_1.basicAuthMiddleware, nameValidation, descriptionValidation, websiteValidation, input_validation_middleware_1.inputValidationMiddleware, (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const { name, description, websiteUrl } = req.body;
     const createBlog = yield blogs_service_1.blogsService.createBlog(name, description, websiteUrl);
     return res.status(201).send(createBlog);
+}));
+// creates new post for specific route
+exports.blogsRouter.post("/:blogId/posts", basic_auth_middleware_1.basicAuthMiddleware, posts_1.titleValidation, posts_1.shortDescriptionValidation, posts_1.contentValidation, input_validation_middleware_1.inputValidationMiddleware, (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    const { title, shortDescription, content } = req.body;
+    const blogId = req.params.blogId;
+    const blog = yield blogs_db_query_repository_1.blogsQueryRepository.findBlog(blogId);
+    if (!blog) {
+        return res.sendStatus(404);
+    }
+    const createPost = yield posts_service_1.postsService.createPost(title, shortDescription, content, blogId, blog.name);
+    return res.status(201).send(createPost);
 }));
 exports.blogsRouter.get("/:id", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const blogId = req.params.id;

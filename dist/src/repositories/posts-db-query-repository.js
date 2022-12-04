@@ -12,15 +12,21 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.postsQueryRepository = void 0;
 const db_1 = require("./db");
 exports.postsQueryRepository = {
-    findPosts(pageNumber, pageSize, sortBy, sortDirection) {
+    findPosts(pageNumber, pageSize, sortBy, sortDirection, blogId) {
         return __awaiter(this, void 0, void 0, function* () {
+            const filter = {};
+            if (blogId) {
+                filter.blogId = { $regex: blogId };
+            }
+            console.log(filter);
             const posts = yield db_1.postsCollection
-                .find({}, { projection: { _id: false } })
+                .find(filter, { projection: { _id: false } })
                 .sort({ [sortBy]: sortDirection === "asc" ? 1 : -1 })
                 .skip((pageNumber - 1) * pageSize)
                 .limit(pageSize)
                 .toArray();
-            const numberOfPosts = yield db_1.postsCollection.count({}, { skip: (pageNumber - 1) * pageSize, limit: pageSize });
+            const numberOfPosts = yield db_1.postsCollection.count({ filter }, { skip: (pageNumber - 1) * pageSize, limit: pageSize });
+            console.log(posts);
             return {
                 pagesCount: Math.ceil(numberOfPosts / pageSize),
                 page: pageNumber,
