@@ -23,11 +23,12 @@ export const blogsQueryRepository = {
     pageNumber: number,
     sortDirection: string | undefined | null
   ): Promise<IBlogs> {
-    const filter: Partial<Record<keyof Omit<IBlog, "id">, { $regex: string }>> =
-      {};
+    const filter: Partial<
+      Record<keyof Omit<IBlog, "id">, { $regex: string; $options: string }>
+    > = {};
 
     if (searchNameTerm) {
-      filter.name = { $regex: searchNameTerm };
+      filter.name = { $regex: searchNameTerm, $options: "i" };
     }
 
     const blogs: IBlog[] = await blogsCollection

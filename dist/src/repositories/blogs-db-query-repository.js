@@ -16,7 +16,7 @@ exports.blogsQueryRepository = {
         return __awaiter(this, void 0, void 0, function* () {
             const filter = {};
             if (searchNameTerm) {
-                filter.name = { $regex: searchNameTerm };
+                filter.name = { $regex: searchNameTerm, $options: "i" };
             }
             const blogs = yield db_1.blogsCollection
                 .find(filter, { projection: { _id: false } })
