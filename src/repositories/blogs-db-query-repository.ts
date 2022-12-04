@@ -36,11 +36,7 @@ export const blogsQueryRepository = {
       .skip((pageNumber - 1) * pageSize)
       .limit(pageSize)
       .toArray();
-    const numberOfBlogs = await blogsCollection.count(
-      { filter },
-      { skip: (pageNumber - 1) * pageSize, limit: pageSize }
-    );
-    console.log(numberOfBlogs);
+    const numberOfBlogs = await blogsCollection.count(filter);
 
     return {
       pagesCount: Math.ceil(numberOfBlogs / pageSize),

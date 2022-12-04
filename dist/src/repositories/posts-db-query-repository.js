@@ -25,8 +25,7 @@ exports.postsQueryRepository = {
                 .skip((pageNumber - 1) * pageSize)
                 .limit(pageSize)
                 .toArray();
-            const numberOfPosts = yield db_1.postsCollection.count({ filter }, { skip: (pageNumber - 1) * pageSize, limit: pageSize });
-            console.log(posts);
+            const numberOfPosts = yield db_1.postsCollection.count(filter);
             return {
                 pagesCount: Math.ceil(numberOfPosts / pageSize),
                 page: pageNumber,
