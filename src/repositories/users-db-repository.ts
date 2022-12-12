@@ -1,5 +1,5 @@
 import { UsersDBModel } from "../models/users-model/UsersDBModel";
-import { usersCollection } from "./db";
+import { postsCollection, usersCollection } from "./db";
 import { UsersDBViewModel } from "../models/users-model/UsersDBViewModel";
 
 export const usersRepository = {
@@ -21,5 +21,8 @@ export const usersRepository = {
       $or: [{ email: loginOrEmail }, { login: loginOrEmail }],
     });
     return user;
+  },
+  async clearUsers() {
+    await usersCollection.deleteMany({});
   },
 };
