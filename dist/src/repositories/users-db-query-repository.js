@@ -15,14 +15,15 @@ exports.usersQueryRepository = {
     findUsers(pageNumber, pageSize, sortBy, sortDirection, searchLoginTerm, searchEmailTerm) {
         return __awaiter(this, void 0, void 0, function* () {
             const filter = {};
+            const filter2 = {};
             if (searchLoginTerm) {
                 filter.login = { $regex: searchLoginTerm, $options: "i" };
             }
             if (searchEmailTerm) {
-                filter.email = { $regex: searchEmailTerm, $options: "i" };
+                filter2.email = { $regex: searchEmailTerm, $options: "i" };
             }
             const users = yield db_1.usersCollection
-                .find(filter, {
+                .find({ $or: [filter, filter2] }, {
                 projection: { _id: false, passwordHash: false },
             })
                 .sort({ [sortBy]: sortDirection === "asc" ? 1 : -1 })

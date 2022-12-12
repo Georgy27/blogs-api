@@ -11,18 +11,21 @@ export const usersQueryRepository = {
     searchEmailTerm: string | undefined | null
   ): Promise<UsersViewModel> {
     const filter: any = {};
-
+    const filter2: any = {};
     if (searchLoginTerm) {
       filter.login = { $regex: searchLoginTerm, $options: "i" };
     }
     if (searchEmailTerm) {
-      filter.email = { $regex: searchEmailTerm, $options: "i" };
+      filter2.email = { $regex: searchEmailTerm, $options: "i" };
     }
 
     const users = await usersCollection
-      .find(filter, {
-        projection: { _id: false, passwordHash: false },
-      })
+      .find(
+        { $or: [filter, filter2] },
+        {
+          projection: { _id: false, passwordHash: false },
+        }
+      )
       .sort({ [sortBy]: sortDirection === "asc" ? 1 : -1 })
       .skip((pageNumber - 1) * pageSize)
       .limit(pageSize)
