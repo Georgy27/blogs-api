@@ -1,38 +1,22 @@
-import { randomUUID } from "crypto";
 import { blogsCollection, postsCollection } from "./db";
-
-interface IPost {
-  id: string;
-  title: string;
-  shortDescription: string;
-  content: string;
-  blogId: string;
-  blogName: string;
-  createdAt: string;
-}
-interface IPosts {
-  pagesCount: number;
-  page: number;
-  pageSize: number;
-  totalCount: number;
-  items: IPost[];
-}
+import { PostsViewModel } from "../models/posts-model/PostsViewModel";
+import { PostsDBModel } from "../models/posts-model/PostsDBModel";
 
 export const postsQueryRepository = {
   async findPosts(
     pageNumber: number,
     pageSize: number,
     sortBy: string,
-    sortDirection: string | undefined | null,
+    sortDirection: string | undefined,
     blogId?: string
-  ): Promise<IPosts> {
+  ): Promise<PostsViewModel> {
     const filter: any = {};
 
     if (blogId) {
       filter.blogId = { $regex: blogId };
     }
     console.log(filter);
-    const posts: IPost[] = await postsCollection
+    const posts: PostsDBModel[] = await postsCollection
       .find(filter, { projection: { _id: false } })
       .sort({ [sortBy]: sortDirection === "asc" ? 1 : -1 })
       .skip((pageNumber - 1) * pageSize)

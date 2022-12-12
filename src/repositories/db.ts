@@ -1,7 +1,8 @@
 import { MongoClient } from "mongodb";
-import { IBlogs } from "./blogs-db-repository";
-import { IPosts } from "./posts-db-repository";
 import * as dotenv from "dotenv";
+import { BlogsDBModel } from "../models/blogs-model/BlogsDBModel";
+import { PostsDBModel } from "../models/posts-model/PostsDBModel";
+import { UsersDBModel } from "../models/users-model/UsersDBModel";
 dotenv.config();
 
 const mongoUrl = process.env.MONGO_URL;
@@ -11,8 +12,9 @@ if (!mongoUrl) {
 }
 const client = new MongoClient(mongoUrl);
 export const db = client.db("blog-api");
-export const blogsCollection = db.collection<IBlogs>("blogs", {});
-export const postsCollection = db.collection<IPosts>("posts");
+export const blogsCollection = db.collection<BlogsDBModel>("blogs", {});
+export const postsCollection = db.collection<PostsDBModel>("posts");
+export const usersCollection = db.collection<UsersDBModel>("users");
 
 export async function runDb() {
   try {

@@ -1,18 +1,9 @@
 import { randomUUID } from "crypto";
 import { blogsCollection, postsCollection } from "./db";
-
-export interface IPosts {
-  id: string;
-  title: string;
-  shortDescription: string;
-  content: string;
-  blogId: string;
-  blogName: string;
-  createdAt: string;
-}
+import { PostsDBModel } from "../models/posts-model/PostsDBModel";
 
 export const postsRepository = {
-  async createPost(newPost: IPosts): Promise<IPosts> {
+  async createPost(newPost: PostsDBModel): Promise<PostsDBModel> {
     await postsCollection.insertOne({ ...newPost });
     return newPost;
   },

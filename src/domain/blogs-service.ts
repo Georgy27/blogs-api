@@ -1,13 +1,14 @@
 import { randomUUID } from "crypto";
-import { blogsRepository, IBlogs } from "../repositories/blogs-db-repository";
+import { blogsRepository } from "../repositories/blogs-db-repository";
+import { BlogsDBModel } from "../models/blogs-model/BlogsDBModel";
 
 export const blogsService = {
   async createBlog(
     name: string,
     description: string,
     websiteUrl: string
-  ): Promise<IBlogs> {
-    const newBlog: IBlogs = {
+  ): Promise<BlogsDBModel> {
+    const newBlog: BlogsDBModel = {
       id: randomUUID(),
       name: name,
       description: description,

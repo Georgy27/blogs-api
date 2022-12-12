@@ -1,16 +1,8 @@
-import { randomUUID } from "crypto";
 import { blogsCollection } from "./db";
-
-export interface IBlogs {
-  id: string;
-  name: string;
-  description: string;
-  websiteUrl: string;
-  createdAt: string;
-}
+import { BlogsDBModel } from "../models/blogs-model/BlogsDBModel";
 
 export const blogsRepository = {
-  async createBlog(newBlog: IBlogs): Promise<IBlogs> {
+  async createBlog(newBlog: BlogsDBModel): Promise<BlogsDBModel> {
     await blogsCollection.insertOne({ ...newBlog });
     return newBlog;
   },

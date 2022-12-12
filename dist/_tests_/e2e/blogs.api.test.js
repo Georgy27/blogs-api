@@ -19,7 +19,7 @@ const productPayload = {
     description: "Just regular Bob's blog",
     websiteUrl: "https://it-incubator.io",
 };
-describe("/blogs", () => {
+describe("/blogs-model", () => {
     beforeAll(() => __awaiter(void 0, void 0, void 0, function* () {
         yield (0, supertest_1.default)(src_1.app).delete("/testing/all-data");
     }));
@@ -115,9 +115,7 @@ describe("/blogs", () => {
             .set("Authorization", `Basic YWRtaW46cXdlcnR5`)
             .expect(204);
         yield (0, supertest_1.default)(src_1.app).get(`/blogs/${createdBlog.id}`).expect(404);
-        yield (0, supertest_1.default)(src_1.app)
-            .get("/blogs")
-            .expect(200, {
+        yield (0, supertest_1.default)(src_1.app).get("/blogs").expect(200, {
             pagesCount: 0,
             page: 1,
             pageSize: 10,

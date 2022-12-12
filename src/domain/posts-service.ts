@@ -1,5 +1,6 @@
 import { randomUUID } from "crypto";
-import { IPosts, postsRepository } from "../repositories/posts-db-repository";
+import { postsRepository } from "../repositories/posts-db-repository";
+import { PostsDBModel } from "../models/posts-model/PostsDBModel";
 
 export const postsService = {
   async createPost(
@@ -8,7 +9,7 @@ export const postsService = {
     content: string,
     blogId: string,
     blogName: string
-  ): Promise<IPosts> {
+  ): Promise<PostsDBModel> {
     const newPost = {
       id: randomUUID(),
       title: title,

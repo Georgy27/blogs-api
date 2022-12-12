@@ -7,7 +7,7 @@ const productPayload = {
   websiteUrl: "https://it-incubator.io",
 };
 
-describe("/blogs", () => {
+describe("/blogs-model", () => {
   beforeAll(async () => {
     await request(app).delete("/testing/all-data");
   });
@@ -123,14 +123,12 @@ describe("/blogs", () => {
 
     await request(app).get(`/blogs/${createdBlog.id}`).expect(404);
 
-    await request(app)
-      .get("/blogs")
-      .expect(200, {
-        pagesCount: 0,
-        page: 1,
-        pageSize: 10,
-        totalCount: 0,
-        items: [],
-      });
+    await request(app).get("/blogs").expect(200, {
+      pagesCount: 0,
+      page: 1,
+      pageSize: 10,
+      totalCount: 0,
+      items: [],
+    });
   });
 });

@@ -1,42 +1,36 @@
 import { Request, Response, Router, NextFunction } from "express";
 import { body, query } from "express-validator";
-import { blogsRepository } from "../repositories/blogs-db-repository";
 import { basicAuthMiddleware } from "../middlewares/basic-auth-middleware";
 import { inputValidationMiddleware } from "../middlewares/input-validation-middleware";
 import { blogsService } from "../domain/blogs-service";
 import { blogsQueryRepository } from "../repositories/blogs-db-query-repository";
-import {
-  blogIdValidation,
-  contentValidation,
-  shortDescriptionValidation,
-  titleValidation,
-} from "./posts";
 import { postsService } from "../domain/posts-service";
 import { postsQueryRepository } from "../repositories/posts-db-query-repository";
+import {
+  RequestWithBody,
+  RequestWithParams,
+  RequestWithParamsAndBody,
+  RequestWithParamsAndQuery,
+  RequestWithQuery,
+} from "../types";
+import { CreateBlogModel } from "../models/blogs-model/CreateBlogModel";
+import { CreatePostForBLogIdModel } from "../models/blogs-model/CreatePostForBlogIdModel";
+import { UpdateBlogModel } from "../models/blogs-model/UpdateBlogModel";
+import { QueryBlogModel } from "../models/blogs-model/QueryBlogModel";
+import { QueryPostForBlogIdModel } from "../models/blogs-model/QueryPostForBlogIdModel";
+import { BlogsViewModel } from "../models/blogs-model/BlogsViewModel";
+import { nameValidation } from "../middlewares/blogs-middleware/nameValidation";
+import { descriptionValidation } from "../middlewares/blogs-middleware/descriptionValidation";
+import { websiteValidation } from "../middlewares/blogs-middleware/websiteValidation";
+import {
+  pageNumberValidation,
+  pageSize,
+  sortBy,
+} from "../middlewares/sorting&pagination-middleware";
+import { contentValidation } from "../middlewares/posts-middleware/contentValidation";
+import { titleValidation } from "../middlewares/posts-middleware/titleValidation";
+import { shortDescriptionValidation } from "../middlewares/posts-middleware/shortDescriptionValidation";
 export const blogsRouter = Router({});
-
-// middlewares
-const nameValidation = body("name")
-  .isString()
-  .trim()
-  .notEmpty()
-  .isLength({ max: 15 })
-  .withMessage("name can not be longer than 15 characters");
-const descriptionValidation = body("description")
-  .isString()
-  .trim()
-  .notEmpty()
-  .isLength({ max: 500 });
-const websiteValidation = body("websiteUrl")
-  .isLength({ max: 100 })
-  .matches(
-    "^https://([a-zA-Z0-9_-]+\\.)+[a-zA-Z0-9_-]+(\\/[a-zA-Z0-9_-]+)*\\/?$"
-  );
-const pageNumberValidation = query("pageNumber").toInt().default(1);
-const pageSize = query("pageSize").toInt().default(10);
-const sortBy = query("sortBy").default("createdAt");
-// const sortDirection = query("sortDirection");
-// const searchNameTerm = query("searchNameTerm").default(null);
 
 // routes
 blogsRouter.get(
@@ -45,23 +39,11 @@ blogsRouter.get(
   sortBy,
   pageNumberValidation,
   async (
-    req: Request<
-      {},
-      {},
-      {},
-      {
-        searchNameTerm: string | null | undefined;
-        sortBy: string;
-        sortDirection: string | null | undefined;
-        pageSize: number;
-        pageNumber: number;
-      }
-    >,
-    res: Response
+    req: RequestWithQuery<QueryBlogModel>,
+    res: Response<BlogsViewModel>
   ) => {
     const { searchNameTerm, sortBy, sortDirection } = req.query;
     const { pageSize, pageNumber } = req.query;
-    console.log(searchNameTerm);
     const allBlogs = await blogsQueryRepository.findBlogs(
       searchNameTerm,
       pageSize,
@@ -80,17 +62,7 @@ blogsRouter.get(
   sortBy,
   pageNumberValidation,
   async (
-    req: Request<
-      { blogId: string },
-      {},
-      {},
-      {
-        sortBy: string;
-        sortDirection: string | null | undefined;
-        pageSize: number;
-        pageNumber: number;
-      }
-    >,
+    req: RequestWithParamsAndQuery<{ blogId: string }, QueryPostForBlogIdModel>,
     res: Response
   ) => {
     const { sortBy, sortDirection } = req.query;
@@ -119,14 +91,7 @@ blogsRouter.post(
   descriptionValidation,
   websiteValidation,
   inputValidationMiddleware,
-  async (
-    req: Request<
-      {},
-      {},
-      { name: string; description: string; websiteUrl: string }
-    >,
-    res: Response
-  ) => {
+  async (req: RequestWithBody<CreateBlogModel>, res: Response) => {
     const { name, description, websiteUrl } = req.body;
 
     const createBlog = await blogsService.createBlog(
@@ -138,7 +103,7 @@ blogsRouter.post(
     return res.status(201).send(createBlog);
   }
 );
-// creates new post for specific route
+// creates new post for specific blog
 blogsRouter.post(
   "/:blogId/posts",
   basicAuthMiddleware,
@@ -147,15 +112,7 @@ blogsRouter.post(
   contentValidation,
   inputValidationMiddleware,
   async (
-    req: Request<
-      { blogId: string },
-      {},
-      {
-        title: string;
-        shortDescription: string;
-        content: string;
-      }
-    >,
+    req: RequestWithParamsAndBody<{ blogId: string }, CreatePostForBLogIdModel>,
     res: Response
   ) => {
     const { title, shortDescription, content } = req.body;
@@ -178,16 +135,19 @@ blogsRouter.post(
   }
 );
 
-blogsRouter.get("/:id", async (req: Request<{ id: string }>, res: Response) => {
-  const blogId = req.params.id;
-  const getBlog = await blogsQueryRepository.findBlog(blogId);
+blogsRouter.get(
+  "/:id",
+  async (req: RequestWithParams<{ id: string }>, res: Response) => {
+    const blogId = req.params.id;
+    const getBlog = await blogsQueryRepository.findBlog(blogId);
 
-  if (!getBlog) {
-    return res.sendStatus(404);
-  } else {
-    return res.status(200).send(getBlog);
+    if (!getBlog) {
+      return res.sendStatus(404);
+    } else {
+      return res.status(200).send(getBlog);
+    }
   }
-});
+);
 
 blogsRouter.put(
   "/:id",
@@ -197,11 +157,7 @@ blogsRouter.put(
   websiteValidation,
   inputValidationMiddleware,
   async (
-    req: Request<
-      { id: string },
-      {},
-      { name: string; description: string; websiteUrl: string }
-    >,
+    req: RequestWithParamsAndBody<{ id: string }, UpdateBlogModel>,
     res: Response
   ) => {
     const blogId = req.params.id;
@@ -221,7 +177,7 @@ blogsRouter.put(
 blogsRouter.delete(
   "/:id",
   basicAuthMiddleware,
-  async (req: Request<{ id: string }>, res: Response) => {
+  async (req: RequestWithParams<{ id: string }>, res: Response) => {
     const blogId = req.params.id;
 
     const getDeletedBlog = await blogsService.deleteBlog(blogId);

@@ -1,37 +1,27 @@
 import { blogsCollection } from "./db";
-
-interface IBlog {
-  id: string;
-  name: string;
-  description: string;
-  websiteUrl: string;
-  createdAt: string;
-}
-interface IBlogs {
-  pagesCount: number;
-  page: number;
-  pageSize: number;
-  totalCount: number;
-  items: IBlog[];
-}
+import { BlogsViewModel } from "../models/blogs-model/BlogsViewModel";
+import { BlogsDBModel } from "../models/blogs-model/BlogsDBModel";
 
 export const blogsQueryRepository = {
   async findBlogs(
-    searchNameTerm: string | undefined | null,
+    searchNameTerm: string | undefined,
     pageSize: number,
     sortBy: string,
     pageNumber: number,
-    sortDirection: string | undefined | null
-  ): Promise<IBlogs> {
+    sortDirection: string | undefined
+  ): Promise<BlogsViewModel> {
     const filter: Partial<
-      Record<keyof Omit<IBlog, "id">, { $regex: string; $options: string }>
+      Record<
+        keyof Omit<BlogsDBModel, "id">,
+        { $regex: string; $options: string }
+      >
     > = {};
 
     if (searchNameTerm) {
       filter.name = { $regex: searchNameTerm, $options: "i" };
     }
 
-    const blogs: IBlog[] = await blogsCollection
+    const blogs: BlogsDBModel[] = await blogsCollection
       .find(filter, { projection: { _id: false } })
       .sort({ [sortBy]: sortDirection === "asc" ? 1 : -1 })
       .skip((pageNumber - 1) * pageSize)
@@ -48,7 +38,7 @@ export const blogsQueryRepository = {
     };
   },
 
-  async findBlog(id: string): Promise<IBlog | null> {
+  async findBlog(id: string): Promise<BlogsDBModel | null> {
     const blog = await blogsCollection.findOne(
       { id },
       { projection: { _id: false } }
