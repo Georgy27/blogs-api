@@ -19,6 +19,7 @@ const posts_1 = require("./routes/posts");
 const testing_1 = require("./routes/testing");
 const db_1 = require("./repositories/db");
 const users_1 = require("./routes/users");
+const auth_1 = require("./routes/auth");
 // remove app to a different folder
 exports.app = (0, express_1.default)();
 const port = 3000;
@@ -29,6 +30,7 @@ exports.app.use("/testing/all-data", testing_1.testingRouter);
 exports.app.use("/blogs", blogs_1.blogsRouter);
 exports.app.use("/posts", posts_1.postsRouter);
 exports.app.use("/users", users_1.usersRouter);
+exports.app.use("/auth/login", auth_1.authRouter);
 const startApp = () => __awaiter(void 0, void 0, void 0, function* () {
     yield (0, db_1.runDb)();
     exports.app.listen(port, () => {

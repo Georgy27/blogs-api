@@ -4,7 +4,7 @@ import { BlogsDBModel } from "../models/blogs-model/BlogsDBModel";
 
 export const blogsQueryRepository = {
   async findBlogs(
-    searchNameTerm: string | undefined,
+    searchNameTerm: string | undefined | null,
     pageSize: number,
     sortBy: string,
     pageNumber: number,

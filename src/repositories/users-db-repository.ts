@@ -12,4 +12,14 @@ export const usersRepository = {
       createdAt: user.createdAt,
     };
   },
+  async deleteUser(id: string) {
+    const result = await usersCollection.deleteOne({ id });
+    return result.deletedCount === 1;
+  },
+  async findLoginOrEmail(loginOrEmail: string): Promise<UsersDBModel | null> {
+    const user = await usersCollection.findOne({
+      $or: [{ email: loginOrEmail }, { login: loginOrEmail }],
+    });
+    return user;
+  },
 };

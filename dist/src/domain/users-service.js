@@ -31,6 +31,20 @@ exports.usersService = {
             return users_db_repository_1.usersRepository.createUser(newUser);
         });
     },
+    deleteUser(id) {
+        return __awaiter(this, void 0, void 0, function* () {
+            return users_db_repository_1.usersRepository.deleteUser(id);
+        });
+    },
+    checkCredentials(loginOrEmail, password) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const user = yield users_db_repository_1.usersRepository.findLoginOrEmail(loginOrEmail);
+            if (!user)
+                return false;
+            const check = bcrypt_1.default.compare(password, user.passwordHash);
+            return check;
+        });
+    },
     _generateHash(password, salt) {
         return __awaiter(this, void 0, void 0, function* () {
             const hash = yield bcrypt_1.default.hash(password, salt);

@@ -30,6 +30,7 @@ import {
 import { contentValidation } from "../middlewares/posts-middleware/contentValidation";
 import { titleValidation } from "../middlewares/posts-middleware/titleValidation";
 import { shortDescriptionValidation } from "../middlewares/posts-middleware/shortDescriptionValidation";
+import { PostsViewModel } from "../models/posts-model/PostsViewModel";
 export const blogsRouter = Router({});
 
 // routes
@@ -63,7 +64,7 @@ blogsRouter.get(
   pageNumberValidation,
   async (
     req: RequestWithParamsAndQuery<{ blogId: string }, QueryPostForBlogIdModel>,
-    res: Response
+    res: Response<PostsViewModel>
   ) => {
     const { sortBy, sortDirection } = req.query;
     const { pageSize, pageNumber } = req.query;

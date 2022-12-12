@@ -3,6 +3,6 @@ export type QueryUserModel = {
   pageSize: number;
   sortBy: string;
   sortDirection: string | undefined;
-  searchLoginTerm: string | undefined;
-  searchEmailTerm: string | undefined;
+  searchLoginTerm: string | undefined | null;
+  searchEmailTerm: string | undefined | null;
 };

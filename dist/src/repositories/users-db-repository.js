@@ -23,4 +23,18 @@ exports.usersRepository = {
             };
         });
     },
+    deleteUser(id) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const result = yield db_1.usersCollection.deleteOne({ id });
+            return result.deletedCount === 1;
+        });
+    },
+    findLoginOrEmail(loginOrEmail) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const user = yield db_1.usersCollection.findOne({
+                $or: [{ email: loginOrEmail }, { login: loginOrEmail }],
+            });
+            return user;
+        });
+    },
 };

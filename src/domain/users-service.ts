@@ -21,6 +21,16 @@ export const usersService = {
     };
     return usersRepository.createUser(newUser);
   },
+  async deleteUser(id: string): Promise<boolean> {
+    return usersRepository.deleteUser(id);
+  },
+  async checkCredentials(loginOrEmail: string, password: string) {
+    const user = await usersRepository.findLoginOrEmail(loginOrEmail);
+    if (!user) return false;
+    const check = bcrypt.compare(password, user.passwordHash);
+
+    return check;
+  },
   async _generateHash(password: string, salt: string): Promise<string> {
     const hash = await bcrypt.hash(password, salt);
     return hash;

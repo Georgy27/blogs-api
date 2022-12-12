@@ -10,8 +10,33 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.usersQueryRepository = void 0;
+const db_1 = require("./db");
 exports.usersQueryRepository = {
     findUsers(pageNumber, pageSize, sortBy, sortDirection, searchLoginTerm, searchEmailTerm) {
-        return __awaiter(this, void 0, void 0, function* () { });
+        return __awaiter(this, void 0, void 0, function* () {
+            const filter = {};
+            if (searchLoginTerm) {
+                filter.login = { $regex: searchLoginTerm, $options: "i" };
+            }
+            if (searchEmailTerm) {
+                filter.email = { $regex: searchEmailTerm, $options: "i" };
+            }
+            const users = yield db_1.usersCollection
+                .find(filter, {
+                projection: { _id: false, passwordHash: false },
+            })
+                .sort({ [sortBy]: sortDirection === "asc" ? 1 : -1 })
+                .skip((pageNumber - 1) * pageSize)
+                .limit(pageSize)
+                .toArray();
+            const numberOfUsers = yield db_1.usersCollection.count(filter);
+            return {
+                pagesCount: Math.ceil(numberOfUsers / pageSize),
+                page: pageNumber,
+                pageSize: pageSize,
+                totalCount: numberOfUsers,
+                items: users,
+            };
+        });
     },
 };
