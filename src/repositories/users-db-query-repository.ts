@@ -31,7 +31,9 @@ export const usersQueryRepository = {
       .limit(pageSize)
       .toArray();
 
-    const numberOfUsers = await usersCollection.count(filter);
+    const numberOfUsers = await usersCollection.count({
+      $or: [filter, filter2],
+    });
 
     return {
       pagesCount: Math.ceil(numberOfUsers / pageSize),
