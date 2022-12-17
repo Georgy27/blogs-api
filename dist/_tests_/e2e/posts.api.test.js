@@ -12,8 +12,9 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-const src_1 = require("../../src");
 const supertest_1 = __importDefault(require("supertest"));
+const server_1 = require("../../src/utils/server");
+const app = (0, server_1.createServer)();
 const productPayload = {
     title: "Bob",
     shortDescription: "Just regular Bob's blog",
@@ -21,13 +22,11 @@ const productPayload = {
 };
 describe("/posts", () => {
     beforeAll(() => __awaiter(void 0, void 0, void 0, function* () {
-        yield (0, supertest_1.default)(src_1.app).delete("/testing/all-data");
+        yield (0, supertest_1.default)(app).delete("/testing/all-data");
     }));
     // GET
     it("should return 200 and an empty array", () => __awaiter(void 0, void 0, void 0, function* () {
-        yield (0, supertest_1.default)(src_1.app)
-            .get("/posts")
-            .expect(200, {
+        yield (0, supertest_1.default)(app).get("/posts").expect(200, {
             pagesCount: 0,
             page: 1,
             pageSize: 10,
@@ -37,10 +36,10 @@ describe("/posts", () => {
     }));
     // POST
     it("shouldn't create a new post when the user is not logged in ", () => __awaiter(void 0, void 0, void 0, function* () {
-        yield (0, supertest_1.default)(src_1.app).post("/posts").send(productPayload).expect(401);
+        yield (0, supertest_1.default)(app).post("/posts").send(productPayload).expect(401);
     }));
     it("shouldn't create a new post when the data is missing", () => __awaiter(void 0, void 0, void 0, function* () {
-        yield (0, supertest_1.default)(src_1.app)
+        yield (0, supertest_1.default)(app)
             .post("/posts")
             .set("Authorization", `Basic YWRtaW46cXdlcnR5`)
             .send(productPayload)
@@ -49,7 +48,7 @@ describe("/posts", () => {
         });
     }));
     it("shouldn't create a new post when the data is incorrect", () => __awaiter(void 0, void 0, void 0, function* () {
-        yield (0, supertest_1.default)(src_1.app)
+        yield (0, supertest_1.default)(app)
             .post("/posts")
             .set("Authorization", `Basic YWRtaW46cXdlcnR5`)
             .send(Object.assign(Object.assign({}, productPayload), { title: null, blogId: 123 }))
@@ -62,7 +61,7 @@ describe("/posts", () => {
     }));
     let createdBlog = null;
     it("should create a new blog when the data is correct", () => __awaiter(void 0, void 0, void 0, function* () {
-        const createdResponse = yield (0, supertest_1.default)(src_1.app)
+        const createdResponse = yield (0, supertest_1.default)(app)
             .post("/blogs")
             .set("Authorization", `Basic YWRtaW46cXdlcnR5`)
             .send({
@@ -82,7 +81,7 @@ describe("/posts", () => {
     }));
     let createdPost = null;
     it("should create a new post when the data is correct", () => __awaiter(void 0, void 0, void 0, function* () {
-        const createdResponse = yield (0, supertest_1.default)(src_1.app)
+        const createdResponse = yield (0, supertest_1.default)(app)
             .post("/posts")
             .set("Authorization", `Basic YWRtaW46cXdlcnR5`)
             .send(Object.assign(Object.assign({}, productPayload), { blogId: createdBlog.id }))

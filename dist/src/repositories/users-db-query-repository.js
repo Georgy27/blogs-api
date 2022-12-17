@@ -14,25 +14,21 @@ const db_1 = require("./db");
 exports.usersQueryRepository = {
     findUsers(pageNumber, pageSize, sortBy, sortDirection, searchLoginTerm, searchEmailTerm) {
         return __awaiter(this, void 0, void 0, function* () {
-            const filter = {};
-            const filter2 = {};
-            if (searchLoginTerm) {
-                filter.login = { $regex: searchLoginTerm, $options: "i" };
-            }
-            if (searchEmailTerm) {
-                filter2.email = { $regex: searchEmailTerm, $options: "i" };
-            }
+            const filter = {
+                $or: [
+                    { login: { $regex: searchLoginTerm !== null && searchLoginTerm !== void 0 ? searchLoginTerm : "", $options: "i" } },
+                    { email: { $regex: searchEmailTerm !== null && searchEmailTerm !== void 0 ? searchEmailTerm : "", $options: "i" } },
+                ],
+            };
             const users = yield db_1.usersCollection
-                .find({ $or: [filter, filter2] }, {
+                .find(filter, {
                 projection: { _id: false, passwordHash: false },
             })
                 .sort({ [sortBy]: sortDirection === "asc" ? 1 : -1 })
                 .skip((pageNumber - 1) * pageSize)
                 .limit(pageSize)
                 .toArray();
-            const numberOfUsers = yield db_1.usersCollection.count({
-                $or: [filter, filter2],
-            });
+            const numberOfUsers = yield db_1.usersCollection.countDocuments(filter);
             return {
                 pagesCount: Math.ceil(numberOfUsers / pageSize),
                 page: pageNumber,

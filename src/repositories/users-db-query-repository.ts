@@ -1,5 +1,7 @@
 import { UsersViewModel } from "../models/users-model/UsersViewModel";
 import { usersCollection } from "./db";
+import { Filter } from "mongodb";
+import { UsersDBModel } from "../models/users-model/UsersDBModel";
 
 export const usersQueryRepository = {
   async findUsers(
@@ -10,18 +12,17 @@ export const usersQueryRepository = {
     searchLoginTerm: string | undefined | null,
     searchEmailTerm: string | undefined | null
   ): Promise<UsersViewModel> {
-    const filter: any = {};
-    const filter2: any = {};
-    if (searchLoginTerm) {
-      filter.login = { $regex: searchLoginTerm, $options: "i" };
-    }
-    if (searchEmailTerm) {
-      filter2.email = { $regex: searchEmailTerm, $options: "i" };
-    }
+    const filter: Filter<UsersDBModel> = {
+      $or: [
+        { login: { $regex: searchLoginTerm ?? "", $options: "i" } },
+        { email: { $regex: searchEmailTerm ?? "", $options: "i" } },
+      ],
+    };
 
     const users = await usersCollection
       .find(
-        { $or: [filter, filter2] },
+        filter,
+
         {
           projection: { _id: false, passwordHash: false },
         }
@@ -31,9 +32,7 @@ export const usersQueryRepository = {
       .limit(pageSize)
       .toArray();
 
-    const numberOfUsers = await usersCollection.count({
-      $or: [filter, filter2],
-    });
+    const numberOfUsers = await usersCollection.countDocuments(filter);
 
     return {
       pagesCount: Math.ceil(numberOfUsers / pageSize),
