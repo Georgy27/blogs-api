@@ -17,4 +17,10 @@ export const commentsService = {
     };
     return commentsRepository.createComment(newComment);
   },
+  async updateComment(content: string, id: string): Promise<boolean> {
+    return commentsRepository.updateComment(content, id);
+  },
+  async deleteComment(id: string) {
+    return commentsRepository.deleteComment(id);
+  },
 };

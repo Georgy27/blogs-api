@@ -1,7 +1,7 @@
 import { CommentsViewModel } from "../models/comments-model/CommentsViewModel";
 import { Filter } from "mongodb";
 import { CommentsDBModel } from "../models/comments-model/CommentsDBModel";
-import { commentsCollection } from "./db";
+import { blogsCollection, commentsCollection } from "./db";
 
 export const commentsQueryRepository = {
   async findComments(
@@ -26,5 +26,11 @@ export const commentsQueryRepository = {
       totalCount: numberOfComments,
       items: comments,
     };
+  },
+  async findComment(id: string): Promise<CommentsDBModel | null> {
+    return await commentsCollection.findOne(
+      { id },
+      { projection: { _id: false } }
+    );
   },
 };

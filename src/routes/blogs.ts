@@ -30,6 +30,7 @@ import { contentValidation } from "../middlewares/posts-middleware/contentValida
 import { titleValidation } from "../middlewares/posts-middleware/titleValidation";
 import { shortDescriptionValidation } from "../middlewares/posts-middleware/shortDescriptionValidation";
 import { PostsViewModel } from "../models/posts-model/PostsViewModel";
+import { BlogsDBModel } from "../models/blogs-model/BlogsDBModel";
 export const blogsRouter = Router({});
 
 // routes
@@ -137,7 +138,10 @@ blogsRouter.post(
 
 blogsRouter.get(
   "/:id",
-  async (req: RequestWithParams<{ id: string }>, res: Response) => {
+  async (
+    req: RequestWithParams<{ id: string }>,
+    res: Response<BlogsDBModel>
+  ) => {
     const blogId = req.params.id;
     const getBlog = await blogsQueryRepository.findBlog(blogId);
 
