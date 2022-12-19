@@ -15,12 +15,14 @@ exports.commentsQueryRepository = {
     findComments(pageNumber, pageSize, sortBy, sortDirection, postId) {
         return __awaiter(this, void 0, void 0, function* () {
             const comments = yield db_1.commentsCollection
-                .find({}, { projection: { _id: false } })
+                .find({ postId }, { projection: { _id: false } })
                 .sort({ [sortBy]: sortDirection === "asc" ? 1 : -1 })
                 .skip((pageNumber - 1) * pageSize)
                 .limit(pageSize)
                 .toArray();
-            const numberOfComments = yield db_1.commentsCollection.countDocuments();
+            const numberOfComments = yield db_1.commentsCollection.countDocuments({
+                postId,
+            });
             return {
                 pagesCount: Math.ceil(numberOfComments / pageSize),
                 page: pageNumber,

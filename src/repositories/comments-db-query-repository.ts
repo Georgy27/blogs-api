@@ -12,12 +12,14 @@ export const commentsQueryRepository = {
     postId: string
   ): Promise<CommentsViewModel> {
     const comments = await commentsCollection
-      .find({}, { projection: { _id: false } })
+      .find({ postId }, { projection: { _id: false } })
       .sort({ [sortBy]: sortDirection === "asc" ? 1 : -1 })
       .skip((pageNumber - 1) * pageSize)
       .limit(pageSize)
       .toArray();
-    const numberOfComments = await commentsCollection.countDocuments();
+    const numberOfComments = await commentsCollection.countDocuments({
+      postId,
+    });
 
     return {
       pagesCount: Math.ceil(numberOfComments / pageSize),
