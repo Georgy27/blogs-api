@@ -1,7 +1,8 @@
-import { CommentsViewModel } from "../models/comments-model/CommentsViewModel";
 import { Filter } from "mongodb";
 import { CommentsDBModel } from "../models/comments-model/CommentsDBModel";
 import { blogsCollection, commentsCollection } from "./db";
+import { Pagination } from "../models/pagination.model";
+import { CommentViewModel } from "../models/comments-model/CommentsViewModel";
 
 export const commentsQueryRepository = {
   async findComments(
@@ -10,9 +11,9 @@ export const commentsQueryRepository = {
     sortBy: string,
     sortDirection: string | undefined,
     postId: string
-  ): Promise<CommentsViewModel> {
+  ): Promise<Pagination<CommentViewModel>> {
     const comments = await commentsCollection
-      .find({ postId }, { projection: { _id: false } })
+      .find({ postId }, { projection: { _id: false, postId: false } })
       .sort({ [sortBy]: sortDirection === "asc" ? 1 : -1 })
       .skip((pageNumber - 1) * pageSize)
       .limit(pageSize)
@@ -29,10 +30,10 @@ export const commentsQueryRepository = {
       items: comments,
     };
   },
-  async findComment(id: string): Promise<CommentsDBModel | null> {
+  async findComment(id: string): Promise<CommentViewModel | null> {
     return await commentsCollection.findOne(
       { id },
-      { projection: { _id: false } }
+      { projection: { _id: false, postId: false } }
     );
   },
 };

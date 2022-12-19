@@ -1,10 +1,17 @@
 import { blogsCollection, commentsCollection } from "./db";
 import { CommentsDBModel } from "../models/comments-model/CommentsDBModel";
+import { CommentViewModel } from "../models/comments-model/CommentsViewModel";
 
 export const commentsRepository = {
-  async createComment(comment: CommentsDBModel) {
+  async createComment(comment: CommentsDBModel): Promise<CommentViewModel> {
     await commentsCollection.insertOne({ ...comment });
-    return comment;
+    return {
+      id: comment.id,
+      content: comment.content,
+      userId: comment.userId,
+      userLogin: comment.userLogin,
+      createdAt: comment.createdAt,
+    };
   },
   async updateComment(content: string, id: string): Promise<boolean> {
     const result = await commentsCollection.updateOne(

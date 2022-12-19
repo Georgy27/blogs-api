@@ -1,9 +1,6 @@
-import { UsersDBViewModel } from "./UsersDBViewModel";
-
 export interface UsersViewModel {
-  pagesCount: number;
-  page: number;
-  pageSize: number;
-  totalCount: number;
-  items: UsersDBViewModel[];
+  id: string;
+  login: string;
+  email: string;
+  createdAt: string;
 }

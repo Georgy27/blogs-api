@@ -1,15 +1,18 @@
 import { commentsRepository } from "../repositories/comments-db-repository";
 import { CommentsDBModel } from "../models/comments-model/CommentsDBModel";
 import { randomUUID } from "crypto";
+import { CommentViewModel } from "../models/comments-model/CommentsViewModel";
 
 export const commentsService = {
   async createComment(
+    postId: string,
     comment: string,
     userId: string,
     userLogin: string
-  ): Promise<CommentsDBModel> {
+  ): Promise<CommentViewModel> {
     const newComment: CommentsDBModel = {
       id: randomUUID(),
+      postId,
       content: comment,
       userId: userId,
       userLogin: userLogin,

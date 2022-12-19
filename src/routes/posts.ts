@@ -30,6 +30,8 @@ import { AuthViewModel } from "../models/auth-model/AuthViewModel";
 import { CommentsDBModel } from "../models/comments-model/CommentsDBModel";
 import { commentsQueryRepository } from "../repositories/comments-db-query-repository";
 import { commentsValidation } from "../middlewares/comments-middleware/content-validation";
+import { CommentViewModel } from "../models/comments-model/CommentsViewModel";
+import { Pagination } from "../models/pagination.model";
 export const postsRouter = Router({});
 
 // routes
@@ -58,7 +60,7 @@ postsRouter.get(
   pageNumberValidation,
   async (
     req: RequestWithParamsAndQuery<{ postId: string }, QueryPostModel>,
-    res: Response
+    res: Response<Pagination<CommentViewModel>>
   ) => {
     const { sortBy, sortDirection, pageSize, pageNumber } = req.query;
     const postId = req.params.postId;
@@ -113,7 +115,7 @@ postsRouter.post(
   inputValidationMiddleware,
   async (
     req: RequestWithParamsAndBody<{ postId: string }, { content: string }>,
-    res: Response<CommentsDBModel>
+    res: Response<CommentViewModel>
   ) => {
     const postId = req.params.postId;
     const comment = req.body.content;
@@ -123,6 +125,7 @@ postsRouter.post(
       return res.sendStatus(404);
     }
     const createComment = await commentsService.createComment(
+      postId,
       comment,
       req.user!.userId,
       req.user!.login

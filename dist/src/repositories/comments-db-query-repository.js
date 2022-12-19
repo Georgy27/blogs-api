@@ -15,7 +15,7 @@ exports.commentsQueryRepository = {
     findComments(pageNumber, pageSize, sortBy, sortDirection, postId) {
         return __awaiter(this, void 0, void 0, function* () {
             const comments = yield db_1.commentsCollection
-                .find({ postId }, { projection: { _id: false } })
+                .find({ postId }, { projection: { _id: false, postId: false } })
                 .sort({ [sortBy]: sortDirection === "asc" ? 1 : -1 })
                 .skip((pageNumber - 1) * pageSize)
                 .limit(pageSize)
@@ -34,7 +34,7 @@ exports.commentsQueryRepository = {
     },
     findComment(id) {
         return __awaiter(this, void 0, void 0, function* () {
-            return yield db_1.commentsCollection.findOne({ id }, { projection: { _id: false } });
+            return yield db_1.commentsCollection.findOne({ id }, { projection: { _id: false, postId: false } });
         });
     },
 };

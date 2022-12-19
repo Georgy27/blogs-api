@@ -13,10 +13,11 @@ exports.commentsService = void 0;
 const comments_db_repository_1 = require("../repositories/comments-db-repository");
 const crypto_1 = require("crypto");
 exports.commentsService = {
-    createComment(comment, userId, userLogin) {
+    createComment(postId, comment, userId, userLogin) {
         return __awaiter(this, void 0, void 0, function* () {
             const newComment = {
                 id: (0, crypto_1.randomUUID)(),
+                postId,
                 content: comment,
                 userId: userId,
                 userLogin: userLogin,

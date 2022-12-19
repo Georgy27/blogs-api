@@ -15,6 +15,7 @@ import { loginValidation } from "../middlewares/users-middleware/loginValidation
 import { passwordValidation } from "../middlewares/users-middleware/passwordValidation";
 import { emailValidation } from "../middlewares/users-middleware/emailValidation";
 import { UsersViewModel } from "../models/users-model/UsersViewModel";
+import { Pagination } from "../models/pagination.model";
 
 export const usersRouter = Router({});
 
@@ -26,7 +27,10 @@ usersRouter.get(
   sortBy,
   pageNumberValidation,
 
-  async (req: RequestWithQuery<any>, res: Response<UsersViewModel>) => {
+  async (
+    req: RequestWithQuery<any>,
+    res: Response<Pagination<UsersViewModel>>
+  ) => {
     const { searchLoginTerm, searchEmailTerm, sortBy, sortDirection } =
       req.query;
     const { pageSize, pageNumber } = req.query;

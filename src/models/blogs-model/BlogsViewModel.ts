@@ -1,9 +1,7 @@
-import { BlogsDBModel } from "./BlogsDBModel";
-
 export interface BlogsViewModel {
-  pagesCount: number;
-  page: number;
-  pageSize: number;
-  totalCount: number;
-  items: BlogsDBModel[];
+  id: string;
+  name: string;
+  description: string;
+  websiteUrl: string;
+  createdAt: string;
 }

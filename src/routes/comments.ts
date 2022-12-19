@@ -8,6 +8,7 @@ import { commentsService } from "../domain/comments-service";
 import { contentValidation } from "../middlewares/posts-middleware/contentValidation";
 import { inputValidationMiddleware } from "../middlewares/input-validation-middleware";
 import { commentsValidation } from "../middlewares/comments-middleware/content-validation";
+import { CommentViewModel } from "../models/comments-model/CommentsViewModel";
 
 export const commentsRouter = Router({});
 
@@ -17,7 +18,7 @@ commentsRouter.get(
   "/:id",
   async (
     req: RequestWithParams<{ id: string }>,
-    res: Response<CommentsDBModel>
+    res: Response<CommentViewModel>
   ) => {
     const commentId = req.params.id;
     const getCommentById = await commentsQueryRepository.findComment(commentId);
@@ -50,6 +51,7 @@ commentsRouter.put(
     if (getCommentById.userId !== req.user!.userId) {
       return res.sendStatus(403);
     }
+
     const getUpdatedComment = await commentsService.updateComment(
       comment,
       commentId

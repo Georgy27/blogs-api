@@ -15,7 +15,13 @@ exports.commentsRepository = {
     createComment(comment) {
         return __awaiter(this, void 0, void 0, function* () {
             yield db_1.commentsCollection.insertOne(Object.assign({}, comment));
-            return comment;
+            return {
+                id: comment.id,
+                content: comment.content,
+                userId: comment.userId,
+                userLogin: comment.userLogin,
+                createdAt: comment.createdAt,
+            };
         });
     },
     updateComment(content, id) {

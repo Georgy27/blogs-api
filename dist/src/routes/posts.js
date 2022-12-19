@@ -61,7 +61,7 @@ exports.postsRouter.post("/:postId/comments", jwt_auth_middleware_1.jwtAuthMiddl
     if (!isPost) {
         return res.sendStatus(404);
     }
-    const createComment = yield comments_service_1.commentsService.createComment(comment, req.user.userId, req.user.login);
+    const createComment = yield comments_service_1.commentsService.createComment(postId, comment, req.user.userId, req.user.login);
     return res.status(201).send(createComment);
 }));
 exports.postsRouter.get("/:id", (req, res) => __awaiter(void 0, void 0, void 0, function* () {

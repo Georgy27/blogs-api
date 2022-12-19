@@ -31,6 +31,7 @@ import { titleValidation } from "../middlewares/posts-middleware/titleValidation
 import { shortDescriptionValidation } from "../middlewares/posts-middleware/shortDescriptionValidation";
 import { PostsViewModel } from "../models/posts-model/PostsViewModel";
 import { BlogsDBModel } from "../models/blogs-model/BlogsDBModel";
+import { Pagination } from "../models/pagination.model";
 export const blogsRouter = Router({});
 
 // routes
@@ -41,7 +42,7 @@ blogsRouter.get(
   pageNumberValidation,
   async (
     req: RequestWithQuery<QueryBlogModel>,
-    res: Response<BlogsViewModel>
+    res: Response<Pagination<BlogsViewModel>>
   ) => {
     const { searchNameTerm, sortBy, sortDirection } = req.query;
     const { pageSize, pageNumber } = req.query;

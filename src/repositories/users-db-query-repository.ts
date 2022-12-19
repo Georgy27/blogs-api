@@ -3,6 +3,7 @@ import { blogsCollection, usersCollection } from "./db";
 import { Filter } from "mongodb";
 import { UsersDBModel } from "../models/users-model/UsersDBModel";
 import { AuthViewModel } from "../models/auth-model/AuthViewModel";
+import { Pagination } from "../models/pagination.model";
 
 export const usersQueryRepository = {
   async findUsers(
@@ -12,7 +13,7 @@ export const usersQueryRepository = {
     sortDirection: string | undefined,
     searchLoginTerm: string | undefined | null,
     searchEmailTerm: string | undefined | null
-  ): Promise<UsersViewModel> {
+  ): Promise<Pagination<UsersViewModel>> {
     const filter: Filter<UsersDBModel> = {
       $or: [
         { login: { $regex: searchLoginTerm ?? "", $options: "i" } },
