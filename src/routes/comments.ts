@@ -7,6 +7,7 @@ import { commentsRepository } from "../repositories/comments-db-repository";
 import { commentsService } from "../domain/comments-service";
 import { contentValidation } from "../middlewares/posts-middleware/contentValidation";
 import { inputValidationMiddleware } from "../middlewares/input-validation-middleware";
+import { commentsValidation } from "../middlewares/comments-middleware/content-validation";
 
 export const commentsRouter = Router({});
 
@@ -31,7 +32,7 @@ commentsRouter.get(
 commentsRouter.put(
   "/:commentId",
   jwtAuthMiddleware,
-  contentValidation,
+  commentsValidation,
   inputValidationMiddleware,
   async (
     req: RequestWithParamsAndBody<{ commentId: string }, { content: string }>,

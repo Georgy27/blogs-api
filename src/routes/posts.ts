@@ -29,6 +29,7 @@ import { jwtAuthMiddleware } from "../middlewares/jwt-auth-middleware";
 import { AuthViewModel } from "../models/auth-model/AuthViewModel";
 import { CommentsDBModel } from "../models/comments-model/CommentsDBModel";
 import { commentsQueryRepository } from "../repositories/comments-db-query-repository";
+import { commentsValidation } from "../middlewares/comments-middleware/content-validation";
 export const postsRouter = Router({});
 
 // routes
@@ -108,7 +109,7 @@ postsRouter.post(
 postsRouter.post(
   "/:postId/comments",
   jwtAuthMiddleware,
-  contentValidation,
+  commentsValidation,
   inputValidationMiddleware,
   async (
     req: RequestWithParamsAndBody<{ postId: string }, { content: string }>,
