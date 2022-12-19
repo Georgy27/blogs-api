@@ -7,6 +7,9 @@ import { passwordValidation } from "../middlewares/users-middleware/passwordVali
 import { inputValidationMiddleware } from "../middlewares/input-validation-middleware";
 import { usersRepository } from "../repositories/users-db-repository";
 import { usersService } from "../domain/users-service";
+import { jwtService } from "../application/jwt-service";
+import { jwtAuthMiddleware } from "../middlewares/jwt-auth-middleware";
+
 export const authRouter = Router({});
 
 const loginOrEmailValidation = body("loginOrEmail")
@@ -15,21 +18,27 @@ const loginOrEmailValidation = body("loginOrEmail")
   .notEmpty();
 
 authRouter.post(
-  "/",
+  "/login",
   loginOrEmailValidation,
   passwordValidation,
   inputValidationMiddleware,
   async (req: RequestWithBody<AuthUserModel>, res: Response) => {
     const { loginOrEmail, password } = req.body;
 
-    const checkUser = await usersService.checkCredentials(
-      loginOrEmail,
-      password
-    );
+    const user = await usersService.checkCredentials(loginOrEmail, password);
 
-    if (!checkUser) {
+    if (!user) {
       return res.sendStatus(401);
     }
-    return res.sendStatus(204);
+    const token = await jwtService.createJWT(user);
+    return res.status(200).send(token);
+  }
+);
+authRouter.get(
+  "/me",
+  jwtAuthMiddleware,
+  async (req: Request, res: Response) => {
+    const user = await req.user;
+    return res.status(200).send(user);
   }
 );

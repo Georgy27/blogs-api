@@ -9,6 +9,7 @@ import {
   RequestWithBody,
   RequestWithParams,
   RequestWithParamsAndBody,
+  RequestWithParamsAndQuery,
   RequestWithQuery,
 } from "../types";
 import { CreatePostModel } from "../models/posts-model/CreatePostModel";
@@ -23,6 +24,11 @@ import { titleValidation } from "../middlewares/posts-middleware/titleValidation
 import { shortDescriptionValidation } from "../middlewares/posts-middleware/shortDescriptionValidation";
 import { contentValidation } from "../middlewares/posts-middleware/contentValidation";
 import { blogIdValidation } from "../middlewares/posts-middleware/blogIdValidation";
+import { commentsService } from "../domain/comments-service";
+import { jwtAuthMiddleware } from "../middlewares/jwt-auth-middleware";
+import { AuthViewModel } from "../models/auth-model/AuthViewModel";
+import { CommentsDBModel } from "../models/comments-model/CommentsDBModel";
+import { commentsQueryRepository } from "../repositories/comments-db-query-repository";
 export const postsRouter = Router({});
 
 // routes
@@ -41,6 +47,33 @@ postsRouter.get(
       sortDirection
     );
     res.status(200).send(allPosts);
+  }
+);
+// returns all comments for specified post
+postsRouter.get(
+  "/:postId/comments",
+  pageSize,
+  sortBy,
+  pageNumberValidation,
+  async (
+    req: RequestWithParamsAndQuery<{ postId: string }, QueryPostModel>,
+    res: Response
+  ) => {
+    const { sortBy, sortDirection, pageSize, pageNumber } = req.query;
+    const postId = req.params.postId;
+    const isPost = await postsQueryRepository.findPost(postId);
+
+    if (!isPost) {
+      return res.sendStatus(404);
+    }
+    const allCommentsWithId = await commentsQueryRepository.findComments(
+      pageNumber,
+      pageSize,
+      sortBy,
+      sortDirection,
+      postId
+    );
+    res.status(200).send(allCommentsWithId);
   }
 );
 postsRouter.post(
@@ -68,6 +101,33 @@ postsRouter.post(
     );
 
     return res.status(201).send(createPost);
+  }
+);
+
+// Create new comment
+postsRouter.post(
+  "/:postId/comments",
+  jwtAuthMiddleware,
+  contentValidation,
+  inputValidationMiddleware,
+  async (
+    req: RequestWithParamsAndBody<{ postId: string }, { content: string }>,
+    res: Response<CommentsDBModel>
+  ) => {
+    const postId = req.params.postId;
+    const comment = req.body.content;
+    const isPost = await postsQueryRepository.findPost(postId);
+
+    if (!isPost) {
+      return res.sendStatus(404);
+    }
+    const createComment = await commentsService.createComment(
+      comment,
+      req.user!.userId,
+      req.user!.login
+    );
+
+    return res.status(201).send(createComment);
   }
 );
 postsRouter.get(

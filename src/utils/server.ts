@@ -4,6 +4,7 @@ import { blogsRouter } from "../routes/blogs";
 import { postsRouter } from "../routes/posts";
 import { usersRouter } from "../routes/users";
 import { authRouter } from "../routes/auth";
+import { commentsRouter } from "../routes/comments";
 
 export function createServer() {
   const app = express();
@@ -13,6 +14,7 @@ export function createServer() {
   app.use("/blogs", blogsRouter);
   app.use("/posts", postsRouter);
   app.use("/users", usersRouter);
-  app.use("/auth/login", authRouter);
+  app.use("/auth", authRouter);
+  app.use("/comments", commentsRouter);
   return app;
 }

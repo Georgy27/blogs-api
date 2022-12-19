@@ -1,6 +1,7 @@
 import { blogsCollection, postsCollection } from "./db";
 import { PostsViewModel } from "../models/posts-model/PostsViewModel";
 import { PostsDBModel } from "../models/posts-model/PostsDBModel";
+import { Filter } from "mongodb";
 
 export const postsQueryRepository = {
   async findPosts(
@@ -10,12 +11,12 @@ export const postsQueryRepository = {
     sortDirection: string | undefined,
     blogId?: string
   ): Promise<PostsViewModel> {
-    const filter: any = {};
+    const filter: Filter<PostsDBModel> = {};
 
     if (blogId) {
       filter.blogId = { $regex: blogId };
     }
-    console.log(filter);
+
     const posts: PostsDBModel[] = await postsCollection
       .find(filter, { projection: { _id: false } })
       .sort({ [sortBy]: sortDirection === "asc" ? 1 : -1 })

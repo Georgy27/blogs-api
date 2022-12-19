@@ -38,4 +38,17 @@ exports.usersQueryRepository = {
             };
         });
     },
+    findUserById(id) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const user = yield db_1.usersCollection.findOne({ id }, { projection: { _id: false } });
+            if (user) {
+                return {
+                    email: user.email,
+                    login: user.login,
+                    userId: user.id,
+                };
+            }
+            return null;
+        });
+    },
 };

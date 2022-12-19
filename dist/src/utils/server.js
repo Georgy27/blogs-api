@@ -10,6 +10,7 @@ const blogs_1 = require("../routes/blogs");
 const posts_1 = require("../routes/posts");
 const users_1 = require("../routes/users");
 const auth_1 = require("../routes/auth");
+const comments_1 = require("../routes/comments");
 function createServer() {
     const app = (0, express_1.default)();
     app.use(express_1.default.json());
@@ -18,7 +19,8 @@ function createServer() {
     app.use("/blogs", blogs_1.blogsRouter);
     app.use("/posts", posts_1.postsRouter);
     app.use("/users", users_1.usersRouter);
-    app.use("/auth/login", auth_1.authRouter);
+    app.use("/auth", auth_1.authRouter);
+    app.use("/comments", comments_1.commentsRouter);
     return app;
 }
 exports.createServer = createServer;

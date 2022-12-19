@@ -5,8 +5,6 @@ import { RequestWithBody, RequestWithParams, RequestWithQuery } from "../types";
 import { UsersDBViewModel } from "../models/users-model/UsersDBViewModel";
 import { basicAuthMiddleware } from "../middlewares/basic-auth-middleware";
 import { inputValidationMiddleware } from "../middlewares/input-validation-middleware";
-import { QueryUserModel } from "../models/users-model/QueryUserModel";
-import { UsersViewModel } from "../models/users-model/UsersViewModel";
 import { usersQueryRepository } from "../repositories/users-db-query-repository";
 import {
   pageNumberValidation,
@@ -16,6 +14,7 @@ import {
 import { loginValidation } from "../middlewares/users-middleware/loginValidation";
 import { passwordValidation } from "../middlewares/users-middleware/passwordValidation";
 import { emailValidation } from "../middlewares/users-middleware/emailValidation";
+import { UsersViewModel } from "../models/users-model/UsersViewModel";
 
 export const usersRouter = Router({});
 
@@ -27,7 +26,7 @@ usersRouter.get(
   sortBy,
   pageNumberValidation,
 
-  async (req: RequestWithQuery<any>, res: Response) => {
+  async (req: RequestWithQuery<any>, res: Response<UsersViewModel>) => {
     const { searchLoginTerm, searchEmailTerm, sortBy, sortDirection } =
       req.query;
     const { pageSize, pageNumber } = req.query;

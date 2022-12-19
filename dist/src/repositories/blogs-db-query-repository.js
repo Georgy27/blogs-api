@@ -24,7 +24,7 @@ exports.blogsQueryRepository = {
                 .skip((pageNumber - 1) * pageSize)
                 .limit(pageSize)
                 .toArray();
-            const numberOfBlogs = yield db_1.blogsCollection.count(filter);
+            const numberOfBlogs = yield db_1.blogsCollection.countDocuments(filter);
             return {
                 pagesCount: Math.ceil(numberOfBlogs / pageSize),
                 page: pageNumber,

@@ -1,7 +1,8 @@
 import { UsersViewModel } from "../models/users-model/UsersViewModel";
-import { usersCollection } from "./db";
+import { blogsCollection, usersCollection } from "./db";
 import { Filter } from "mongodb";
 import { UsersDBModel } from "../models/users-model/UsersDBModel";
+import { AuthViewModel } from "../models/auth-model/AuthViewModel";
 
 export const usersQueryRepository = {
   async findUsers(
@@ -41,5 +42,20 @@ export const usersQueryRepository = {
       totalCount: numberOfUsers,
       items: users,
     };
+  },
+  async findUserById(id: string): Promise<AuthViewModel | null> {
+    const user = await usersCollection.findOne(
+      { id },
+      { projection: { _id: false } }
+    );
+
+    if (user) {
+      return {
+        email: user.email,
+        login: user.login,
+        userId: user.id,
+      };
+    }
+    return null;
   },
 };

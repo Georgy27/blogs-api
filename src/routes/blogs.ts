@@ -1,5 +1,4 @@
 import { Request, Response, Router, NextFunction } from "express";
-import { body, query } from "express-validator";
 import { basicAuthMiddleware } from "../middlewares/basic-auth-middleware";
 import { inputValidationMiddleware } from "../middlewares/input-validation-middleware";
 import { blogsService } from "../domain/blogs-service";

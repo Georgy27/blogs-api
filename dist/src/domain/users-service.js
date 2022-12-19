@@ -41,8 +41,13 @@ exports.usersService = {
             const user = yield users_db_repository_1.usersRepository.findLoginOrEmail(loginOrEmail);
             if (!user)
                 return false;
-            const check = bcrypt_1.default.compare(password, user.passwordHash);
-            return check;
+            const check = yield bcrypt_1.default.compare(password, user.passwordHash);
+            if (check) {
+                return user;
+            }
+            else {
+                return false;
+            }
         });
     },
     _generateHash(password, salt) {

@@ -18,7 +18,6 @@ exports.postsQueryRepository = {
             if (blogId) {
                 filter.blogId = { $regex: blogId };
             }
-            console.log(filter);
             const posts = yield db_1.postsCollection
                 .find(filter, { projection: { _id: false } })
                 .sort({ [sortBy]: sortDirection === "asc" ? 1 : -1 })

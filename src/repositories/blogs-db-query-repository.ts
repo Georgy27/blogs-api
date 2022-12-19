@@ -1,6 +1,7 @@
 import { blogsCollection } from "./db";
 import { BlogsViewModel } from "../models/blogs-model/BlogsViewModel";
 import { BlogsDBModel } from "../models/blogs-model/BlogsDBModel";
+import { Filter } from "mongodb";
 
 export const blogsQueryRepository = {
   async findBlogs(
@@ -10,12 +11,7 @@ export const blogsQueryRepository = {
     pageNumber: number,
     sortDirection: string | undefined
   ): Promise<BlogsViewModel> {
-    const filter: Partial<
-      Record<
-        keyof Omit<BlogsDBModel, "id">,
-        { $regex: string; $options: string }
-      >
-    > = {};
+    const filter: Filter<BlogsDBModel> = {};
 
     if (searchNameTerm) {
       filter.name = { $regex: searchNameTerm, $options: "i" };
@@ -27,7 +23,7 @@ export const blogsQueryRepository = {
       .skip((pageNumber - 1) * pageSize)
       .limit(pageSize)
       .toArray();
-    const numberOfBlogs = await blogsCollection.count(filter);
+    const numberOfBlogs = await blogsCollection.countDocuments(filter);
 
     return {
       pagesCount: Math.ceil(numberOfBlogs / pageSize),

@@ -4,4 +4,4 @@ export const contentValidation = body("content")
   .isString()
   .trim()
   .notEmpty()
-  .isLength({ max: 1000 });
+  .isLength({ min: 20, max: 1000 });
