@@ -143,7 +143,7 @@ describe("blog router", () => {
                 expect(statusCode).toBe(400);
                 expect(body).toEqual(errors);
             }));
-            it("should return 400 status code and array of error because data the data exceeds the length requirement", () => __awaiter(void 0, void 0, void 0, function* () {
+            it("should return 400 status code and array of error because the data exceeds the length requirement", () => __awaiter(void 0, void 0, void 0, function* () {
                 const { statusCode, body } = yield (0, supertest_1.default)(app)
                     .post("/blogs")
                     .set("Authorization", `Basic YWRtaW46cXdlcnR5`)

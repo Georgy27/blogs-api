@@ -18,4 +18,23 @@ exports.commentsRepository = {
             return comment;
         });
     },
+    updateComment(content, id) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const result = yield db_1.commentsCollection.updateOne({ id: id }, {
+                $set: { content },
+            });
+            return result.matchedCount === 1;
+        });
+    },
+    deleteComment(id) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const result = yield db_1.commentsCollection.deleteOne({ id });
+            return result.deletedCount === 1;
+        });
+    },
+    clearComments() {
+        return __awaiter(this, void 0, void 0, function* () {
+            yield db_1.commentsCollection.deleteMany({});
+        });
+    },
 };

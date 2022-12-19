@@ -30,4 +30,9 @@ exports.commentsQueryRepository = {
             };
         });
     },
+    findComment(id) {
+        return __awaiter(this, void 0, void 0, function* () {
+            return yield db_1.commentsCollection.findOne({ id }, { projection: { _id: false } });
+        });
+    },
 };

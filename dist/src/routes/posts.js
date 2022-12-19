@@ -24,6 +24,7 @@ const blogIdValidation_1 = require("../middlewares/posts-middleware/blogIdValida
 const comments_service_1 = require("../domain/comments-service");
 const jwt_auth_middleware_1 = require("../middlewares/jwt-auth-middleware");
 const comments_db_query_repository_1 = require("../repositories/comments-db-query-repository");
+const content_validation_1 = require("../middlewares/comments-middleware/content-validation");
 exports.postsRouter = (0, express_1.Router)({});
 // routes
 exports.postsRouter.get("/", sorting_pagination_middleware_1.pageSize, sorting_pagination_middleware_1.sortBy, sorting_pagination_middleware_1.pageNumberValidation, (req, res) => __awaiter(void 0, void 0, void 0, function* () {
@@ -53,7 +54,7 @@ exports.postsRouter.post("/", basic_auth_middleware_1.basicAuthMiddleware, title
     return res.status(201).send(createPost);
 }));
 // Create new comment
-exports.postsRouter.post("/:postId/comments", jwt_auth_middleware_1.jwtAuthMiddleware, contentValidation_1.contentValidation, input_validation_middleware_1.inputValidationMiddleware, (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+exports.postsRouter.post("/:postId/comments", jwt_auth_middleware_1.jwtAuthMiddleware, content_validation_1.commentsValidation, input_validation_middleware_1.inputValidationMiddleware, (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const postId = req.params.postId;
     const comment = req.body.content;
     const isPost = yield posts_db_query_repository_1.postsQueryRepository.findPost(postId);

@@ -6,4 +6,4 @@ exports.contentValidation = (0, express_validator_1.body)("content")
     .isString()
     .trim()
     .notEmpty()
-    .isLength({ min: 20, max: 1000 });
+    .isLength({ max: 1000 });

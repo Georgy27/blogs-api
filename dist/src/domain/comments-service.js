@@ -25,4 +25,14 @@ exports.commentsService = {
             return comments_db_repository_1.commentsRepository.createComment(newComment);
         });
     },
+    updateComment(content, id) {
+        return __awaiter(this, void 0, void 0, function* () {
+            return comments_db_repository_1.commentsRepository.updateComment(content, id);
+        });
+    },
+    deleteComment(id) {
+        return __awaiter(this, void 0, void 0, function* () {
+            return comments_db_repository_1.commentsRepository.deleteComment(id);
+        });
+    },
 };
