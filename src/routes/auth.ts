@@ -65,6 +65,7 @@ authRouter.post(
 authRouter.post(
   "/registration-email-resending",
   emailResendingValidation,
+  inputValidationMiddleware,
   morgan("tiny"),
   async (req: RequestWithBody<{ email: string }>, res: Response) => {
     const userEmail = req.body.email;

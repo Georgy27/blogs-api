@@ -48,7 +48,7 @@ exports.authRouter.post("/registration-confirmation", confirmEmail_1.confirmEmai
     }
     return res.sendStatus(204);
 }));
-exports.authRouter.post("/registration-email-resending", emailResendingValidation_1.emailResendingValidation, (0, morgan_middleware_1.morgan)("tiny"), (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+exports.authRouter.post("/registration-email-resending", emailResendingValidation_1.emailResendingValidation, input_validation_middleware_1.inputValidationMiddleware, (0, morgan_middleware_1.morgan)("tiny"), (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const userEmail = req.body.email;
     const result = yield auth_service_1.authService.resendEmail(userEmail);
     // if email could not be send (can be 500 error)
