@@ -46,7 +46,7 @@ exports.usersService = {
             }
             catch (error) {
                 console.log(error);
-                yield users_db_repository_1.usersRepository.deleteUser(userResult.id);
+                // await usersRepository.deleteUser(userResult.id);
                 return null;
             }
             return userResult;

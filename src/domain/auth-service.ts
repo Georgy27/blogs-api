@@ -21,7 +21,7 @@ export const authService = {
       await emailsManager.sendEmailConformationMessage(user);
     } catch (error) {
       console.log(error);
-      await usersRepository.deleteUser(user.id);
+      // await usersRepository.deleteUser(user.id);
       return null;
     }
     return true;

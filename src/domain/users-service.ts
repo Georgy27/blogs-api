@@ -38,7 +38,7 @@ export const usersService = {
       await emailsManager.sendEmailConformationMessage(userResult);
     } catch (error) {
       console.log(error);
-      await usersRepository.deleteUser(userResult.id);
+      // await usersRepository.deleteUser(userResult.id);
       return null;
     }
     return userResult;
