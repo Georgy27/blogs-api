@@ -14,7 +14,7 @@ const email_adapter_1 = require("../adapters/email-adapter");
 exports.emailsManager = {
     sendEmailConformationMessage(user) {
         return __awaiter(this, void 0, void 0, function* () {
-            let message = `<h1>Thank for your registration</h1><p>To finish registration please follow the link below: <a href='https://blogs-api-ruby.vercel.app/registration-confirmation?code=${user.emailConfirmation.confirmationCode}'>complete registration</a> </p>`;
+            let message = `<h1>Thank for your registration</h1><p>To finish registration please follow the link below: <a href='https://some-front.com/confirm-registration?code=${user.emailConfirmation.confirmationCode}'>complete registration</a> </p>`;
             yield email_adapter_1.emailAdapter.sendEmail(user.accountData.email, message);
         });
     },
