@@ -11,6 +11,9 @@ import { loginValidation } from "../middlewares/users-middleware/loginValidation
 import { emailValidation } from "../middlewares/users-middleware/emailValidation";
 import { loginOrEmailValidation } from "../middlewares/auth-middleware/loginOrEmailValidation";
 import { morgan } from "../middlewares/morgan-middleware";
+import { authService } from "../domain/auth-service";
+import { confirmEmail } from "../middlewares/auth-middleware/confirmEmail";
+import { emailResendingValidation } from "../middlewares/auth-middleware/emailResendingValidation";
 export const authRouter = Router({});
 
 authRouter.post(
@@ -39,7 +42,6 @@ authRouter.post(
   inputValidationMiddleware,
   morgan("tiny"),
   async (req: RequestWithBody<AuthRegistrationModel>, res: Response) => {
-    //  if the user with the given email or login already exists
     const { login, password, email } = req.body;
     const newUser = await usersService.createUser(login, password, email);
     if (!newUser) return res.sendStatus(400);
@@ -48,9 +50,28 @@ authRouter.post(
 );
 authRouter.post(
   "/registration-confirmation",
+  confirmEmail,
+  inputValidationMiddleware,
   morgan("tiny"),
   async (req: RequestWithBody<{ code: string }>, res: Response) => {
-    console.log("hello there");
+    const code = req.body.code;
+    const isConfirmedEmail = await authService.confirmEmail(code);
+    if (!isConfirmedEmail) {
+      return res.sendStatus(400);
+    }
+    return res.sendStatus(204);
+  }
+);
+authRouter.post(
+  "/registration-email-resending",
+  emailResendingValidation,
+  morgan("tiny"),
+  async (req: RequestWithBody<{ email: string }>, res: Response) => {
+    const userEmail = req.body.email;
+    const result = await authService.resendEmail(userEmail);
+    // if email could not be send (can be 500 error)
+    if (!result) return res.sendStatus(400);
+    return res.sendStatus(204);
   }
 );
 authRouter.get(

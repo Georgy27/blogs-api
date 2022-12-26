@@ -9,21 +9,25 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.loginValidation = void 0;
+exports.confirmEmail = void 0;
 const express_validator_1 = require("express-validator");
 const users_db_query_repository_1 = require("../../repositories/users-db-query-repository");
-exports.loginValidation = (0, express_validator_1.body)("login")
+exports.confirmEmail = (0, express_validator_1.body)("code")
     .isString()
-    .trim()
     .notEmpty()
-    .isLength({ min: 3, max: 10 })
-    .matches("^[a-zA-Z0-9_-]*$")
-    .custom((login) => __awaiter(void 0, void 0, void 0, function* () {
-    const isUserWithLogin = yield users_db_query_repository_1.usersQueryRepository.findByLoginOrEmail(login);
-    if (isUserWithLogin) {
-        throw new Error("user with given login already exist");
+    .custom((code) => __awaiter(void 0, void 0, void 0, function* () {
+    const user = yield users_db_query_repository_1.usersQueryRepository.findUserByConfirmationCode(code);
+    if (!user) {
+        throw new Error("user doesn't exist");
     }
-    else {
-        return true;
+    if (user.emailConfirmation.isConfirmed) {
+        throw new Error("user email already confirmed");
     }
+    if (user.emailConfirmation.confirmationCode !== code) {
+        throw new Error("user code does not match");
+    }
+    if (user.emailConfirmation.expirationDate < new Date().toISOString()) {
+        throw new Error("user code has expired");
+    }
+    return true;
 }));

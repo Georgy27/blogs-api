@@ -1,28 +1,29 @@
-import { UsersDBViewModel } from "../models/users-model/UsersDBViewModel";
-import bcrypt from "bcrypt";
-import { UsersDBModel } from "../models/users-model/UsersDBModel";
-import { randomUUID } from "crypto";
-import { usersRepository } from "../repositories/users-db-repository";
-import add from "date-fns/add";
-import { UserAccountDBModel } from "../models/users-model/UserAccountDBModel";
+import { usersQueryRepository } from "../repositories/users-db-query-repository";
+import { usersService } from "./users-service";
 import { emailsManager } from "../managers/emails-manager";
-export const authService = {
-  async deleteUser(id: string): Promise<boolean> {
-    return usersRepository.deleteUser(id);
-  },
-  async checkCredentials(loginOrEmail: string, password: string) {
-    const user = await usersRepository.findByLoginOrEmail(loginOrEmail);
-    if (!user) return false;
-    const check = await bcrypt.compare(password, user.accountData.passwordHash);
+import { usersRepository } from "../repositories/users-db-repository";
 
-    if (check) {
-      return user;
-    } else {
-      return false;
-    }
+export const authService = {
+  async confirmEmail(code: string): Promise<boolean> {
+    const user = await usersQueryRepository.findUserByConfirmationCode(code);
+    if (!user) return false;
+    const updatedConfirmation = await usersService.updateConfirmation(user.id);
+    return updatedConfirmation;
   },
-  async _generateHash(password: string, salt: string): Promise<string> {
-    const hash = await bcrypt.hash(password, salt);
-    return hash;
+  async resendEmail(email: string) {
+    const user = await usersQueryRepository.findByLoginOrEmail(email);
+    if (!user) return false;
+    const updatedConfirmationCode = await usersService.updateConfirmationCode(
+      user.id
+    );
+    if (!updatedConfirmationCode) return false;
+    try {
+      await emailsManager.sendEmailConformationMessage(user);
+    } catch (error) {
+      console.log(error);
+      await usersRepository.deleteUser(user.id);
+      return null;
+    }
+    return true;
   },
 };

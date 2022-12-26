@@ -11,11 +11,11 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.emailValidation = void 0;
 const express_validator_1 = require("express-validator");
-const users_db_repository_1 = require("../../repositories/users-db-repository");
+const users_db_query_repository_1 = require("../../repositories/users-db-query-repository");
 exports.emailValidation = (0, express_validator_1.body)("email")
     .isEmail()
     .custom((email) => __awaiter(void 0, void 0, void 0, function* () {
-    const isUserWithEmail = yield users_db_repository_1.usersRepository.findByLoginOrEmail(email);
+    const isUserWithEmail = yield users_db_query_repository_1.usersQueryRepository.findByLoginOrEmail(email);
     if (isUserWithEmail) {
         throw new Error("user with given email already exist");
     }

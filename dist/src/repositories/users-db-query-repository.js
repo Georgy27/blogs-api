@@ -56,4 +56,23 @@ exports.usersQueryRepository = {
             return null;
         });
     },
+    findByLoginOrEmail(loginOrEmail) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const user = yield db_1.usersCollection.findOne({
+                $or: [
+                    { "accountData.email": loginOrEmail },
+                    { "accountData.login": loginOrEmail },
+                ],
+            });
+            return user;
+        });
+    },
+    findUserByConfirmationCode(code) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const user = yield db_1.usersCollection.findOne({
+                "emailConfirmation.confirmationCode": code,
+            });
+            return user;
+        });
+    },
 };

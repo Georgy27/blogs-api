@@ -20,6 +20,9 @@ const loginValidation_1 = require("../middlewares/users-middleware/loginValidati
 const emailValidation_1 = require("../middlewares/users-middleware/emailValidation");
 const loginOrEmailValidation_1 = require("../middlewares/auth-middleware/loginOrEmailValidation");
 const morgan_middleware_1 = require("../middlewares/morgan-middleware");
+const auth_service_1 = require("../domain/auth-service");
+const confirmEmail_1 = require("../middlewares/auth-middleware/confirmEmail");
+const emailResendingValidation_1 = require("../middlewares/auth-middleware/emailResendingValidation");
 exports.authRouter = (0, express_1.Router)({});
 exports.authRouter.post("/login", loginOrEmailValidation_1.loginOrEmailValidation, passwordValidation_1.passwordValidation, input_validation_middleware_1.inputValidationMiddleware, (0, morgan_middleware_1.morgan)("tiny"), (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const { loginOrEmail, password } = req.body;
@@ -31,15 +34,27 @@ exports.authRouter.post("/login", loginOrEmailValidation_1.loginOrEmailValidatio
     return res.status(200).send(token);
 }));
 exports.authRouter.post("/registration", loginValidation_1.loginValidation, passwordValidation_1.passwordValidation, emailValidation_1.emailValidation, input_validation_middleware_1.inputValidationMiddleware, (0, morgan_middleware_1.morgan)("tiny"), (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    //  if the user with the given email or login already exists
     const { login, password, email } = req.body;
     const newUser = yield users_service_1.usersService.createUser(login, password, email);
     if (!newUser)
         return res.sendStatus(400);
     return res.sendStatus(204);
 }));
-exports.authRouter.post("/registration-confirmation", (0, morgan_middleware_1.morgan)("tiny"), (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    console.log("hello there");
+exports.authRouter.post("/registration-confirmation", confirmEmail_1.confirmEmail, input_validation_middleware_1.inputValidationMiddleware, (0, morgan_middleware_1.morgan)("tiny"), (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    const code = req.body.code;
+    const isConfirmedEmail = yield auth_service_1.authService.confirmEmail(code);
+    if (!isConfirmedEmail) {
+        return res.sendStatus(400);
+    }
+    return res.sendStatus(204);
+}));
+exports.authRouter.post("/registration-email-resending", emailResendingValidation_1.emailResendingValidation, (0, morgan_middleware_1.morgan)("tiny"), (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    const userEmail = req.body.email;
+    const result = yield auth_service_1.authService.resendEmail(userEmail);
+    // if email could not be send (can be 500 error)
+    if (!result)
+        return res.sendStatus(400);
+    return res.sendStatus(204);
 }));
 exports.authRouter.get("/me", jwt_auth_middleware_1.jwtAuthMiddleware, (0, morgan_middleware_1.morgan)("tiny"), (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const user = yield req.user;

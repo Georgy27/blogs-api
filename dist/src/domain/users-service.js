@@ -18,6 +18,7 @@ const crypto_1 = require("crypto");
 const users_db_repository_1 = require("../repositories/users-db-repository");
 const add_1 = __importDefault(require("date-fns/add"));
 const emails_manager_1 = require("../managers/emails-manager");
+const users_db_query_repository_1 = require("../repositories/users-db-query-repository");
 exports.usersService = {
     createUser(login, password, email) {
         return __awaiter(this, void 0, void 0, function* () {
@@ -81,7 +82,7 @@ exports.usersService = {
     },
     checkCredentials(loginOrEmail, password) {
         return __awaiter(this, void 0, void 0, function* () {
-            const user = yield users_db_repository_1.usersRepository.findByLoginOrEmail(loginOrEmail);
+            const user = yield users_db_query_repository_1.usersQueryRepository.findByLoginOrEmail(loginOrEmail);
             if (!user)
                 return false;
             const check = yield bcrypt_1.default.compare(password, user.accountData.passwordHash);
@@ -91,6 +92,16 @@ exports.usersService = {
             else {
                 return false;
             }
+        });
+    },
+    updateConfirmation(id) {
+        return __awaiter(this, void 0, void 0, function* () {
+            return yield users_db_repository_1.usersRepository.updateConfirmation(id);
+        });
+    },
+    updateConfirmationCode(id) {
+        return __awaiter(this, void 0, void 0, function* () {
+            return yield users_db_repository_1.usersRepository.updateConfirmationCode(id);
         });
     },
     _generateHash(password, salt) {

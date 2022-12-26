@@ -11,6 +11,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.usersRepository = void 0;
 const db_1 = require("./db");
+const crypto_1 = require("crypto");
 exports.usersRepository = {
     createUser(user) {
         return __awaiter(this, void 0, void 0, function* () {
@@ -35,16 +36,18 @@ exports.usersRepository = {
             return result.deletedCount === 1;
         });
     },
-    findByLoginOrEmail(loginOrEmail) {
+    updateConfirmation(id) {
         return __awaiter(this, void 0, void 0, function* () {
-            const user = yield db_1.usersCollection.findOne({
-                $or: [
-                    { "accountData.email": loginOrEmail },
-                    { "accountData.login": loginOrEmail },
-                ],
+            const updatedUser = yield db_1.usersCollection.updateOne({ id }, { $set: { "emailConfirmation.isConfirmed": true } });
+            return updatedUser.modifiedCount === 1;
+        });
+    },
+    updateConfirmationCode(id) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const updatedCode = yield db_1.usersCollection.updateOne({ id }, {
+                $set: { "emailConfirmation.confirmationCode": (0, crypto_1.randomUUID)() },
             });
-            console.log(user);
-            return user;
+            return updatedCode.modifiedCount === 1;
         });
     },
     clearUsers() {

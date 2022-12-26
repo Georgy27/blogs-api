@@ -8,37 +8,39 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
-var __importDefault = (this && this.__importDefault) || function (mod) {
-    return (mod && mod.__esModule) ? mod : { "default": mod };
-};
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.authService = void 0;
-const bcrypt_1 = __importDefault(require("bcrypt"));
+const users_db_query_repository_1 = require("../repositories/users-db-query-repository");
+const users_service_1 = require("./users-service");
+const emails_manager_1 = require("../managers/emails-manager");
 const users_db_repository_1 = require("../repositories/users-db-repository");
 exports.authService = {
-    deleteUser(id) {
+    confirmEmail(code) {
         return __awaiter(this, void 0, void 0, function* () {
-            return users_db_repository_1.usersRepository.deleteUser(id);
-        });
-    },
-    checkCredentials(loginOrEmail, password) {
-        return __awaiter(this, void 0, void 0, function* () {
-            const user = yield users_db_repository_1.usersRepository.findByLoginOrEmail(loginOrEmail);
+            const user = yield users_db_query_repository_1.usersQueryRepository.findUserByConfirmationCode(code);
             if (!user)
                 return false;
-            const check = yield bcrypt_1.default.compare(password, user.accountData.passwordHash);
-            if (check) {
-                return user;
-            }
-            else {
-                return false;
-            }
+            const updatedConfirmation = yield users_service_1.usersService.updateConfirmation(user.id);
+            return updatedConfirmation;
         });
     },
-    _generateHash(password, salt) {
+    resendEmail(email) {
         return __awaiter(this, void 0, void 0, function* () {
-            const hash = yield bcrypt_1.default.hash(password, salt);
-            return hash;
+            const user = yield users_db_query_repository_1.usersQueryRepository.findByLoginOrEmail(email);
+            if (!user)
+                return false;
+            const updatedConfirmationCode = yield users_service_1.usersService.updateConfirmationCode(user.id);
+            if (!updatedConfirmationCode)
+                return false;
+            try {
+                yield emails_manager_1.emailsManager.sendEmailConformationMessage(user);
+            }
+            catch (error) {
+                console.log(error);
+                yield users_db_repository_1.usersRepository.deleteUser(user.id);
+                return null;
+            }
+            return true;
         });
     },
 };

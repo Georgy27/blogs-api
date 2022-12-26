@@ -6,6 +6,7 @@ import { UsersDBViewModel } from "../models/users-model/UsersDBViewModel";
 import { UserAccountDBModel } from "../models/users-model/UserAccountDBModel";
 import add from "date-fns/add";
 import { emailsManager } from "../managers/emails-manager";
+import { usersQueryRepository } from "../repositories/users-db-query-repository";
 
 export const usersService = {
   async createUser(
@@ -71,7 +72,7 @@ export const usersService = {
     return usersRepository.deleteUser(id);
   },
   async checkCredentials(loginOrEmail: string, password: string) {
-    const user = await usersRepository.findByLoginOrEmail(loginOrEmail);
+    const user = await usersQueryRepository.findByLoginOrEmail(loginOrEmail);
     if (!user) return false;
     const check = await bcrypt.compare(password, user.accountData.passwordHash);
 
@@ -80,6 +81,12 @@ export const usersService = {
     } else {
       return false;
     }
+  },
+  async updateConfirmation(id: string) {
+    return await usersRepository.updateConfirmation(id);
+  },
+  async updateConfirmationCode(id: string) {
+    return await usersRepository.updateConfirmationCode(id);
   },
   async _generateHash(password: string, salt: string): Promise<string> {
     const hash = await bcrypt.hash(password, salt);

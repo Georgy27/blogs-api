@@ -25,22 +25,16 @@ export const usersQueryRepository = {
         },
       ],
     };
-
     const users = await usersCollection
-      .find(
-        filter,
-
-        {
-          projection: { _id: false, "accountData.passwordHash": false },
-        }
-      )
+      .find(filter, {
+        projection: { _id: false, "accountData.passwordHash": false },
+      })
       .sort({ [sortBy]: sortDirection === "asc" ? 1 : -1 })
       .skip((pageNumber - 1) * pageSize)
       .limit(pageSize)
       .toArray();
 
     const numberOfUsers = await usersCollection.countDocuments(filter);
-
     return {
       pagesCount: Math.ceil(numberOfUsers / pageSize),
       page: pageNumber,
@@ -63,5 +57,24 @@ export const usersQueryRepository = {
       };
     }
     return null;
+  },
+  async findByLoginOrEmail(
+    loginOrEmail: string
+  ): Promise<UserAccountDBModel | null> {
+    const user = await usersCollection.findOne({
+      $or: [
+        { "accountData.email": loginOrEmail },
+        { "accountData.login": loginOrEmail },
+      ],
+    });
+    return user;
+  },
+  async findUserByConfirmationCode(
+    code: string
+  ): Promise<UserAccountDBModel | null> {
+    const user = await usersCollection.findOne({
+      "emailConfirmation.confirmationCode": code,
+    });
+    return user;
   },
 };
