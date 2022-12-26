@@ -15,11 +15,17 @@ exports.usersRepository = {
     createUser(user) {
         return __awaiter(this, void 0, void 0, function* () {
             yield db_1.usersCollection.insertOne(Object.assign({}, user));
+            return user;
+        });
+    },
+    createUserByAdmin(user) {
+        return __awaiter(this, void 0, void 0, function* () {
+            yield db_1.usersCollection.insertOne(Object.assign({}, user));
             return {
                 id: user.id,
-                login: user.login,
-                email: user.email,
-                createdAt: user.createdAt,
+                login: user.accountData.login,
+                email: user.accountData.email,
+                createdAt: user.accountData.createdAt,
             };
         });
     },
@@ -29,11 +35,15 @@ exports.usersRepository = {
             return result.deletedCount === 1;
         });
     },
-    findLoginOrEmail(loginOrEmail) {
+    findByLoginOrEmail(loginOrEmail) {
         return __awaiter(this, void 0, void 0, function* () {
             const user = yield db_1.usersCollection.findOne({
-                $or: [{ email: loginOrEmail }, { login: loginOrEmail }],
+                $or: [
+                    { "accountData.email": loginOrEmail },
+                    { "accountData.login": loginOrEmail },
+                ],
             });
+            console.log(user);
             return user;
         });
     },

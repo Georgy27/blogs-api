@@ -1,9 +1,10 @@
 import { UsersViewModel } from "../models/users-model/UsersViewModel";
 import { blogsCollection, usersCollection } from "./db";
 import { Filter } from "mongodb";
-import { UsersDBModel } from "../models/users-model/UsersDBModel";
 import { AuthViewModel } from "../models/auth-model/AuthViewModel";
 import { Pagination } from "../models/pagination.model";
+import { UserAccountDBModel } from "../models/users-model/UserAccountDBModel";
+import { mappedUsers } from "../utils/helpers";
 
 export const usersQueryRepository = {
   async findUsers(
@@ -14,10 +15,14 @@ export const usersQueryRepository = {
     searchLoginTerm: string | undefined | null,
     searchEmailTerm: string | undefined | null
   ): Promise<Pagination<UsersViewModel>> {
-    const filter: Filter<UsersDBModel> = {
+    const filter: Filter<UserAccountDBModel> = {
       $or: [
-        { login: { $regex: searchLoginTerm ?? "", $options: "i" } },
-        { email: { $regex: searchEmailTerm ?? "", $options: "i" } },
+        {
+          "accountData.login": { $regex: searchLoginTerm ?? "", $options: "i" },
+        },
+        {
+          "accountData.email": { $regex: searchEmailTerm ?? "", $options: "i" },
+        },
       ],
     };
 
@@ -26,7 +31,7 @@ export const usersQueryRepository = {
         filter,
 
         {
-          projection: { _id: false, passwordHash: false },
+          projection: { _id: false, "accountData.passwordHash": false },
         }
       )
       .sort({ [sortBy]: sortDirection === "asc" ? 1 : -1 })
@@ -41,7 +46,7 @@ export const usersQueryRepository = {
       page: pageNumber,
       pageSize: pageSize,
       totalCount: numberOfUsers,
-      items: users,
+      items: mappedUsers(users),
     };
   },
   async findUserById(id: string): Promise<AuthViewModel | null> {
@@ -52,8 +57,8 @@ export const usersQueryRepository = {
 
     if (user) {
       return {
-        email: user.email,
-        login: user.login,
+        email: user.accountData.email,
+        login: user.accountData.login,
         userId: user.id,
       };
     }

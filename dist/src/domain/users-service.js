@@ -16,6 +16,8 @@ exports.usersService = void 0;
 const bcrypt_1 = __importDefault(require("bcrypt"));
 const crypto_1 = require("crypto");
 const users_db_repository_1 = require("../repositories/users-db-repository");
+const add_1 = __importDefault(require("date-fns/add"));
+const emails_manager_1 = require("../managers/emails-manager");
 exports.usersService = {
     createUser(login, password, email) {
         return __awaiter(this, void 0, void 0, function* () {
@@ -23,12 +25,53 @@ exports.usersService = {
             const passwordHash = yield this._generateHash(password, passwordSalt);
             const newUser = {
                 id: (0, crypto_1.randomUUID)(),
-                login: login,
-                email: email,
-                passwordHash: passwordHash,
-                createdAt: new Date().toISOString(),
+                accountData: {
+                    login,
+                    email,
+                    passwordHash,
+                    createdAt: new Date().toISOString(),
+                },
+                emailConfirmation: {
+                    confirmationCode: (0, crypto_1.randomUUID)(),
+                    expirationDate: (0, add_1.default)(new Date(), {
+                        minutes: 1,
+                    }).toISOString(),
+                    isConfirmed: false,
+                },
             };
-            return users_db_repository_1.usersRepository.createUser(newUser);
+            const userResult = yield users_db_repository_1.usersRepository.createUser(newUser);
+            try {
+                yield emails_manager_1.emailsManager.sendEmailConformationMessage(userResult);
+            }
+            catch (error) {
+                console.log(error);
+                yield users_db_repository_1.usersRepository.deleteUser(userResult.id);
+                return null;
+            }
+            return userResult;
+        });
+    },
+    createUserByAdmin(login, password, email) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const passwordSalt = yield bcrypt_1.default.genSalt(10);
+            const passwordHash = yield this._generateHash(password, passwordSalt);
+            const newUser = {
+                id: (0, crypto_1.randomUUID)(),
+                accountData: {
+                    login,
+                    email,
+                    passwordHash,
+                    createdAt: new Date().toISOString(),
+                },
+                emailConfirmation: {
+                    confirmationCode: (0, crypto_1.randomUUID)(),
+                    expirationDate: (0, add_1.default)(new Date(), {
+                        minutes: 1,
+                    }).toISOString(),
+                    isConfirmed: true,
+                },
+            };
+            return users_db_repository_1.usersRepository.createUserByAdmin(newUser);
         });
     },
     deleteUser(id) {
@@ -38,10 +81,10 @@ exports.usersService = {
     },
     checkCredentials(loginOrEmail, password) {
         return __awaiter(this, void 0, void 0, function* () {
-            const user = yield users_db_repository_1.usersRepository.findLoginOrEmail(loginOrEmail);
+            const user = yield users_db_repository_1.usersRepository.findByLoginOrEmail(loginOrEmail);
             if (!user)
                 return false;
-            const check = yield bcrypt_1.default.compare(password, user.passwordHash);
+            const check = yield bcrypt_1.default.compare(password, user.accountData.passwordHash);
             if (check) {
                 return user;
             }

@@ -16,6 +16,7 @@ describe("blog router", () => {
     expect(statusCode).toBe(204);
     expect(body).toEqual({});
   });
+  //GET
   describe("GET METHODS", () => {
     describe("Get all blogs /blogs (GET)", () => {
       it("should return 200 and an empty array", async () => {
@@ -89,6 +90,7 @@ describe("blog router", () => {
       });
     });
   });
+  // POST
   describe("POST METHODS", () => {
     const generateString = (len: number) => {
       let str = "";
@@ -181,81 +183,73 @@ describe("blog router", () => {
       });
     });
   });
-
   // PUT
-  it("shouldn't update a blog when the data is incorrect", async () => {
-    await request(app)
-      .put(`/blogs/${constants.variables.setBlogId}`)
-      .set("Authorization", `Basic YWRtaW46cXdlcnR5`)
-      .send({ ...constants.createBlog1, name: null })
-      .expect(400, {
-        errorsMessages: [{ message: "Invalid value", field: "name" }],
+  describe("PUT METHODS", () => {
+    describe("check input validations", () => {
+      it("shouldn't update a blog when the name is null", async () => {
+        const { blog1 } = expect.getState();
+        const { statusCode, body } = await request(app)
+          .put(`/blogs/${blog1.body.id}`)
+          .set("Authorization", `Basic YWRtaW46cXdlcnR5`)
+          .send({ ...constants.createBlog1, name: null });
+        expect(statusCode).toBe(400);
+        expect(body).toEqual({
+          errorsMessages: [{ message: expect.any(String), field: "name" }],
+        });
       });
-  });
 
-  it("shouldn't update the course when the id is incorrect", async () => {
-    await request(app)
-      .put(`/blogs/${constants.variables.setBlogId3}`)
-      .set("Authorization", `Basic YWRtaW46cXdlcnR5`)
-      .send(constants.createBlog1)
-      .expect(404);
-  });
-
-  it("shouldn't update the course when the user is not authorized", async () => {
-    await request(app)
-      .put(`/blogs/${constants.variables.setBlogId}`)
-      .set("Authorization", `Bearer YWRtaW46cXdlcnR5`)
-      .send(constants.createBlog1)
-      .expect(401);
-
-    // checking if the blog with this id exists
-    const { statusCode, body } = await request(app).get(
-      `/blogs/${constants.variables.setBlogId}`
-    );
-    expect(statusCode).toBe(200);
-    expect(body).toEqual({
-      id: expect.any(String),
-      ...constants.createBlog1,
-      createdAt: expect.any(String),
+      it("shouldn't update the course when the id is incorrect", async () => {
+        await request(app)
+          .put(`/blogs/123`)
+          .set("Authorization", `Basic YWRtaW46cXdlcnR5`)
+          .send(constants.createBlog1)
+          .expect(404);
+      });
+      describe("check authorization", () => {
+        it("shouldn't update the course when the user is not authorized", async () => {
+          const { blog1 } = expect.getState();
+          await request(app)
+            .put(`/blogs/${blog1.body.id}`)
+            .set("Authorization", `Basic YWRtaW46cXdlcnR5saf`)
+            .send(constants.createBlog2)
+            .expect(401);
+        });
+      });
+      describe("Update the blog /blogs:id (BLOG)", () => {
+        it("should update the course when the input data is correct", async () => {
+          const { blog1 } = expect.getState();
+          await request(app)
+            .put(`/blogs/${blog1.body.id}`)
+            .set("Authorization", `Basic YWRtaW46cXdlcnR5`)
+            .send(constants.createBlog3)
+            .expect(204);
+        });
+      });
     });
   });
-
-  it("should update the course when the input data is correct", async () => {
-    await request(app)
-      .put(`/blogs/${constants.variables.setBlogId}`)
-      .set("Authorization", `Basic YWRtaW46cXdlcnR5`)
-      .send({ ...constants.createBlog1, name: "George" })
-      .expect(204);
-  });
-
   // DELETE
-
-  it("should delete the course when the input data is correct", async () => {
-    await request(app)
-      .delete(`/blogs/${constants.variables.setBlogId}`)
-      .set("Authorization", `Basic YWRtaW46cXdlcnR5`)
-      .expect(204);
-
-    await request(app)
-      .get(`/blogs/${constants.variables.setBlogId}`)
-      .expect(404);
-
-    const { statusCode, body } = await request(app).get("/blogs");
-    expect(statusCode).toBe(200);
-    expect(body).toStrictEqual({
-      pagesCount: 1,
-      page: 1,
-      pageSize: 10,
-      totalCount: 1,
-      items: [
-        {
-          id: expect.any(String),
-          name: "blogTest1",
-          description: "blogTest1 description",
-          websiteUrl: "https://blogTest1.com",
-          createdAt: expect.any(String),
-        },
-      ],
+  describe("DELETE METHODS", () => {
+    describe("Delete the blog /blogs:id (BLOG)", () => {
+      it("should get all the blogs to check the length", async () => {
+        const { blog1 } = expect.getState();
+        const { statusCode, body } = await request(app).get("/blogs");
+        expect(statusCode).toBe(200);
+        expect(body.items).toHaveLength(2);
+      });
+      it("should delete the blog", async () => {
+        const { blog1 } = expect.getState();
+        await request(app)
+          .delete(`/blogs/${blog1.body.id}`)
+          .set("Authorization", `Basic YWRtaW46cXdlcnR5`)
+          .expect(204);
+      });
+      it("should check that the length of all blogs has changed", async () => {
+        const { blog1 } = expect.getState();
+        await request(app).get(`/blogs/${blog1.body.id}`).expect(404);
+        const { statusCode, body } = await request(app).get("/blogs");
+        expect(statusCode).toBe(200);
+        expect(body.items).toHaveLength(1);
+      });
     });
   });
 });

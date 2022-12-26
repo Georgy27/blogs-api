@@ -25,16 +25,17 @@ const comments_service_1 = require("../domain/comments-service");
 const jwt_auth_middleware_1 = require("../middlewares/jwt-auth-middleware");
 const comments_db_query_repository_1 = require("../repositories/comments-db-query-repository");
 const content_validation_1 = require("../middlewares/comments-middleware/content-validation");
+const morgan_middleware_1 = require("../middlewares/morgan-middleware");
 exports.postsRouter = (0, express_1.Router)({});
 // routes
-exports.postsRouter.get("/", sorting_pagination_middleware_1.pageSize, sorting_pagination_middleware_1.sortBy, sorting_pagination_middleware_1.pageNumberValidation, (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+exports.postsRouter.get("/", sorting_pagination_middleware_1.pageSize, sorting_pagination_middleware_1.sortBy, sorting_pagination_middleware_1.pageNumberValidation, (0, morgan_middleware_1.morgan)("tiny"), (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const { sortBy, sortDirection } = req.query;
     const { pageSize, pageNumber } = req.query;
     const allPosts = yield posts_db_query_repository_1.postsQueryRepository.findPosts(pageNumber, pageSize, sortBy, sortDirection);
     res.status(200).send(allPosts);
 }));
 // returns all comments for specified post
-exports.postsRouter.get("/:postId/comments", sorting_pagination_middleware_1.pageSize, sorting_pagination_middleware_1.sortBy, sorting_pagination_middleware_1.pageNumberValidation, (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+exports.postsRouter.get("/:postId/comments", sorting_pagination_middleware_1.pageSize, sorting_pagination_middleware_1.sortBy, sorting_pagination_middleware_1.pageNumberValidation, (0, morgan_middleware_1.morgan)("tiny"), (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const { sortBy, sortDirection, pageSize, pageNumber } = req.query;
     const postId = req.params.postId;
     const isPost = yield posts_db_query_repository_1.postsQueryRepository.findPost(postId);
@@ -44,7 +45,7 @@ exports.postsRouter.get("/:postId/comments", sorting_pagination_middleware_1.pag
     const allCommentsWithId = yield comments_db_query_repository_1.commentsQueryRepository.findComments(pageNumber, pageSize, sortBy, sortDirection, postId);
     res.status(200).send(allCommentsWithId);
 }));
-exports.postsRouter.post("/", basic_auth_middleware_1.basicAuthMiddleware, titleValidation_1.titleValidation, shortDescriptionValidation_1.shortDescriptionValidation, contentValidation_1.contentValidation, blogIdValidation_1.blogIdValidation, input_validation_middleware_1.inputValidationMiddleware, (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+exports.postsRouter.post("/", basic_auth_middleware_1.basicAuthMiddleware, titleValidation_1.titleValidation, shortDescriptionValidation_1.shortDescriptionValidation, contentValidation_1.contentValidation, blogIdValidation_1.blogIdValidation, input_validation_middleware_1.inputValidationMiddleware, (0, morgan_middleware_1.morgan)("tiny"), (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const { title, shortDescription, content, blogId } = req.body;
     const blog = yield blogs_db_query_repository_1.blogsQueryRepository.findBlog(blogId);
     if (!blog) {
@@ -54,7 +55,7 @@ exports.postsRouter.post("/", basic_auth_middleware_1.basicAuthMiddleware, title
     return res.status(201).send(createPost);
 }));
 // Create new comment
-exports.postsRouter.post("/:postId/comments", jwt_auth_middleware_1.jwtAuthMiddleware, content_validation_1.commentsValidation, input_validation_middleware_1.inputValidationMiddleware, (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+exports.postsRouter.post("/:postId/comments", jwt_auth_middleware_1.jwtAuthMiddleware, content_validation_1.commentsValidation, input_validation_middleware_1.inputValidationMiddleware, (0, morgan_middleware_1.morgan)("tiny"), (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const postId = req.params.postId;
     const comment = req.body.content;
     const isPost = yield posts_db_query_repository_1.postsQueryRepository.findPost(postId);
@@ -64,7 +65,7 @@ exports.postsRouter.post("/:postId/comments", jwt_auth_middleware_1.jwtAuthMiddl
     const createComment = yield comments_service_1.commentsService.createComment(postId, comment, req.user.userId, req.user.login);
     return res.status(201).send(createComment);
 }));
-exports.postsRouter.get("/:id", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+exports.postsRouter.get("/:id", (0, morgan_middleware_1.morgan)("tiny"), (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const postId = req.params.id;
     const getPost = yield posts_db_query_repository_1.postsQueryRepository.findPost(postId);
     if (!getPost) {
@@ -74,7 +75,7 @@ exports.postsRouter.get("/:id", (req, res) => __awaiter(void 0, void 0, void 0, 
         return res.status(200).send(getPost);
     }
 }));
-exports.postsRouter.put("/:id", basic_auth_middleware_1.basicAuthMiddleware, titleValidation_1.titleValidation, shortDescriptionValidation_1.shortDescriptionValidation, contentValidation_1.contentValidation, blogIdValidation_1.blogIdValidation, input_validation_middleware_1.inputValidationMiddleware, (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+exports.postsRouter.put("/:id", basic_auth_middleware_1.basicAuthMiddleware, titleValidation_1.titleValidation, shortDescriptionValidation_1.shortDescriptionValidation, contentValidation_1.contentValidation, blogIdValidation_1.blogIdValidation, input_validation_middleware_1.inputValidationMiddleware, (0, morgan_middleware_1.morgan)("tiny"), (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const postId = req.params.id;
     const { title, shortDescription, content, blogId } = req.body;
     const getUpdatedPost = yield posts_service_1.postsService.updatePost(postId, title, shortDescription, content, blogId);
@@ -83,7 +84,7 @@ exports.postsRouter.put("/:id", basic_auth_middleware_1.basicAuthMiddleware, tit
     }
     return res.sendStatus(204);
 }));
-exports.postsRouter.delete("/:id", basic_auth_middleware_1.basicAuthMiddleware, (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+exports.postsRouter.delete("/:id", basic_auth_middleware_1.basicAuthMiddleware, (0, morgan_middleware_1.morgan)("tiny"), (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const postId = req.params.id;
     const getDeletedPost = yield posts_service_1.postsService.deletePost(postId);
     if (!getDeletedPost) {

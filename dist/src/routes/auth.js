@@ -11,18 +11,17 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.authRouter = void 0;
 const express_1 = require("express");
-const express_validator_1 = require("express-validator");
 const passwordValidation_1 = require("../middlewares/users-middleware/passwordValidation");
 const input_validation_middleware_1 = require("../middlewares/input-validation-middleware");
 const users_service_1 = require("../domain/users-service");
 const jwt_service_1 = require("../application/jwt-service");
 const jwt_auth_middleware_1 = require("../middlewares/jwt-auth-middleware");
+const loginValidation_1 = require("../middlewares/users-middleware/loginValidation");
+const emailValidation_1 = require("../middlewares/users-middleware/emailValidation");
+const loginOrEmailValidation_1 = require("../middlewares/auth-middleware/loginOrEmailValidation");
+const morgan_middleware_1 = require("../middlewares/morgan-middleware");
 exports.authRouter = (0, express_1.Router)({});
-const loginOrEmailValidation = (0, express_validator_1.body)("loginOrEmail")
-    .isString()
-    .trim()
-    .notEmpty();
-exports.authRouter.post("/login", loginOrEmailValidation, passwordValidation_1.passwordValidation, input_validation_middleware_1.inputValidationMiddleware, (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+exports.authRouter.post("/login", loginOrEmailValidation_1.loginOrEmailValidation, passwordValidation_1.passwordValidation, input_validation_middleware_1.inputValidationMiddleware, (0, morgan_middleware_1.morgan)("tiny"), (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const { loginOrEmail, password } = req.body;
     const user = yield users_service_1.usersService.checkCredentials(loginOrEmail, password);
     if (!user) {
@@ -31,7 +30,18 @@ exports.authRouter.post("/login", loginOrEmailValidation, passwordValidation_1.p
     const token = yield jwt_service_1.jwtService.createJWT(user);
     return res.status(200).send(token);
 }));
-exports.authRouter.get("/me", jwt_auth_middleware_1.jwtAuthMiddleware, (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+exports.authRouter.post("/registration", loginValidation_1.loginValidation, passwordValidation_1.passwordValidation, emailValidation_1.emailValidation, input_validation_middleware_1.inputValidationMiddleware, (0, morgan_middleware_1.morgan)("tiny"), (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    //  if the user with the given email or login already exists
+    const { login, password, email } = req.body;
+    const newUser = yield users_service_1.usersService.createUser(login, password, email);
+    if (!newUser)
+        return res.sendStatus(400);
+    return res.sendStatus(204);
+}));
+exports.authRouter.post("/registration-confirmation", (0, morgan_middleware_1.morgan)("tiny"), (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    console.log("hello there");
+}));
+exports.authRouter.get("/me", jwt_auth_middleware_1.jwtAuthMiddleware, (0, morgan_middleware_1.morgan)("tiny"), (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const user = yield req.user;
     return res.status(200).send(user);
 }));

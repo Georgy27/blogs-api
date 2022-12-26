@@ -32,6 +32,7 @@ import { shortDescriptionValidation } from "../middlewares/posts-middleware/shor
 import { PostsViewModel } from "../models/posts-model/PostsViewModel";
 import { BlogsDBModel } from "../models/blogs-model/BlogsDBModel";
 import { Pagination } from "../models/pagination.model";
+import { morgan } from "../middlewares/morgan-middleware";
 export const blogsRouter = Router({});
 
 // routes
@@ -40,6 +41,7 @@ blogsRouter.get(
   pageSize,
   sortBy,
   pageNumberValidation,
+  morgan("tiny"),
   async (
     req: RequestWithQuery<QueryBlogModel>,
     res: Response<Pagination<BlogsViewModel>>
@@ -63,6 +65,7 @@ blogsRouter.get(
   pageSize,
   sortBy,
   pageNumberValidation,
+  morgan("tiny"),
   async (
     req: RequestWithParamsAndQuery<{ blogId: string }, QueryPostForBlogIdModel>,
     res: Response<PostsViewModel>
@@ -93,6 +96,7 @@ blogsRouter.post(
   descriptionValidation,
   websiteValidation,
   inputValidationMiddleware,
+  morgan("tiny"),
   async (req: RequestWithBody<CreateBlogModel>, res: Response) => {
     const { name, description, websiteUrl } = req.body;
 
@@ -113,6 +117,7 @@ blogsRouter.post(
   shortDescriptionValidation,
   contentValidation,
   inputValidationMiddleware,
+  morgan("tiny"),
   async (
     req: RequestWithParamsAndBody<{ blogId: string }, CreatePostForBLogIdModel>,
     res: Response
@@ -139,6 +144,7 @@ blogsRouter.post(
 
 blogsRouter.get(
   "/:id",
+  morgan("tiny"),
   async (
     req: RequestWithParams<{ id: string }>,
     res: Response<BlogsDBModel>
@@ -161,6 +167,7 @@ blogsRouter.put(
   descriptionValidation,
   websiteValidation,
   inputValidationMiddleware,
+  morgan("tiny"),
   async (
     req: RequestWithParamsAndBody<{ id: string }, UpdateBlogModel>,
     res: Response
@@ -182,6 +189,7 @@ blogsRouter.put(
 blogsRouter.delete(
   "/:id",
   basicAuthMiddleware,
+  morgan("tiny"),
   async (req: RequestWithParams<{ id: string }>, res: Response) => {
     const blogId = req.params.id;
 

@@ -32,6 +32,7 @@ import { commentsQueryRepository } from "../repositories/comments-db-query-repos
 import { commentsValidation } from "../middlewares/comments-middleware/content-validation";
 import { CommentViewModel } from "../models/comments-model/CommentsViewModel";
 import { Pagination } from "../models/pagination.model";
+import { morgan } from "../middlewares/morgan-middleware";
 export const postsRouter = Router({});
 
 // routes
@@ -40,6 +41,7 @@ postsRouter.get(
   pageSize,
   sortBy,
   pageNumberValidation,
+  morgan("tiny"),
   async (req: RequestWithQuery<QueryPostModel>, res: Response) => {
     const { sortBy, sortDirection } = req.query;
     const { pageSize, pageNumber } = req.query;
@@ -58,6 +60,7 @@ postsRouter.get(
   pageSize,
   sortBy,
   pageNumberValidation,
+  morgan("tiny"),
   async (
     req: RequestWithParamsAndQuery<{ postId: string }, QueryPostModel>,
     res: Response<Pagination<CommentViewModel>>
@@ -87,6 +90,7 @@ postsRouter.post(
   contentValidation,
   blogIdValidation,
   inputValidationMiddleware,
+  morgan("tiny"),
   async (req: RequestWithBody<CreatePostModel>, res: Response) => {
     const { title, shortDescription, content, blogId } = req.body;
     const blog = await blogsQueryRepository.findBlog(blogId);
@@ -113,6 +117,7 @@ postsRouter.post(
   jwtAuthMiddleware,
   commentsValidation,
   inputValidationMiddleware,
+  morgan("tiny"),
   async (
     req: RequestWithParamsAndBody<{ postId: string }, { content: string }>,
     res: Response<CommentViewModel>
@@ -136,6 +141,7 @@ postsRouter.post(
 );
 postsRouter.get(
   "/:id",
+  morgan("tiny"),
   async (req: RequestWithParams<{ id: string }>, res: Response) => {
     const postId = req.params.id;
     const getPost = await postsQueryRepository.findPost(postId);
@@ -155,6 +161,7 @@ postsRouter.put(
   contentValidation,
   blogIdValidation,
   inputValidationMiddleware,
+  morgan("tiny"),
   async (
     req: RequestWithParamsAndBody<{ id: string }, UpdatePostModel>,
     res: Response
@@ -178,6 +185,7 @@ postsRouter.put(
 postsRouter.delete(
   "/:id",
   basicAuthMiddleware,
+  morgan("tiny"),
   async (req: RequestWithParams<{ id: string }>, res: Response) => {
     const postId = req.params.id;
     const getDeletedPost = await postsService.deletePost(postId);

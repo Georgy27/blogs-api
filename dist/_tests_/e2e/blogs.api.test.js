@@ -27,6 +27,7 @@ describe("blog router", () => {
         expect(statusCode).toBe(204);
         expect(body).toEqual({});
     }));
+    //GET
     describe("GET METHODS", () => {
         describe("Get all blogs /blogs (GET)", () => {
             it("should return 200 and an empty array", () => __awaiter(void 0, void 0, void 0, function* () {
@@ -97,6 +98,7 @@ describe("blog router", () => {
             }));
         });
     });
+    // POST
     describe("POST METHODS", () => {
         const generateString = (len) => {
             let str = "";
@@ -177,65 +179,71 @@ describe("blog router", () => {
         });
     });
     // PUT
-    it("shouldn't update a blog when the data is incorrect", () => __awaiter(void 0, void 0, void 0, function* () {
-        yield (0, supertest_1.default)(app)
-            .put(`/blogs/${constants_1.constants.variables.setBlogId}`)
-            .set("Authorization", `Basic YWRtaW46cXdlcnR5`)
-            .send(Object.assign(Object.assign({}, constants_1.constants.createBlog1), { name: null }))
-            .expect(400, {
-            errorsMessages: [{ message: "Invalid value", field: "name" }],
+    describe("PUT METHODS", () => {
+        describe("check input validations", () => {
+            it("shouldn't update a blog when the name is null", () => __awaiter(void 0, void 0, void 0, function* () {
+                const { blog1 } = expect.getState();
+                const { statusCode, body } = yield (0, supertest_1.default)(app)
+                    .put(`/blogs/${blog1.body.id}`)
+                    .set("Authorization", `Basic YWRtaW46cXdlcnR5`)
+                    .send(Object.assign(Object.assign({}, constants_1.constants.createBlog1), { name: null }));
+                expect(statusCode).toBe(400);
+                expect(body).toEqual({
+                    errorsMessages: [{ message: expect.any(String), field: "name" }],
+                });
+            }));
+            it("shouldn't update the course when the id is incorrect", () => __awaiter(void 0, void 0, void 0, function* () {
+                yield (0, supertest_1.default)(app)
+                    .put(`/blogs/123`)
+                    .set("Authorization", `Basic YWRtaW46cXdlcnR5`)
+                    .send(constants_1.constants.createBlog1)
+                    .expect(404);
+            }));
+            describe("check authorization", () => {
+                it("shouldn't update the course when the user is not authorized", () => __awaiter(void 0, void 0, void 0, function* () {
+                    const { blog1 } = expect.getState();
+                    yield (0, supertest_1.default)(app)
+                        .put(`/blogs/${blog1.body.id}`)
+                        .set("Authorization", `Basic YWRtaW46cXdlcnR5saf`)
+                        .send(constants_1.constants.createBlog2)
+                        .expect(401);
+                }));
+            });
+            describe("Update the blog /blogs:id (BLOG)", () => {
+                it("should update the course when the input data is correct", () => __awaiter(void 0, void 0, void 0, function* () {
+                    const { blog1 } = expect.getState();
+                    yield (0, supertest_1.default)(app)
+                        .put(`/blogs/${blog1.body.id}`)
+                        .set("Authorization", `Basic YWRtaW46cXdlcnR5`)
+                        .send(constants_1.constants.createBlog3)
+                        .expect(204);
+                }));
+            });
         });
-    }));
-    it("shouldn't update the course when the id is incorrect", () => __awaiter(void 0, void 0, void 0, function* () {
-        yield (0, supertest_1.default)(app)
-            .put(`/blogs/${constants_1.constants.variables.setBlogId3}`)
-            .set("Authorization", `Basic YWRtaW46cXdlcnR5`)
-            .send(constants_1.constants.createBlog1)
-            .expect(404);
-    }));
-    it("shouldn't update the course when the user is not authorized", () => __awaiter(void 0, void 0, void 0, function* () {
-        yield (0, supertest_1.default)(app)
-            .put(`/blogs/${constants_1.constants.variables.setBlogId}`)
-            .set("Authorization", `Bearer YWRtaW46cXdlcnR5`)
-            .send(constants_1.constants.createBlog1)
-            .expect(401);
-        // checking if the blog with this id exists
-        const { statusCode, body } = yield (0, supertest_1.default)(app).get(`/blogs/${constants_1.constants.variables.setBlogId}`);
-        expect(statusCode).toBe(200);
-        expect(body).toEqual(Object.assign(Object.assign({ id: expect.any(String) }, constants_1.constants.createBlog1), { createdAt: expect.any(String) }));
-    }));
-    it("should update the course when the input data is correct", () => __awaiter(void 0, void 0, void 0, function* () {
-        yield (0, supertest_1.default)(app)
-            .put(`/blogs/${constants_1.constants.variables.setBlogId}`)
-            .set("Authorization", `Basic YWRtaW46cXdlcnR5`)
-            .send(Object.assign(Object.assign({}, constants_1.constants.createBlog1), { name: "George" }))
-            .expect(204);
-    }));
+    });
     // DELETE
-    it("should delete the course when the input data is correct", () => __awaiter(void 0, void 0, void 0, function* () {
-        yield (0, supertest_1.default)(app)
-            .delete(`/blogs/${constants_1.constants.variables.setBlogId}`)
-            .set("Authorization", `Basic YWRtaW46cXdlcnR5`)
-            .expect(204);
-        yield (0, supertest_1.default)(app)
-            .get(`/blogs/${constants_1.constants.variables.setBlogId}`)
-            .expect(404);
-        const { statusCode, body } = yield (0, supertest_1.default)(app).get("/blogs");
-        expect(statusCode).toBe(200);
-        expect(body).toStrictEqual({
-            pagesCount: 1,
-            page: 1,
-            pageSize: 10,
-            totalCount: 1,
-            items: [
-                {
-                    id: expect.any(String),
-                    name: "blogTest1",
-                    description: "blogTest1 description",
-                    websiteUrl: "https://blogTest1.com",
-                    createdAt: expect.any(String),
-                },
-            ],
+    describe("DELETE METHODS", () => {
+        describe("Delete the blog /blogs:id (BLOG)", () => {
+            it("should get all the blogs to check the length", () => __awaiter(void 0, void 0, void 0, function* () {
+                const { blog1 } = expect.getState();
+                const { statusCode, body } = yield (0, supertest_1.default)(app).get("/blogs");
+                expect(statusCode).toBe(200);
+                expect(body.items).toHaveLength(2);
+            }));
+            it("should delete the blog", () => __awaiter(void 0, void 0, void 0, function* () {
+                const { blog1 } = expect.getState();
+                yield (0, supertest_1.default)(app)
+                    .delete(`/blogs/${blog1.body.id}`)
+                    .set("Authorization", `Basic YWRtaW46cXdlcnR5`)
+                    .expect(204);
+            }));
+            it("should check that the length of all blogs has changed", () => __awaiter(void 0, void 0, void 0, function* () {
+                const { blog1 } = expect.getState();
+                yield (0, supertest_1.default)(app).get(`/blogs/${blog1.body.id}`).expect(404);
+                const { statusCode, body } = yield (0, supertest_1.default)(app).get("/blogs");
+                expect(statusCode).toBe(200);
+                expect(body.items).toHaveLength(1);
+            }));
         });
-    }));
+    });
 });

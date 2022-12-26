@@ -16,6 +16,7 @@ import { passwordValidation } from "../middlewares/users-middleware/passwordVali
 import { emailValidation } from "../middlewares/users-middleware/emailValidation";
 import { UsersViewModel } from "../models/users-model/UsersViewModel";
 import { Pagination } from "../models/pagination.model";
+import { morgan } from "../middlewares/morgan-middleware";
 
 export const usersRouter = Router({});
 
@@ -26,7 +27,7 @@ usersRouter.get(
   pageSize,
   sortBy,
   pageNumberValidation,
-
+  morgan("tiny"),
   async (
     req: RequestWithQuery<any>,
     res: Response<Pagination<UsersViewModel>>
@@ -53,12 +54,17 @@ usersRouter.post(
   passwordValidation,
   emailValidation,
   inputValidationMiddleware,
+  morgan("tiny"),
   async (
     req: RequestWithBody<CreateUserModel>,
     res: Response<UsersDBViewModel>
   ) => {
     const { login, password, email } = req.body;
-    const newUser = await usersService.createUser(login, password, email);
+    const newUser = await usersService.createUserByAdmin(
+      login,
+      password,
+      email
+    );
     return res.status(201).send(newUser);
   }
 );
@@ -66,6 +72,7 @@ usersRouter.post(
 usersRouter.delete(
   "/:id",
   basicAuthMiddleware,
+  morgan("tiny"),
   async (req: RequestWithParams<{ id: string }>, res: Response) => {
     const userId = req.params.id;
 

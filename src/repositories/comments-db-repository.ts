@@ -13,6 +13,18 @@ export const commentsRepository = {
       createdAt: comment.createdAt,
     };
   },
+
+  // async createCommentFake(comment: CommentsDBModel): Promise<CommViewModel> {
+  //   await commentsCollection.insertOne({ ...comment });
+  //   return new CommViewModel(
+  //     comment.id,
+  //     comment.content,
+  //     comment.userId,
+  //     comment.userLogin,
+  //     comment.createdAt
+  //   );
+  // },
+
   async updateComment(content: string, id: string): Promise<boolean> {
     const result = await commentsCollection.updateOne(
       { id: id },

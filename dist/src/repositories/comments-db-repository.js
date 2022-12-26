@@ -24,6 +24,16 @@ exports.commentsRepository = {
             };
         });
     },
+    // async createCommentFake(comment: CommentsDBModel): Promise<CommViewModel> {
+    //   await commentsCollection.insertOne({ ...comment });
+    //   return new CommViewModel(
+    //     comment.id,
+    //     comment.content,
+    //     comment.userId,
+    //     comment.userLogin,
+    //     comment.createdAt
+    //   );
+    // },
     updateComment(content, id) {
         return __awaiter(this, void 0, void 0, function* () {
             const result = yield db_1.commentsCollection.updateOne({ id: id }, {

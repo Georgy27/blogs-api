@@ -11,18 +11,23 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.usersQueryRepository = void 0;
 const db_1 = require("./db");
+const helpers_1 = require("../utils/helpers");
 exports.usersQueryRepository = {
     findUsers(pageNumber, pageSize, sortBy, sortDirection, searchLoginTerm, searchEmailTerm) {
         return __awaiter(this, void 0, void 0, function* () {
             const filter = {
                 $or: [
-                    { login: { $regex: searchLoginTerm !== null && searchLoginTerm !== void 0 ? searchLoginTerm : "", $options: "i" } },
-                    { email: { $regex: searchEmailTerm !== null && searchEmailTerm !== void 0 ? searchEmailTerm : "", $options: "i" } },
+                    {
+                        "accountData.login": { $regex: searchLoginTerm !== null && searchLoginTerm !== void 0 ? searchLoginTerm : "", $options: "i" },
+                    },
+                    {
+                        "accountData.email": { $regex: searchEmailTerm !== null && searchEmailTerm !== void 0 ? searchEmailTerm : "", $options: "i" },
+                    },
                 ],
             };
             const users = yield db_1.usersCollection
                 .find(filter, {
-                projection: { _id: false, passwordHash: false },
+                projection: { _id: false, "accountData.passwordHash": false },
             })
                 .sort({ [sortBy]: sortDirection === "asc" ? 1 : -1 })
                 .skip((pageNumber - 1) * pageSize)
@@ -34,7 +39,7 @@ exports.usersQueryRepository = {
                 page: pageNumber,
                 pageSize: pageSize,
                 totalCount: numberOfUsers,
-                items: users,
+                items: (0, helpers_1.mappedUsers)(users),
             };
         });
     },
@@ -43,8 +48,8 @@ exports.usersQueryRepository = {
             const user = yield db_1.usersCollection.findOne({ id }, { projection: { _id: false } });
             if (user) {
                 return {
-                    email: user.email,
-                    login: user.login,
+                    email: user.accountData.email,
+                    login: user.accountData.login,
                     userId: user.id,
                 };
             }

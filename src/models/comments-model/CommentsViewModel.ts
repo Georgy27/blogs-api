@@ -5,3 +5,13 @@ export type CommentViewModel = {
   userLogin: string;
   createdAt: string;
 };
+
+// export class CommViewModel {
+//   constructor(
+//     id: string,
+//     content: string,
+//     userId: string,
+//     userLogin: string,
+//     createdAt: string
+//   ) {}
+// }
