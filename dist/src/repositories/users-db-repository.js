@@ -42,12 +42,15 @@ exports.usersRepository = {
             return updatedUser.modifiedCount === 1;
         });
     },
-    updateConfirmationCode(id) {
+    updateConfirmationCode(user) {
         return __awaiter(this, void 0, void 0, function* () {
+            const id = user.id;
             const updatedCode = yield db_1.usersCollection.updateOne({ id }, {
                 $set: { "emailConfirmation.confirmationCode": (0, crypto_1.randomUUID)() },
             });
-            return updatedCode.modifiedCount === 1;
+            if (updatedCode.modifiedCount !== 1)
+                return false;
+            return user;
         });
     },
     clearUsers() {

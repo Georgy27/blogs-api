@@ -30,14 +30,16 @@ export const usersRepository = {
     );
     return updatedUser.modifiedCount === 1;
   },
-  async updateConfirmationCode(id: string) {
+  async updateConfirmationCode(user: UserAccountDBModel) {
+    const id = user.id;
     const updatedCode = await usersCollection.updateOne(
       { id },
       {
         $set: { "emailConfirmation.confirmationCode": randomUUID() },
       }
     );
-    return updatedCode.modifiedCount === 1;
+    if (updatedCode.modifiedCount !== 1) return false;
+    return user;
   },
   async clearUsers() {
     await usersCollection.deleteMany({});

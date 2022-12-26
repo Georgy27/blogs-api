@@ -34,6 +34,7 @@ exports.usersQueryRepository = {
                 .limit(pageSize)
                 .toArray();
             const numberOfUsers = yield db_1.usersCollection.countDocuments(filter);
+            console.log(users);
             return {
                 pagesCount: Math.ceil(numberOfUsers / pageSize),
                 page: pageNumber,

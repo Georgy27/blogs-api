@@ -13,12 +13,11 @@ export const authService = {
   async resendEmail(email: string) {
     const user = await usersQueryRepository.findByLoginOrEmail(email);
     if (!user) return false;
-    const updatedConfirmationCode = await usersService.updateConfirmationCode(
-      user.id
-    );
+    const updatedConfirmationCode =
+      await usersRepository.updateConfirmationCode(user);
     if (!updatedConfirmationCode) return false;
     try {
-      await emailsManager.sendEmailConformationMessage(user);
+      await emailsManager.sendEmailConformationMessage(updatedConfirmationCode);
     } catch (error) {
       console.log(error);
       // await usersRepository.deleteUser(user.id);

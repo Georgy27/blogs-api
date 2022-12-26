@@ -35,6 +35,8 @@ export const usersQueryRepository = {
       .toArray();
 
     const numberOfUsers = await usersCollection.countDocuments(filter);
+
+    console.log(users);
     return {
       pagesCount: Math.ceil(numberOfUsers / pageSize),
       page: pageNumber,
