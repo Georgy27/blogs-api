@@ -13,7 +13,6 @@ exports.authService = void 0;
 const users_db_query_repository_1 = require("../repositories/users-db-query-repository");
 const users_service_1 = require("./users-service");
 const emails_manager_1 = require("../managers/emails-manager");
-const users_db_repository_1 = require("../repositories/users-db-repository");
 exports.authService = {
     confirmEmail(code) {
         return __awaiter(this, void 0, void 0, function* () {
@@ -29,7 +28,7 @@ exports.authService = {
             const user = yield users_db_query_repository_1.usersQueryRepository.findByLoginOrEmail(email);
             if (!user)
                 return false;
-            const updatedConfirmationCode = yield users_db_repository_1.usersRepository.updateConfirmationCode(user);
+            const updatedConfirmationCode = yield users_service_1.usersService.updateConfirmationCode(user.id);
             if (!updatedConfirmationCode)
                 return false;
             try {
