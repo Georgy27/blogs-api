@@ -45,7 +45,7 @@ authRouter.post(
       secure: true,
     });
 
-    return res.status(200).send(token.accessToken);
+    return res.status(200).send({ accessToken: token.accessToken });
   }
 );
 authRouter.post(
@@ -77,7 +77,7 @@ authRouter.post(
       secure: true,
     });
 
-    return res.status(200).send(token.accessToken);
+    return res.status(200).send({ accessToken: token.accessToken });
   }
 );
 authRouter.post(

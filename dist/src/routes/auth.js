@@ -41,7 +41,7 @@ exports.authRouter.post("/login", loginOrEmailValidation_1.loginOrEmailValidatio
         httpOnly: true,
         secure: true,
     });
-    return res.status(200).send(token.accessToken);
+    return res.status(200).send({ accessToken: token.accessToken });
 }));
 exports.authRouter.post("/registration", loginValidation_1.loginValidation, passwordValidation_1.passwordValidation, emailValidation_1.emailValidation, input_validation_middleware_1.inputValidationMiddleware, (0, morgan_middleware_1.morgan)("tiny"), (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const { login, password, email } = req.body;
@@ -59,7 +59,7 @@ exports.authRouter.post("/refresh-token", refresh_token_middleware_1.refreshToke
         httpOnly: true,
         secure: true,
     });
-    return res.status(200).send(token.accessToken);
+    return res.status(200).send({ accessToken: token.accessToken });
 }));
 exports.authRouter.post("/logout", refresh_token_middleware_1.refreshTokenMiddleware, (0, morgan_middleware_1.morgan)("tiny"), (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const userId = req.user.userId;
