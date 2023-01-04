@@ -1,7 +1,7 @@
 import { Request, Response, Router } from "express";
 import { body, query } from "express-validator";
-import { basicAuthMiddleware } from "../middlewares/basic-auth-middleware";
-import { inputValidationMiddleware } from "../middlewares/input-validation-middleware";
+import { basicAuthMiddleware } from "../middlewares/auth/basic-auth-middleware";
+import { inputValidationMiddleware } from "../middlewares/validation/input-validation-middleware";
 import { blogsQueryRepository } from "../repositories/blogs-db-query-repository";
 import { postsService } from "../domain/posts-service";
 import { postsQueryRepository } from "../repositories/posts-db-query-repository";
@@ -19,17 +19,17 @@ import {
   pageNumberValidation,
   pageSize,
   sortBy,
-} from "../middlewares/sorting&pagination-middleware";
-import { titleValidation } from "../middlewares/posts-middleware/titleValidation";
-import { shortDescriptionValidation } from "../middlewares/posts-middleware/shortDescriptionValidation";
-import { contentValidation } from "../middlewares/posts-middleware/contentValidation";
-import { blogIdValidation } from "../middlewares/posts-middleware/blogIdValidation";
+} from "../middlewares/validation/sorting&pagination-middleware";
+import { titleValidation } from "../middlewares/validation/posts-middleware/titleValidation";
+import { shortDescriptionValidation } from "../middlewares/validation/posts-middleware/shortDescriptionValidation";
+import { contentValidation } from "../middlewares/validation/posts-middleware/contentValidation";
+import { blogIdValidation } from "../middlewares/validation/posts-middleware/blogIdValidation";
 import { commentsService } from "../domain/comments-service";
-import { jwtAuthMiddleware } from "../middlewares/jwt-auth-middleware";
+import { jwtAuthMiddleware } from "../middlewares/auth/jwt-auth-middleware";
 import { AuthViewModel } from "../models/auth-model/AuthViewModel";
 import { CommentsDBModel } from "../models/comments-model/CommentsDBModel";
 import { commentsQueryRepository } from "../repositories/comments-db-query-repository";
-import { commentsValidation } from "../middlewares/comments-middleware/content-validation";
+import { commentsValidation } from "../middlewares/validation/comments-middleware/content-validation";
 import { CommentViewModel } from "../models/comments-model/CommentsViewModel";
 import { Pagination } from "../models/pagination.model";
 import { morgan } from "../middlewares/morgan-middleware";

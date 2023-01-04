@@ -3,17 +3,17 @@ import { usersService } from "../domain/users-service";
 import { CreateUserModel } from "../models/users-model/CreateUserModel";
 import { RequestWithBody, RequestWithParams, RequestWithQuery } from "../types";
 import { UsersDBViewModel } from "../models/users-model/UsersDBViewModel";
-import { basicAuthMiddleware } from "../middlewares/basic-auth-middleware";
-import { inputValidationMiddleware } from "../middlewares/input-validation-middleware";
+import { basicAuthMiddleware } from "../middlewares/auth/basic-auth-middleware";
+import { inputValidationMiddleware } from "../middlewares/validation/input-validation-middleware";
 import { usersQueryRepository } from "../repositories/users-db-query-repository";
 import {
   pageNumberValidation,
   pageSize,
   sortBy,
-} from "../middlewares/sorting&pagination-middleware";
-import { loginValidation } from "../middlewares/users-middleware/loginValidation";
-import { passwordValidation } from "../middlewares/users-middleware/passwordValidation";
-import { emailValidation } from "../middlewares/users-middleware/emailValidation";
+} from "../middlewares/validation/sorting&pagination-middleware";
+import { loginValidation } from "../middlewares/validation/users-middleware/loginValidation";
+import { passwordValidation } from "../middlewares/validation/users-middleware/passwordValidation";
+import { emailValidation } from "../middlewares/validation/users-middleware/emailValidation";
 import { UsersViewModel } from "../models/users-model/UsersViewModel";
 import { Pagination } from "../models/pagination.model";
 import { morgan } from "../middlewares/morgan-middleware";

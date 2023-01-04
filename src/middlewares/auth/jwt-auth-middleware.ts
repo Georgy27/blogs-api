@@ -1,6 +1,6 @@
 import { NextFunction, Request, Response } from "express";
-import { jwtService } from "../application/jwt-service";
-import { usersQueryRepository } from "../repositories/users-db-query-repository";
+import { jwtService } from "../../application/jwt-service";
+import { usersQueryRepository } from "../../repositories/users-db-query-repository";
 
 export const jwtAuthMiddleware = async (
   req: Request,
@@ -14,7 +14,7 @@ export const jwtAuthMiddleware = async (
 
   if (authType !== "Bearer") return res.sendStatus(401);
 
-  const userId = await jwtService.getUserIdByToken(token);
+  const userId = await jwtService.getUserIdByAccessToken(token);
 
   if (!userId) return res.sendStatus(401);
   req.user = await usersQueryRepository.findUserById(userId);

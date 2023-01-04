@@ -1,5 +1,5 @@
 import { body } from "express-validator";
-import { blogsQueryRepository } from "../../repositories/blogs-db-query-repository";
+import { blogsQueryRepository } from "../../../repositories/blogs-db-query-repository";
 
 export const blogIdValidation = body("blogId")
   .isString()

@@ -5,10 +5,12 @@ import { postsRouter } from "../routes/posts";
 import { usersRouter } from "../routes/users";
 import { authRouter } from "../routes/auth";
 import { commentsRouter } from "../routes/comments";
+import cookieParser from "cookie-parser";
 
 export function createServer() {
   const app = express();
   app.use(express.json());
+  app.use(cookieParser());
   // routes
   app.use("/testing/all-data", testingRouter);
   app.use("/blogs", blogsRouter);

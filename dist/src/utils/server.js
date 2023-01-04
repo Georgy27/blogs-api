@@ -11,9 +11,11 @@ const posts_1 = require("../routes/posts");
 const users_1 = require("../routes/users");
 const auth_1 = require("../routes/auth");
 const comments_1 = require("../routes/comments");
+const cookie_parser_1 = __importDefault(require("cookie-parser"));
 function createServer() {
     const app = (0, express_1.default)();
     app.use(express_1.default.json());
+    app.use((0, cookie_parser_1.default)());
     // routes
     app.use("/testing/all-data", testing_1.testingRouter);
     app.use("/blogs", blogs_1.blogsRouter);

@@ -1,19 +1,21 @@
 import { Request, Response, Router, NextFunction } from "express";
 import { RequestWithBody } from "../types";
 import { AuthUserModel } from "../models/auth-model/AuthUserModel";
-import { passwordValidation } from "../middlewares/users-middleware/passwordValidation";
-import { inputValidationMiddleware } from "../middlewares/input-validation-middleware";
+import { passwordValidation } from "../middlewares/validation/users-middleware/passwordValidation";
+import { inputValidationMiddleware } from "../middlewares/validation/input-validation-middleware";
 import { usersService } from "../domain/users-service";
 import { jwtService } from "../application/jwt-service";
-import { jwtAuthMiddleware } from "../middlewares/jwt-auth-middleware";
+import { jwtAuthMiddleware } from "../middlewares/auth/jwt-auth-middleware";
 import { AuthRegistrationModel } from "../models/auth-model/AuthRegistrationModel";
-import { loginValidation } from "../middlewares/users-middleware/loginValidation";
-import { emailValidation } from "../middlewares/users-middleware/emailValidation";
-import { loginOrEmailValidation } from "../middlewares/auth-middleware/loginOrEmailValidation";
+import { loginValidation } from "../middlewares/validation/users-middleware/loginValidation";
+import { emailValidation } from "../middlewares/validation/users-middleware/emailValidation";
+import { loginOrEmailValidation } from "../middlewares/validation/auth-middleware/loginOrEmailValidation";
 import { morgan } from "../middlewares/morgan-middleware";
 import { authService } from "../domain/auth-service";
-import { confirmEmail } from "../middlewares/auth-middleware/confirmEmail";
-import { emailResendingValidation } from "../middlewares/auth-middleware/emailResendingValidation";
+import { confirmEmail } from "../middlewares/validation/auth-middleware/confirmEmail";
+import { emailResendingValidation } from "../middlewares/validation/auth-middleware/emailResendingValidation";
+import { tokenRepository } from "../repositories/token-db-repository";
+import { refreshTokenMiddleware } from "../middlewares/auth/refresh-token-middleware";
 export const authRouter = Router({});
 
 authRouter.post(
@@ -30,8 +32,20 @@ authRouter.post(
     if (!user) {
       return res.sendStatus(401);
     }
-    const token = await jwtService.createJWT(user);
-    return res.status(200).send(token);
+    const token = await jwtService.createJWT(user.id);
+    const saveTokenToDb = await jwtService.saveTokenToDB(
+      user.id,
+      token.refreshToken
+    );
+    if (!saveTokenToDb) return res.status(401).send("Token could not be saved");
+
+    res.cookie("refreshToken", token.refreshToken, {
+      maxAge: 20000,
+      httpOnly: true,
+      secure: true,
+    });
+
+    return res.status(200).send(token.accessToken);
   }
 );
 authRouter.post(
@@ -46,6 +60,35 @@ authRouter.post(
     const newUser = await usersService.createUser(login, password, email);
     if (!newUser) return res.sendStatus(400);
     return res.sendStatus(204);
+  }
+);
+authRouter.post(
+  "/refresh-token",
+  refreshTokenMiddleware,
+  async (req: Request, res: Response) => {
+    const userId = req.user!.userId;
+
+    const token = await jwtService.createJWT(userId);
+    await jwtService.saveTokenToDB(userId, token.refreshToken);
+
+    res.cookie("refreshToken", token.refreshToken, {
+      maxAge: 20000,
+      httpOnly: true,
+      secure: true,
+    });
+
+    return res.status(200).send(token.accessToken);
+  }
+);
+authRouter.post(
+  "/logout",
+  refreshTokenMiddleware,
+  morgan("tiny"),
+  async (req: Request, res: Response) => {
+    const userId = req.user!.userId;
+    const removeToken = await tokenRepository.deleteRefreshToken(userId);
+    if (!removeToken) return res.sendStatus(401);
+    return res.clearCookie("refreshToken").status(204).send({});
   }
 );
 authRouter.post(

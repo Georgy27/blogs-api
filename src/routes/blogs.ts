@@ -1,6 +1,6 @@
 import { Request, Response, Router, NextFunction } from "express";
-import { basicAuthMiddleware } from "../middlewares/basic-auth-middleware";
-import { inputValidationMiddleware } from "../middlewares/input-validation-middleware";
+import { basicAuthMiddleware } from "../middlewares/auth/basic-auth-middleware";
+import { inputValidationMiddleware } from "../middlewares/validation/input-validation-middleware";
 import { blogsService } from "../domain/blogs-service";
 import { blogsQueryRepository } from "../repositories/blogs-db-query-repository";
 import { postsService } from "../domain/posts-service";
@@ -18,17 +18,17 @@ import { UpdateBlogModel } from "../models/blogs-model/UpdateBlogModel";
 import { QueryBlogModel } from "../models/blogs-model/QueryBlogModel";
 import { QueryPostForBlogIdModel } from "../models/blogs-model/QueryPostForBlogIdModel";
 import { BlogsViewModel } from "../models/blogs-model/BlogsViewModel";
-import { nameValidation } from "../middlewares/blogs-middleware/nameValidation";
-import { descriptionValidation } from "../middlewares/blogs-middleware/descriptionValidation";
-import { websiteValidation } from "../middlewares/blogs-middleware/websiteValidation";
+import { nameValidation } from "../middlewares/validation/blogs-middleware/nameValidation";
+import { descriptionValidation } from "../middlewares/validation/blogs-middleware/descriptionValidation";
+import { websiteValidation } from "../middlewares/validation/blogs-middleware/websiteValidation";
 import {
   pageNumberValidation,
   pageSize,
   sortBy,
-} from "../middlewares/sorting&pagination-middleware";
-import { contentValidation } from "../middlewares/posts-middleware/contentValidation";
-import { titleValidation } from "../middlewares/posts-middleware/titleValidation";
-import { shortDescriptionValidation } from "../middlewares/posts-middleware/shortDescriptionValidation";
+} from "../middlewares/validation/sorting&pagination-middleware";
+import { contentValidation } from "../middlewares/validation/posts-middleware/contentValidation";
+import { titleValidation } from "../middlewares/validation/posts-middleware/titleValidation";
+import { shortDescriptionValidation } from "../middlewares/validation/posts-middleware/shortDescriptionValidation";
 import { PostsViewModel } from "../models/posts-model/PostsViewModel";
 import { BlogsDBModel } from "../models/blogs-model/BlogsDBModel";
 import { Pagination } from "../models/pagination.model";

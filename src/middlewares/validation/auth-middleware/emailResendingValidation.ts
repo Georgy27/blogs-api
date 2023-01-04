@@ -1,5 +1,5 @@
 import { body } from "express-validator";
-import { usersQueryRepository } from "../../repositories/users-db-query-repository";
+import { usersQueryRepository } from "../../../repositories/users-db-query-repository";
 
 export const emailResendingValidation = body("email")
   .isEmail()

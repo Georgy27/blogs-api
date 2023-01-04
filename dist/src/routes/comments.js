@@ -12,10 +12,10 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.commentsRouter = void 0;
 const express_1 = require("express");
 const comments_db_query_repository_1 = require("../repositories/comments-db-query-repository");
-const jwt_auth_middleware_1 = require("../middlewares/jwt-auth-middleware");
+const jwt_auth_middleware_1 = require("../middlewares/auth/jwt-auth-middleware");
 const comments_service_1 = require("../domain/comments-service");
-const input_validation_middleware_1 = require("../middlewares/input-validation-middleware");
-const content_validation_1 = require("../middlewares/comments-middleware/content-validation");
+const input_validation_middleware_1 = require("../middlewares/validation/input-validation-middleware");
+const content_validation_1 = require("../middlewares/validation/comments-middleware/content-validation");
 exports.commentsRouter = (0, express_1.Router)({});
 // routes
 exports.commentsRouter.get("/:id", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
