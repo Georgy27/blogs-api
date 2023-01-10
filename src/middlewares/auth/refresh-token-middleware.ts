@@ -1,7 +1,7 @@
 import { NextFunction, Request, Response } from "express";
 import { jwtService } from "../../application/jwt-service";
 import { usersQueryRepository } from "../../repositories/users-db-query-repository";
-import { tokenRepository } from "../../repositories/token-db-repository";
+import { sessionRepository } from "../../repositories/sessions-db-repository";
 
 export const refreshTokenMiddleware = async (
   req: Request,
@@ -10,16 +10,20 @@ export const refreshTokenMiddleware = async (
 ) => {
   const { refreshToken } = req.cookies;
   if (!refreshToken) return res.sendStatus(401);
-  const userId = await jwtService.getUserIdByRefreshToken(refreshToken);
-  if (!userId) return res.sendStatus(401);
-  // check is user exists
-  const user = await usersQueryRepository.findUserById(userId);
+  const jwtPayload = await jwtService.getJWTPayloadByRefreshToken(refreshToken);
+  if (!jwtPayload.userId) return res.sendStatus(401);
+  // check if user exists
+  const user = await usersQueryRepository.findUserById(jwtPayload.userId);
   if (!user) return res.sendStatus(401);
-  const checkRefreshTokenInDb = await tokenRepository.findTokenByUserId(
-    userId,
-    refreshToken
+  const issuedAt = await jwtService.getIssuedAtByRefreshToken(refreshToken);
+  // check if the token expired
+  const lastActiveDate = await sessionRepository.findLastActiveDate(
+    user.userId,
+    issuedAt
   );
-  if (!checkRefreshTokenInDb) return res.sendStatus(401);
+  if (!lastActiveDate) return res.sendStatus(401);
+
   req.user = user;
+  req.jwtPayload = jwtPayload;
   return next();
 };

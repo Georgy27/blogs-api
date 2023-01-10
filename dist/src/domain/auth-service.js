@@ -13,7 +13,31 @@ exports.authService = void 0;
 const users_db_query_repository_1 = require("../repositories/users-db-query-repository");
 const users_service_1 = require("./users-service");
 const emails_manager_1 = require("../managers/emails-manager");
+const crypto_1 = require("crypto");
+const jwt_service_1 = require("../application/jwt-service");
+const sessions_db_repository_1 = require("../repositories/sessions-db-repository");
 exports.authService = {
+    login(loginOrEmail, password, ip, deviceName) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const user = yield users_service_1.usersService.checkCredentials(loginOrEmail, password);
+            if (!user) {
+                return null;
+            }
+            const deviceId = (0, crypto_1.randomUUID)();
+            const tokens = yield jwt_service_1.jwtService.createJWT(user.id, deviceId);
+            const issuedAt = yield jwt_service_1.jwtService.getIssuedAtByRefreshToken(tokens.refreshToken);
+            yield jwt_service_1.jwtService.saveTokenToDB(ip, deviceName, issuedAt, deviceId, user.id);
+            return tokens;
+        });
+    },
+    refreshToken(userId, deviceId) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const tokens = yield jwt_service_1.jwtService.createJWT(userId, deviceId);
+            const issuedAt = yield jwt_service_1.jwtService.getIssuedAtByRefreshToken(tokens.refreshToken);
+            const updateLastActiveDate = yield sessions_db_repository_1.sessionRepository.updateLastActiveDate(deviceId, issuedAt);
+            return tokens;
+        });
+    },
     confirmEmail(code) {
         return __awaiter(this, void 0, void 0, function* () {
             const user = yield users_db_query_repository_1.usersQueryRepository.findUserByConfirmationCode(code);

@@ -12,22 +12,25 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.refreshTokenMiddleware = void 0;
 const jwt_service_1 = require("../../application/jwt-service");
 const users_db_query_repository_1 = require("../../repositories/users-db-query-repository");
-const token_db_repository_1 = require("../../repositories/token-db-repository");
+const sessions_db_repository_1 = require("../../repositories/sessions-db-repository");
 const refreshTokenMiddleware = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     const { refreshToken } = req.cookies;
     if (!refreshToken)
         return res.sendStatus(401);
-    const userId = yield jwt_service_1.jwtService.getUserIdByRefreshToken(refreshToken);
-    if (!userId)
+    const jwtPayload = yield jwt_service_1.jwtService.getJWTPayloadByRefreshToken(refreshToken);
+    if (!jwtPayload.userId)
         return res.sendStatus(401);
-    // check is user exists
-    const user = yield users_db_query_repository_1.usersQueryRepository.findUserById(userId);
+    // check if user exists
+    const user = yield users_db_query_repository_1.usersQueryRepository.findUserById(jwtPayload.userId);
     if (!user)
         return res.sendStatus(401);
-    const checkRefreshTokenInDb = yield token_db_repository_1.tokenRepository.findTokenByUserId(userId, refreshToken);
-    if (!checkRefreshTokenInDb)
+    const issuedAt = yield jwt_service_1.jwtService.getIssuedAtByRefreshToken(refreshToken);
+    // check if the token expired
+    const lastActiveDate = yield sessions_db_repository_1.sessionRepository.findLastActiveDate(user.userId, issuedAt);
+    if (!lastActiveDate)
         return res.sendStatus(401);
     req.user = user;
+    req.jwtPayload = jwtPayload;
     return next();
 });
 exports.refreshTokenMiddleware = refreshTokenMiddleware;

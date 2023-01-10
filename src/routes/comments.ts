@@ -1,18 +1,13 @@
 import { Request, Response, Router } from "express";
 import { RequestWithParams, RequestWithParamsAndBody } from "../types";
-import { CommentsDBModel } from "../models/comments-model/CommentsDBModel";
 import { commentsQueryRepository } from "../repositories/comments-db-query-repository";
 import { jwtAuthMiddleware } from "../middlewares/auth/jwt-auth-middleware";
-import { commentsRepository } from "../repositories/comments-db-repository";
 import { commentsService } from "../domain/comments-service";
-import { contentValidation } from "../middlewares/validation/posts-middleware/contentValidation";
 import { inputValidationMiddleware } from "../middlewares/validation/input-validation-middleware";
 import { commentsValidation } from "../middlewares/validation/comments-middleware/content-validation";
 import { CommentViewModel } from "../models/comments-model/CommentsViewModel";
 
 export const commentsRouter = Router({});
-
-// routes
 
 commentsRouter.get(
   "/:id",

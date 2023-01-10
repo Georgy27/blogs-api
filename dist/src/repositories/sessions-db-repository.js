@@ -9,18 +9,18 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.tokenRepository = void 0;
+exports.sessionRepository = void 0;
 const db_1 = require("./db");
-exports.tokenRepository = {
+exports.sessionRepository = {
     saveNewSession(tokenData) {
         return __awaiter(this, void 0, void 0, function* () {
             return db_1.refreshTokensMetaCollection.insertOne(Object.assign({}, tokenData));
         });
     },
-    findAllActiveSessions() {
+    findAllActiveSessions(userId) {
         return __awaiter(this, void 0, void 0, function* () {
             const devices = yield db_1.refreshTokensMetaCollection
-                .find({}, { projection: { _id: false } })
+                .find({ userId }, { projection: { _id: false } })
                 .toArray();
             const newDevices = devices.map((device) => {
                 return {
@@ -33,9 +33,9 @@ exports.tokenRepository = {
             return newDevices;
         });
     },
-    findLastActiveDate(lastActiveDate) {
+    findLastActiveDate(userId, lastActiveDate) {
         return __awaiter(this, void 0, void 0, function* () {
-            return db_1.refreshTokensMetaCollection.findOne({ lastActiveDate });
+            return db_1.refreshTokensMetaCollection.findOne({ userId, lastActiveDate });
         });
     },
     updateLastActiveDate(deviceId, lastActiveDate) {
@@ -46,12 +46,26 @@ exports.tokenRepository = {
             return result.matchedCount === 1;
         });
     },
-    deleteSessionByDeviceID(deviceId) {
+    findDeviceById(deviceId) {
+        return __awaiter(this, void 0, void 0, function* () {
+            return db_1.refreshTokensMetaCollection.findOne({ deviceId });
+        });
+    },
+    deleteSessionByDeviceID(deviceId, userId) {
         return __awaiter(this, void 0, void 0, function* () {
             const deletedToken = yield db_1.refreshTokensMetaCollection.deleteOne({
+                userId,
                 deviceId,
             });
             return deletedToken.deletedCount === 1;
+        });
+    },
+    deleteAllSessionsExceptCurrent(deviceId, userId) {
+        return __awaiter(this, void 0, void 0, function* () {
+            return db_1.refreshTokensMetaCollection.deleteMany({
+                userId,
+                deviceId: { $ne: deviceId },
+            });
         });
     },
 };

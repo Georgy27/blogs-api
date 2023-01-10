@@ -12,10 +12,13 @@ const users_1 = require("../routes/users");
 const auth_1 = require("../routes/auth");
 const comments_1 = require("../routes/comments");
 const cookie_parser_1 = __importDefault(require("cookie-parser"));
+const securityDevices_1 = require("../routes/securityDevices");
 function createServer() {
     const app = (0, express_1.default)();
+    app.set("trust proxy", true);
     app.use(express_1.default.json());
     app.use((0, cookie_parser_1.default)());
+    // app.use(useragent.express());
     // routes
     app.use("/testing/all-data", testing_1.testingRouter);
     app.use("/blogs", blogs_1.blogsRouter);
@@ -23,6 +26,7 @@ function createServer() {
     app.use("/users", users_1.usersRouter);
     app.use("/auth", auth_1.authRouter);
     app.use("/comments", comments_1.commentsRouter);
+    app.use("/security/devices", securityDevices_1.securityDevicesRouter);
     return app;
 }
 exports.createServer = createServer;

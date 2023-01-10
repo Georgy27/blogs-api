@@ -15,14 +15,14 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.jwtService = void 0;
 const jsonwebtoken_1 = __importDefault(require("jsonwebtoken"));
 const settings_1 = require("../settings");
-const token_db_repository_1 = require("../repositories/token-db-repository");
+const sessions_db_repository_1 = require("../repositories/sessions-db-repository");
 exports.jwtService = {
-    createJWT(userId) {
+    createJWT(userId, deviceId) {
         return __awaiter(this, void 0, void 0, function* () {
             const accessToken = jsonwebtoken_1.default.sign({ userId }, settings_1.settings.JWT_SECRET, {
                 expiresIn: "10s",
             });
-            const refreshToken = jsonwebtoken_1.default.sign({ userId }, settings_1.settings.JWT_REFRESH_SECRET, {
+            const refreshToken = jsonwebtoken_1.default.sign({ deviceId, userId }, settings_1.settings.JWT_REFRESH_SECRET, {
                 expiresIn: "20s",
             });
             return {
@@ -31,9 +31,23 @@ exports.jwtService = {
             };
         });
     },
-    saveTokenToDB(userId, refreshToken) {
+    getIssuedAtByRefreshToken(refreshToken) {
         return __awaiter(this, void 0, void 0, function* () {
-            const tokenData = yield token_db_repository_1.tokenRepository.saveRefreshToken(userId, refreshToken);
+            const refreshTokenDecoded = jsonwebtoken_1.default.decode(refreshToken);
+            const issuedAt = new Date(refreshTokenDecoded.iat * 1000).toISOString();
+            return issuedAt;
+        });
+    },
+    saveTokenToDB(ip, deviceName, issuedAt, deviceId, userId) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const tokenData = {
+                ip,
+                deviceName,
+                lastActiveDate: issuedAt,
+                deviceId,
+                userId,
+            };
+            yield sessions_db_repository_1.sessionRepository.saveNewSession(tokenData);
             return tokenData;
         });
     },
@@ -48,11 +62,11 @@ exports.jwtService = {
             }
         });
     },
-    getUserIdByRefreshToken(token) {
+    getJWTPayloadByRefreshToken(token) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
                 const result = jsonwebtoken_1.default.verify(token, settings_1.settings.JWT_REFRESH_SECRET);
-                return result.userId;
+                return result;
             }
             catch (error) {
                 return null;

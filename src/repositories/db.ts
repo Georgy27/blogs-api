@@ -4,7 +4,7 @@ import { BlogsDBModel } from "../models/blogs-model/BlogsDBModel";
 import { PostsDBModel } from "../models/posts-model/PostsDBModel";
 import { CommentsDBModel } from "../models/comments-model/CommentsDBModel";
 import { UserAccountDBModel } from "../models/users-model/UserAccountDBModel";
-import { UserTokenDBModel } from "../models/token-model/UserTokenDBModel";
+import { SessionsDBModel } from "../models/token-model/SessionsDBModel";
 dotenv.config();
 
 const mongoUrl = process.env.MONGO_URL;
@@ -18,8 +18,8 @@ export const blogsCollection = db.collection<BlogsDBModel>("blogs", {});
 export const postsCollection = db.collection<PostsDBModel>("posts");
 export const usersCollection = db.collection<UserAccountDBModel>("users");
 export const commentsCollection = db.collection<CommentsDBModel>("comments");
-export const userTokenCollection =
-  db.collection<UserTokenDBModel>("user_tokens");
+export const refreshTokensMetaCollection =
+  db.collection<SessionsDBModel>("refresh_tokens");
 
 export async function runDb() {
   try {

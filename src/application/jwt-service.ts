@@ -1,28 +1,46 @@
-import { UsersDBModel } from "../models/users-model/UsersDBModel";
 import jwt from "jsonwebtoken";
 import { settings } from "../settings";
-import { UserAccountDBModel } from "../models/users-model/UserAccountDBModel";
-import { userTokenCollection } from "../repositories/db";
-import { tokenRepository } from "../repositories/token-db-repository";
+import { sessionRepository } from "../repositories/sessions-db-repository";
+import { randomUUID } from "crypto";
 
 export const jwtService = {
-  async createJWT(userId: string) {
+  async createJWT(userId: string, deviceId: string) {
     const accessToken = jwt.sign({ userId }, settings.JWT_SECRET, {
       expiresIn: "10s",
     });
-    const refreshToken = jwt.sign({ userId }, settings.JWT_REFRESH_SECRET, {
-      expiresIn: "20s",
-    });
+    const refreshToken = jwt.sign(
+      { deviceId, userId },
+      settings.JWT_REFRESH_SECRET,
+      {
+        expiresIn: "20s",
+      }
+    );
+
     return {
       accessToken,
       refreshToken,
     };
   },
-  async saveTokenToDB(userId: string, refreshToken: string) {
-    const tokenData = await tokenRepository.saveRefreshToken(
+  async getIssuedAtByRefreshToken(refreshToken: string) {
+    const refreshTokenDecoded: any = jwt.decode(refreshToken);
+    const issuedAt = new Date(refreshTokenDecoded.iat * 1000).toISOString();
+    return issuedAt;
+  },
+  async saveTokenToDB(
+    ip: string,
+    deviceName: string,
+    issuedAt: string,
+    deviceId: string,
+    userId: string
+  ) {
+    const tokenData = {
+      ip,
+      deviceName,
+      lastActiveDate: issuedAt,
+      deviceId,
       userId,
-      refreshToken
-    );
+    };
+    await sessionRepository.saveNewSession(tokenData);
     return tokenData;
   },
   async getUserIdByAccessToken(token: string) {
@@ -33,10 +51,10 @@ export const jwtService = {
       return null;
     }
   },
-  async getUserIdByRefreshToken(token: string) {
+  async getJWTPayloadByRefreshToken(token: string) {
     try {
       const result: any = jwt.verify(token, settings.JWT_REFRESH_SECRET);
-      return result.userId;
+      return result;
     } catch (error) {
       return null;
     }

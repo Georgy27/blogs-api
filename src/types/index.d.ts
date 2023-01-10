@@ -11,6 +11,7 @@ declare global {
   declare namespace Express {
     export interface Request {
       user: AuthViewModel | null;
+      jwtPayload: any;
     }
   }
 }
