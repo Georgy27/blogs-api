@@ -8,24 +8,23 @@ export const checkRequests = async (
   res: Response,
   next: NextFunction
 ) => {
-  // const blockTimeOut = 10 * 1000;
-  // const connectionsLimit = 5;
-  // const connectionAt = +new Date();
+  const blockTimeOut = 10 * 1000;
+  const connectionsLimit = 5;
   const path = req.path;
   const ip = req.ip;
-  const connectionsCount = memoryRequests.filter(
-    (r) => r.ip === ip && r.path === path
-  );
-  const currentDate = new Date().toISOString();
-  const requestsNumber = connectionsCount.filter(
-    (r) => +currentDate - +r.date <= 10 * 1000
-  );
-  if (requestsNumber.length > 5) {
-    return res.sendStatus(429);
-  }
-  memoryRequests.push({ ip, path, date: currentDate });
+  const connectionAt = Date.now().toString();
 
-  next();
+  memoryRequests.push({ ip, path, connectionAt });
+
+  const connectionsCount = memoryRequests.filter(
+    (r) =>
+      r.ip === ip &&
+      r.path === path &&
+      +connectionAt - +r.connectionAt <= blockTimeOut
+  ).length;
+
+  if (connectionsCount > connectionsLimit) return res.sendStatus(429);
+  return next();
 };
 
 // const requests = await connDb.countDocuments({
