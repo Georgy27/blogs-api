@@ -12,12 +12,6 @@ import {
   RequestWithParamsAndQuery,
   RequestWithQuery,
 } from "../types";
-import { CreateBlogModel } from "../models/blogs-model/CreateBlogModel";
-import { CreatePostForBLogIdModel } from "../models/blogs-model/CreatePostForBlogIdModel";
-import { UpdateBlogModel } from "../models/blogs-model/UpdateBlogModel";
-import { QueryBlogModel } from "../models/blogs-model/QueryBlogModel";
-import { QueryPostForBlogIdModel } from "../models/blogs-model/QueryPostForBlogIdModel";
-import { BlogsViewModel } from "../models/blogs-model/BlogsViewModel";
 import { nameValidation } from "../middlewares/validation/blogs-middleware/nameValidation";
 import { descriptionValidation } from "../middlewares/validation/blogs-middleware/descriptionValidation";
 import { websiteValidation } from "../middlewares/validation/blogs-middleware/websiteValidation";
@@ -30,9 +24,18 @@ import { contentValidation } from "../middlewares/validation/posts-middleware/co
 import { titleValidation } from "../middlewares/validation/posts-middleware/titleValidation";
 import { shortDescriptionValidation } from "../middlewares/validation/posts-middleware/shortDescriptionValidation";
 import { PostsViewModel } from "../models/posts-model/PostsViewModel";
-import { BlogsDBModel } from "../models/blogs-model/BlogsDBModel";
 import { Pagination } from "../models/pagination.model";
 import { morgan } from "../middlewares/morgan-middleware";
+import {
+  BlogsDBModel,
+  BlogsViewModel,
+  CreateBlogModel,
+  CreatePostForBLogIdModel,
+  QueryBlogModel,
+  QueryPostForBlogIdModel,
+  UpdateBlogModel,
+} from "../models/blogs-model";
+
 export const blogsRouter = Router({});
 
 // routes

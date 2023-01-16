@@ -23,16 +23,15 @@ var __importStar = (this && this.__importStar) || function (mod) {
     return result;
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.settings = void 0;
-const dotenv = __importStar(require("dotenv"));
-dotenv.config();
-const MONGO_USERNAME = process.env.MONGO_USERNAME || "";
-const MONGO_PASSWORD = process.env.MONGO_PASSWORD || "";
-const MONGO_URL = `mongodb+srv://${MONGO_USERNAME}:${MONGO_PASSWORD}@cluster0.orhfxbm.mongodb.net/blog-api`;
-exports.settings = {
-    mongo: {
-        url: MONGO_URL,
-    },
-    JWT_SECRET: process.env.JWT_SECRET || "5587",
-    JWT_REFRESH_SECRET: process.env.JWT_REFRESH_SECRET || "3285932",
-};
+exports.BlogsModel = void 0;
+const mongoose_1 = __importStar(require("mongoose"));
+const BlogsSchema = new mongoose_1.Schema({
+    id: { type: String, required: true, unique: true },
+    name: { type: String, required: true },
+    description: { type: String, required: true },
+    websiteUrl: { type: String, required: true },
+    createdAt: { type: String, required: true },
+}, {
+    versionKey: false,
+});
+exports.BlogsModel = mongoose_1.default.model("blogs", BlogsSchema);

@@ -1,4 +1,4 @@
-import { blogsCollection, refreshTokensMetaCollection } from "./db";
+import { refreshTokensMetaCollection } from "./db";
 import jwt from "jsonwebtoken";
 import { SessionsDBModel } from "../models/token-model/SessionsDBModel";
 import { SessionsViewModel } from "../models/token-model/SessionsViewModel";

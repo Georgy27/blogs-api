@@ -1,5 +1,4 @@
 import { Request, Response, Router } from "express";
-import { body, query } from "express-validator";
 import { basicAuthMiddleware } from "../middlewares/auth/basic-auth-middleware";
 import { inputValidationMiddleware } from "../middlewares/validation/input-validation-middleware";
 import { blogsQueryRepository } from "../repositories/blogs-db-query-repository";
@@ -26,8 +25,6 @@ import { contentValidation } from "../middlewares/validation/posts-middleware/co
 import { blogIdValidation } from "../middlewares/validation/posts-middleware/blogIdValidation";
 import { commentsService } from "../domain/comments-service";
 import { jwtAuthMiddleware } from "../middlewares/auth/jwt-auth-middleware";
-import { AuthViewModel } from "../models/auth-model/AuthViewModel";
-import { CommentsDBModel } from "../models/comments-model/CommentsDBModel";
 import { commentsQueryRepository } from "../repositories/comments-db-query-repository";
 import { commentsValidation } from "../middlewares/validation/comments-middleware/content-validation";
 import { CommentViewModel } from "../models/comments-model/CommentsViewModel";

@@ -1,10 +1,10 @@
 import { UsersViewModel } from "../models/users-model/UsersViewModel";
-import { blogsCollection, usersCollection } from "./db";
+import { usersCollection } from "./db";
 import { Filter } from "mongodb";
-import { AuthViewModel } from "../models/auth-model/AuthViewModel";
 import { Pagination } from "../models/pagination.model";
 import { UserAccountDBModel } from "../models/users-model/UserAccountDBModel";
 import { mappedUsers } from "../utils/helpers";
+import { AuthViewModel } from "../models/auth-model";
 
 export const usersQueryRepository = {
   async findUsers(

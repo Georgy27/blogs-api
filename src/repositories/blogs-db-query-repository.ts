@@ -1,8 +1,7 @@
-import { blogsCollection } from "./db";
-import { BlogsViewModel } from "../models/blogs-model/BlogsViewModel";
-import { BlogsDBModel } from "../models/blogs-model/BlogsDBModel";
-import { Filter } from "mongodb";
 import { Pagination } from "../models/pagination.model";
+import { BlogsDBModel, BlogsViewModel } from "../models/blogs-model";
+import { BlogsModel } from "../models/blogs-model/blog-schema";
+import { FilterQuery } from "mongoose";
 
 export const blogsQueryRepository = {
   async findBlogs(
@@ -12,19 +11,18 @@ export const blogsQueryRepository = {
     pageNumber: number,
     sortDirection: string | undefined
   ): Promise<Pagination<BlogsViewModel>> {
-    const filter: Filter<BlogsDBModel> = {};
+    const filter: FilterQuery<BlogsDBModel> = {
+      $regex: searchNameTerm ?? "",
+      $options: "i",
+    };
 
-    if (searchNameTerm) {
-      filter.name = { $regex: searchNameTerm, $options: "i" };
-    }
-
-    const blogs: BlogsDBModel[] = await blogsCollection
-      .find(filter, { projection: { _id: false } })
+    const blogs: BlogsDBModel[] = await BlogsModel.find(filter, { _id: false })
       .sort({ [sortBy]: sortDirection === "asc" ? 1 : -1 })
       .skip((pageNumber - 1) * pageSize)
       .limit(pageSize)
-      .toArray();
-    const numberOfBlogs = await blogsCollection.countDocuments(filter);
+      .lean();
+
+    const numberOfBlogs = await BlogsModel.countDocuments(filter);
 
     return {
       pagesCount: Math.ceil(numberOfBlogs / pageSize),
@@ -36,9 +34,9 @@ export const blogsQueryRepository = {
   },
 
   async findBlog(id: string): Promise<BlogsDBModel | null> {
-    const blog = await blogsCollection.findOne(
+    const blog: BlogsDBModel | null = await BlogsModel.findOne(
       { id },
-      { projection: { _id: false } }
+      { _id: false }
     );
     return blog;
   },

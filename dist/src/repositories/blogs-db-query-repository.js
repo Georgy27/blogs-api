@@ -10,21 +10,20 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.blogsQueryRepository = void 0;
-const db_1 = require("./db");
+const blog_schema_1 = require("../models/blogs-model/blog-schema");
 exports.blogsQueryRepository = {
     findBlogs(searchNameTerm, pageSize, sortBy, pageNumber, sortDirection) {
         return __awaiter(this, void 0, void 0, function* () {
-            const filter = {};
-            if (searchNameTerm) {
-                filter.name = { $regex: searchNameTerm, $options: "i" };
-            }
-            const blogs = yield db_1.blogsCollection
-                .find(filter, { projection: { _id: false } })
+            const filter = {
+                $regex: searchNameTerm !== null && searchNameTerm !== void 0 ? searchNameTerm : "",
+                $options: "i",
+            };
+            const blogs = yield blog_schema_1.BlogsModel.find(filter, { _id: false })
                 .sort({ [sortBy]: sortDirection === "asc" ? 1 : -1 })
                 .skip((pageNumber - 1) * pageSize)
                 .limit(pageSize)
-                .toArray();
-            const numberOfBlogs = yield db_1.blogsCollection.countDocuments(filter);
+                .lean();
+            const numberOfBlogs = yield blog_schema_1.BlogsModel.countDocuments(filter);
             return {
                 pagesCount: Math.ceil(numberOfBlogs / pageSize),
                 page: pageNumber,
@@ -36,7 +35,7 @@ exports.blogsQueryRepository = {
     },
     findBlog(id) {
         return __awaiter(this, void 0, void 0, function* () {
-            const blog = yield db_1.blogsCollection.findOne({ id }, { projection: { _id: false } });
+            const blog = yield blog_schema_1.BlogsModel.findOne({ id }, { _id: false });
             return blog;
         });
     },

@@ -1,6 +1,6 @@
 import { Filter } from "mongodb";
 import { CommentsDBModel } from "../models/comments-model/CommentsDBModel";
-import { blogsCollection, commentsCollection } from "./db";
+import { commentsCollection } from "./db";
 import { Pagination } from "../models/pagination.model";
 import { CommentViewModel } from "../models/comments-model/CommentsViewModel";
 

@@ -1,5 +1,5 @@
 import { NextFunction, Request, Response } from "express";
-import { AuthIPModel } from "../../models/auth-model/AuthIPModel";
+import { AuthIPModel } from "../../models/auth-model";
 
 const memoryRequests: AuthIPModel[] = [];
 

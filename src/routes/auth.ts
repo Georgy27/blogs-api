@@ -1,11 +1,9 @@
 import { Request, Response, Router, NextFunction } from "express";
 import { RequestWithBody } from "../types";
-import { AuthUserModel } from "../models/auth-model/AuthUserModel";
 import { passwordValidation } from "../middlewares/validation/users-middleware/passwordValidation";
 import { inputValidationMiddleware } from "../middlewares/validation/input-validation-middleware";
 import { usersService } from "../domain/users-service";
 import { jwtAuthMiddleware } from "../middlewares/auth/jwt-auth-middleware";
-import { AuthRegistrationModel } from "../models/auth-model/AuthRegistrationModel";
 import { loginValidation } from "../middlewares/validation/users-middleware/loginValidation";
 import { emailValidation } from "../middlewares/validation/users-middleware/emailValidation";
 import { loginOrEmailValidation } from "../middlewares/validation/auth-middleware/loginOrEmailValidation";
@@ -16,6 +14,7 @@ import { emailResendingValidation } from "../middlewares/validation/auth-middlew
 import { sessionRepository } from "../repositories/sessions-db-repository";
 import { refreshTokenMiddleware } from "../middlewares/auth/refresh-token-middleware";
 import { checkRequests } from "../middlewares/auth/checkRequests-middleware";
+import { AuthRegistrationModel, AuthUserModel } from "../models/auth-model";
 
 export const authRouter = Router({});
 

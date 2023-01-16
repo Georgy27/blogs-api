@@ -1,9 +1,9 @@
-import { blogsCollection } from "./db";
-import { BlogsDBModel } from "../models/blogs-model/BlogsDBModel";
+import { BlogsDBModel } from "../models/blogs-model";
+import { BlogsModel } from "../models/blogs-model/blog-schema";
 
 export const blogsRepository = {
   async createBlog(newBlog: BlogsDBModel): Promise<BlogsDBModel> {
-    await blogsCollection.insertOne({ ...newBlog });
+    await BlogsModel.create({ ...newBlog });
     return newBlog;
   },
   async updateBlog(
@@ -12,19 +12,18 @@ export const blogsRepository = {
     description: string,
     websiteUrl: string
   ): Promise<boolean> {
-    const result = await blogsCollection.updateOne(
+    const result = await BlogsModel.updateOne(
       { id: blogId },
-      {
-        $set: { name, description, websiteUrl },
-      }
+
+      { name, description, websiteUrl }
     );
     return result.matchedCount === 1;
   },
   async deleteBlog(id: string): Promise<boolean> {
-    const result = await blogsCollection.deleteOne({ id });
+    const result = await BlogsModel.deleteOne({ id });
     return result.deletedCount === 1;
   },
   async clearBlogs() {
-    await blogsCollection.deleteMany({});
+    await BlogsModel.deleteMany({});
   },
 };

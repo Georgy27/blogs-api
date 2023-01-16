@@ -1,7 +1,8 @@
 import request from "supertest";
 import { createServer } from "../../src/utils/server";
 import { constants } from "./constants";
-import { BlogsDBModel } from "../../src/models/blogs-model/BlogsDBModel";
+import { runDb } from "../../src/repositories/db";
+
 const app = createServer();
 
 const blogsPayload = {
@@ -11,11 +12,15 @@ const blogsPayload = {
 };
 
 describe("blog router", () => {
+  // jest.setTimeout(1000 * 15);
+
   beforeAll(async () => {
+    await runDb();
     const { statusCode, body } = await request(app).delete("/testing/all-data");
     expect(statusCode).toBe(204);
     expect(body).toEqual({});
   });
+
   //GET
   describe("GET METHODS", () => {
     describe("Get all blogs /blogs (GET)", () => {

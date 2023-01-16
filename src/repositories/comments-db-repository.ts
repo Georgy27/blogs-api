@@ -1,4 +1,4 @@
-import { blogsCollection, commentsCollection } from "./db";
+import { commentsCollection } from "./db";
 import { CommentsDBModel } from "../models/comments-model/CommentsDBModel";
 import { CommentViewModel } from "../models/comments-model/CommentsViewModel";
 

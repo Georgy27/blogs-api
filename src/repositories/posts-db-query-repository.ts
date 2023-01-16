@@ -1,4 +1,4 @@
-import { blogsCollection, postsCollection } from "./db";
+import { postsCollection } from "./db";
 import { PostsViewModel } from "../models/posts-model/PostsViewModel";
 import { PostsDBModel } from "../models/posts-model/PostsDBModel";
 import { Filter } from "mongodb";

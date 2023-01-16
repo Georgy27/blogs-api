@@ -1,5 +1,5 @@
 import { randomUUID } from "crypto";
-import { blogsCollection, postsCollection } from "./db";
+import { postsCollection } from "./db";
 import { PostsDBModel } from "../models/posts-model/PostsDBModel";
 
 export const postsRepository = {
