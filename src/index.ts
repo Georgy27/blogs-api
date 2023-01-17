@@ -7,6 +7,8 @@ const app = createServer();
 const port = 3000;
 
 const startApp = async () => {
+  console.log(process.env.PORT);
+  console.log(process.env.MONGO_URL);
   await runDb();
   app.listen(port, () => {
     console.log(`App is listening on the port ${port}`);

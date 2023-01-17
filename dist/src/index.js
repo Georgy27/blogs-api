@@ -17,6 +17,8 @@ const server_1 = require("./utils/server");
 const app = (0, server_1.createServer)();
 const port = 3000;
 const startApp = () => __awaiter(void 0, void 0, void 0, function* () {
+    console.log(process.env.PORT);
+    console.log(process.env.MONGO_URL);
     yield (0, db_1.runDb)();
     app.listen(port, () => {
         console.log(`App is listening on the port ${port}`);
