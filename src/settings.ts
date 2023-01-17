@@ -3,7 +3,7 @@ dotenv.config();
 
 const MONGO_USERNAME = process.env.MONGO_USERNAME || "";
 const MONGO_PASSWORD = process.env.MONGO_PASSWORD || "";
-const MONGO_URL = `mongodb+srv://${MONGO_USERNAME}:${MONGO_PASSWORD}@cluster0.orhfxbm.mongodb.net/blog-api`;
+const MONGO_URL = `mongodb+srv://${MONGO_USERNAME}:${MONGO_PASSWORD}@cluster0.orhfxbm.mongodb.net`;
 
 export const settings = {
   mongo: {
