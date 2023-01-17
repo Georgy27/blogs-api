@@ -4,6 +4,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.createServer = void 0;
+require("dotenv").config();
 const express_1 = __importDefault(require("express"));
 const testing_1 = require("../routes/testing");
 const blogs_1 = require("../routes/blogs");

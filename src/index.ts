@@ -5,12 +5,11 @@ import { createServer } from "./utils/server";
 const app = createServer();
 const port = 3000;
 
-function sleep(seconds: number) {
-  return new Promise((resolve) => setTimeout(resolve, seconds * 1000));
-}
+// function sleep(seconds: number) {
+//   return new Promise((resolve) => setTimeout(resolve, seconds * 1000));
+// }
 
 const startApp = async () => {
-  await sleep(10);
   console.log(process.env.PORT);
   console.log(process.env.MONGO_URL);
   await runDb();

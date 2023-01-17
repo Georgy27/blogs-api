@@ -1,3 +1,4 @@
+require("dotenv").config();
 import express from "express";
 import { testingRouter } from "../routes/testing";
 import { blogsRouter } from "../routes/blogs";
