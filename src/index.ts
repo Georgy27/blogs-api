@@ -1,5 +1,4 @@
-import * as dotenv from "dotenv";
-dotenv.config();
+require("dotenv").config();
 import { runDb } from "./repositories/db";
 import { createServer } from "./utils/server";
 // remove app to a different folder
@@ -12,7 +11,6 @@ function sleep(seconds: number) {
 
 const startApp = async () => {
   await sleep(10);
-  console.log(dotenv);
   console.log(process.env.PORT);
   console.log(process.env.MONGO_URL);
   await runDb();
