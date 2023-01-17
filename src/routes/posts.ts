@@ -11,9 +11,6 @@ import {
   RequestWithParamsAndQuery,
   RequestWithQuery,
 } from "../types";
-import { CreatePostModel } from "../models/posts-model/CreatePostModel";
-import { QueryPostModel } from "../models/posts-model/QueryPostModel";
-import { UpdatePostModel } from "../models/posts-model/UpdatePostModel";
 import {
   pageNumberValidation,
   pageSize,
@@ -27,9 +24,14 @@ import { commentsService } from "../domain/comments-service";
 import { jwtAuthMiddleware } from "../middlewares/auth/jwt-auth-middleware";
 import { commentsQueryRepository } from "../repositories/comments-db-query-repository";
 import { commentsValidation } from "../middlewares/validation/comments-middleware/content-validation";
-import { CommentViewModel } from "../models/comments-model/CommentsViewModel";
 import { Pagination } from "../models/pagination.model";
 import { morgan } from "../middlewares/morgan-middleware";
+import {
+  CreatePostModel,
+  QueryPostModel,
+  UpdatePostModel,
+} from "../models/posts-model";
+import { CommentViewModel } from "../models/comments-model";
 export const postsRouter = Router({});
 
 // routes

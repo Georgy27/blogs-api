@@ -1,6 +1,3 @@
-import { PostsViewModel } from "../../src/models/posts-model/PostsViewModel";
-import { PostsDBModel } from "../../src/models/posts-model/PostsDBModel";
-
 export const constants = {
   createBlog1: {
     name: "blogTest1",

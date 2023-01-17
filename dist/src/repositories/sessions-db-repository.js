@@ -10,18 +10,16 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.sessionRepository = void 0;
-const db_1 = require("./db");
+const session_schema_1 = require("../models/sessions-model/session-schema");
 exports.sessionRepository = {
     saveNewSession(tokenData) {
         return __awaiter(this, void 0, void 0, function* () {
-            return db_1.refreshTokensMetaCollection.insertOne(Object.assign({}, tokenData));
+            return session_schema_1.SessionsModel.create(Object.assign({}, tokenData));
         });
     },
     findAllActiveSessions(userId) {
         return __awaiter(this, void 0, void 0, function* () {
-            const devices = yield db_1.refreshTokensMetaCollection
-                .find({ userId }, { projection: { _id: false } })
-                .toArray();
+            const devices = yield session_schema_1.SessionsModel.find({ userId }, { _id: false }).lean();
             const newDevices = devices.map((device) => {
                 return {
                     ip: device.ip,
@@ -35,25 +33,23 @@ exports.sessionRepository = {
     },
     findLastActiveDate(userId, lastActiveDate) {
         return __awaiter(this, void 0, void 0, function* () {
-            return db_1.refreshTokensMetaCollection.findOne({ userId, lastActiveDate });
+            return session_schema_1.SessionsModel.findOne({ userId, lastActiveDate });
         });
     },
     updateLastActiveDate(deviceId, lastActiveDate) {
         return __awaiter(this, void 0, void 0, function* () {
-            const result = yield db_1.refreshTokensMetaCollection.updateOne({ deviceId }, {
-                $set: { lastActiveDate },
-            });
+            const result = yield session_schema_1.SessionsModel.updateOne({ deviceId }, { lastActiveDate });
             return result.matchedCount === 1;
         });
     },
     findDeviceById(deviceId) {
         return __awaiter(this, void 0, void 0, function* () {
-            return db_1.refreshTokensMetaCollection.findOne({ deviceId });
+            return session_schema_1.SessionsModel.findOne({ deviceId });
         });
     },
     deleteSessionByDeviceID(deviceId, userId) {
         return __awaiter(this, void 0, void 0, function* () {
-            const deletedToken = yield db_1.refreshTokensMetaCollection.deleteOne({
+            const deletedToken = yield session_schema_1.SessionsModel.deleteOne({
                 userId,
                 deviceId,
             });
@@ -62,7 +58,7 @@ exports.sessionRepository = {
     },
     deleteAllSessionsExceptCurrent(deviceId, userId) {
         return __awaiter(this, void 0, void 0, function* () {
-            return db_1.refreshTokensMetaCollection.deleteMany({
+            return session_schema_1.SessionsModel.deleteMany({
                 userId,
                 deviceId: { $ne: deviceId },
             });

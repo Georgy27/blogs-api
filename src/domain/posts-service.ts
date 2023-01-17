@@ -1,6 +1,6 @@
 import { randomUUID } from "crypto";
 import { postsRepository } from "../repositories/posts-db-repository";
-import { PostsDBModel } from "../models/posts-model/PostsDBModel";
+import { PostsDBModel } from "../models/posts-model";
 
 export const postsService = {
   async createPost(

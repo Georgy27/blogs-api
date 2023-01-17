@@ -1,4 +1,4 @@
-import { UserAccountDBModel } from "../models/users-model/UserAccountDBModel";
+import { UserAccountDBModel } from "../models/users-model";
 
 export const mappedUsers = function (users: UserAccountDBModel[]) {
   const newUsers = users.map((user) => {

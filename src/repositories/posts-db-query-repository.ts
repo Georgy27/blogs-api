@@ -1,7 +1,6 @@
-import { postsCollection } from "./db";
-import { PostsViewModel } from "../models/posts-model/PostsViewModel";
-import { PostsDBModel } from "../models/posts-model/PostsDBModel";
-import { Filter } from "mongodb";
+import { PostsDBModel, PostsViewModel } from "../models/posts-model";
+import { PostsModel } from "../models/posts-model/post-schema";
+import { FilterQuery } from "mongoose";
 
 export const postsQueryRepository = {
   async findPosts(
@@ -11,19 +10,19 @@ export const postsQueryRepository = {
     sortDirection: string | undefined,
     blogId?: string
   ): Promise<PostsViewModel> {
-    const filter: Filter<PostsDBModel> = {};
+    const filter: FilterQuery<PostsDBModel> = {};
 
     if (blogId) {
       filter.blogId = { $regex: blogId };
     }
 
-    const posts: PostsDBModel[] = await postsCollection
-      .find(filter, { projection: { _id: false } })
+    const posts: PostsDBModel[] = await PostsModel.find(filter, { _id: false })
       .sort({ [sortBy]: sortDirection === "asc" ? 1 : -1 })
       .skip((pageNumber - 1) * pageSize)
       .limit(pageSize)
-      .toArray();
-    const numberOfPosts = await postsCollection.count(filter);
+      .lean();
+
+    const numberOfPosts = await PostsModel.count(filter);
 
     return {
       pagesCount: Math.ceil(numberOfPosts / pageSize),
@@ -34,11 +33,11 @@ export const postsQueryRepository = {
     };
   },
 
-  async findPost(id: string) {
-    const post = await postsCollection.findOne(
+  async findPost(id: string): Promise<PostsDBModel | null> {
+    const post: PostsDBModel | null = await PostsModel.findOne(
       { id },
-      { projection: { _id: false } }
-    );
+      { _id: false }
+    ).lean();
     return post;
   },
 };

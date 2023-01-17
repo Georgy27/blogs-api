@@ -15,6 +15,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const supertest_1 = __importDefault(require("supertest"));
 const server_1 = require("../../src/utils/server");
 const constants_1 = require("./constants");
+const db_1 = require("../../src/repositories/db");
 const app = (0, server_1.createServer)();
 const blogsPayload = {
     name: "Bob",
@@ -22,7 +23,9 @@ const blogsPayload = {
     websiteUrl: "https://it-incubator.io",
 };
 describe("blog router", () => {
+    // jest.setTimeout(1000 * 15);
     beforeAll(() => __awaiter(void 0, void 0, void 0, function* () {
+        yield (0, db_1.runDb)();
         const { statusCode, body } = yield (0, supertest_1.default)(app).delete("/testing/all-data");
         expect(statusCode).toBe(204);
         expect(body).toEqual({});

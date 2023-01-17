@@ -12,7 +12,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.runDb = exports.refreshTokensMetaCollection = exports.commentsCollection = exports.usersCollection = exports.postsCollection = exports.db = void 0;
+exports.runDb = exports.refreshTokensMetaCollection = exports.db = void 0;
 const mongodb_1 = require("mongodb");
 const mongoose_1 = __importDefault(require("mongoose"));
 const settings_1 = require("../settings");
@@ -22,9 +22,6 @@ if (!mongoUrl) {
 }
 const client = new mongodb_1.MongoClient(mongoUrl);
 exports.db = client.db("blog-api");
-exports.postsCollection = exports.db.collection("posts");
-exports.usersCollection = exports.db.collection("users");
-exports.commentsCollection = exports.db.collection("comments");
 exports.refreshTokensMetaCollection = exports.db.collection("refresh_tokens");
 function runDb() {
     return __awaiter(this, void 0, void 0, function* () {

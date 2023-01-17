@@ -18,7 +18,6 @@ function createServer() {
     app.set("trust proxy", true);
     app.use(express_1.default.json());
     app.use((0, cookie_parser_1.default)());
-    // app.use(useragent.express());
     // routes
     app.use("/testing/all-data", testing_1.testingRouter);
     app.use("/blogs", blogs_1.blogsRouter);

@@ -23,7 +23,6 @@ import {
 import { contentValidation } from "../middlewares/validation/posts-middleware/contentValidation";
 import { titleValidation } from "../middlewares/validation/posts-middleware/titleValidation";
 import { shortDescriptionValidation } from "../middlewares/validation/posts-middleware/shortDescriptionValidation";
-import { PostsViewModel } from "../models/posts-model/PostsViewModel";
 import { Pagination } from "../models/pagination.model";
 import { morgan } from "../middlewares/morgan-middleware";
 import {
@@ -35,6 +34,7 @@ import {
   QueryPostForBlogIdModel,
   UpdateBlogModel,
 } from "../models/blogs-model";
+import { PostsViewModel } from "../models/posts-model";
 
 export const blogsRouter = Router({});
 

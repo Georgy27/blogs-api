@@ -1,7 +1,6 @@
 import { commentsRepository } from "../repositories/comments-db-repository";
-import { CommentsDBModel } from "../models/comments-model/CommentsDBModel";
 import { randomUUID } from "crypto";
-import { CommentViewModel } from "../models/comments-model/CommentsViewModel";
+import { CommentsDBModel, CommentViewModel } from "../models/comments-model";
 
 export const commentsService = {
   async createComment(

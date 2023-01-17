@@ -10,31 +10,29 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.postsRepository = void 0;
-const db_1 = require("./db");
+const post_schema_1 = require("../models/posts-model/post-schema");
 exports.postsRepository = {
     createPost(newPost) {
         return __awaiter(this, void 0, void 0, function* () {
-            yield db_1.postsCollection.insertOne(Object.assign({}, newPost));
+            yield post_schema_1.PostsModel.create(Object.assign({}, newPost));
             return newPost;
         });
     },
     updatePost(postId, title, shortDescription, content, blogId) {
         return __awaiter(this, void 0, void 0, function* () {
-            const result = yield db_1.postsCollection.updateOne({ id: postId }, {
-                $set: { title, shortDescription, content, blogId },
-            });
+            const result = yield post_schema_1.PostsModel.updateOne({ id: postId }, { title, shortDescription, content, blogId });
             return result.matchedCount === 1;
         });
     },
     deletePost(id) {
         return __awaiter(this, void 0, void 0, function* () {
-            const result = yield db_1.postsCollection.deleteOne({ id });
+            const result = yield post_schema_1.PostsModel.deleteOne({ id });
             return result.deletedCount === 1;
         });
     },
     clearPosts() {
         return __awaiter(this, void 0, void 0, function* () {
-            yield db_1.postsCollection.deleteMany({});
+            yield post_schema_1.PostsModel.deleteMany({});
         });
     },
 };

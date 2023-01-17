@@ -10,8 +10,8 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.usersQueryRepository = void 0;
-const db_1 = require("./db");
 const helpers_1 = require("../utils/helpers");
+const user_schema_1 = require("../models/users-model/user-schema");
 exports.usersQueryRepository = {
     findUsers(pageNumber, pageSize, sortBy, sortDirection, searchLoginTerm, searchEmailTerm) {
         return __awaiter(this, void 0, void 0, function* () {
@@ -25,15 +25,14 @@ exports.usersQueryRepository = {
                     },
                 ],
             };
-            const users = yield db_1.usersCollection
-                .find(filter, {
+            const users = yield user_schema_1.UsersModel.find(filter, {
                 projection: { _id: false, "accountData.passwordHash": false },
             })
                 .sort({ [sortBy]: sortDirection === "asc" ? 1 : -1 })
                 .skip((pageNumber - 1) * pageSize)
                 .limit(pageSize)
-                .toArray();
-            const numberOfUsers = yield db_1.usersCollection.countDocuments(filter);
+                .lean();
+            const numberOfUsers = yield user_schema_1.UsersModel.countDocuments(filter);
             console.log(users);
             return {
                 pagesCount: Math.ceil(numberOfUsers / pageSize),
@@ -46,7 +45,7 @@ exports.usersQueryRepository = {
     },
     findUserById(id) {
         return __awaiter(this, void 0, void 0, function* () {
-            const user = yield db_1.usersCollection.findOne({ id }, { projection: { _id: false } });
+            const user = yield user_schema_1.UsersModel.findOne({ id }, { _id: false });
             if (user) {
                 return {
                     email: user.accountData.email,
@@ -59,20 +58,18 @@ exports.usersQueryRepository = {
     },
     findByLoginOrEmail(loginOrEmail) {
         return __awaiter(this, void 0, void 0, function* () {
-            const user = yield db_1.usersCollection.findOne({
-                $or: [
-                    { "accountData.email": loginOrEmail },
-                    { "accountData.login": loginOrEmail },
-                ],
-            });
+            const user = yield user_schema_1.UsersModel.findOne([
+                { "accountData.email": loginOrEmail },
+                { "accountData.login": loginOrEmail },
+            ]).lean();
             return user;
         });
     },
     findUserByConfirmationCode(code) {
         return __awaiter(this, void 0, void 0, function* () {
-            const user = yield db_1.usersCollection.findOne({
+            const user = yield user_schema_1.UsersModel.findOne({
                 "emailConfirmation.confirmationCode": code,
-            });
+            }).lean();
             return user;
         });
     },

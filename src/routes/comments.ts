@@ -5,7 +5,7 @@ import { jwtAuthMiddleware } from "../middlewares/auth/jwt-auth-middleware";
 import { commentsService } from "../domain/comments-service";
 import { inputValidationMiddleware } from "../middlewares/validation/input-validation-middleware";
 import { commentsValidation } from "../middlewares/validation/comments-middleware/content-validation";
-import { CommentViewModel } from "../models/comments-model/CommentsViewModel";
+import { CommentViewModel } from "../models/comments-model";
 
 export const commentsRouter = Router({});
 

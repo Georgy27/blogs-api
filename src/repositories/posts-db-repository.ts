@@ -1,10 +1,9 @@
-import { randomUUID } from "crypto";
-import { postsCollection } from "./db";
-import { PostsDBModel } from "../models/posts-model/PostsDBModel";
+import { PostsDBModel } from "../models/posts-model";
+import { PostsModel } from "../models/posts-model/post-schema";
 
 export const postsRepository = {
   async createPost(newPost: PostsDBModel): Promise<PostsDBModel> {
-    await postsCollection.insertOne({ ...newPost });
+    await PostsModel.create({ ...newPost });
     return newPost;
   },
   async updatePost(
@@ -14,19 +13,18 @@ export const postsRepository = {
     content: string,
     blogId: string
   ) {
-    const result = await postsCollection.updateOne(
+    const result = await PostsModel.updateOne(
       { id: postId },
-      {
-        $set: { title, shortDescription, content, blogId },
-      }
+
+      { title, shortDescription, content, blogId }
     );
     return result.matchedCount === 1;
   },
   async deletePost(id: string) {
-    const result = await postsCollection.deleteOne({ id });
+    const result = await PostsModel.deleteOne({ id });
     return result.deletedCount === 1;
   },
   async clearPosts() {
-    await postsCollection.deleteMany({});
+    await PostsModel.deleteMany({});
   },
 };

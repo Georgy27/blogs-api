@@ -35,7 +35,7 @@ exports.blogsQueryRepository = {
     },
     findBlog(id) {
         return __awaiter(this, void 0, void 0, function* () {
-            const blog = yield blog_schema_1.BlogsModel.findOne({ id }, { _id: false });
+            const blog = yield blog_schema_1.BlogsModel.findOne({ id }, { _id: false }).lean();
             return blog;
         });
     },

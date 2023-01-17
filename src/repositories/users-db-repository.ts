@@ -1,16 +1,14 @@
-import { UsersDBModel } from "../models/users-model/UsersDBModel";
-import { postsCollection, usersCollection } from "./db";
-import { UsersDBViewModel } from "../models/users-model/UsersDBViewModel";
-import { UserAccountDBModel } from "../models/users-model/UserAccountDBModel";
 import { randomUUID } from "crypto";
+import { UserAccountDBModel, UsersViewModel } from "../models/users-model";
+import { UsersModel } from "../models/users-model/user-schema";
 
 export const usersRepository = {
   async createUser(user: UserAccountDBModel): Promise<UserAccountDBModel> {
-    await usersCollection.insertOne({ ...user });
+    await UsersModel.create({ ...user });
     return user;
   },
-  async createUserByAdmin(user: UserAccountDBModel): Promise<UsersDBViewModel> {
-    await usersCollection.insertOne({ ...user });
+  async createUserByAdmin(user: UserAccountDBModel): Promise<UsersViewModel> {
+    await UsersModel.create({ ...user });
     return {
       id: user.id,
       login: user.accountData.login,
@@ -19,30 +17,30 @@ export const usersRepository = {
     };
   },
   async deleteUser(id: string) {
-    const result = await usersCollection.deleteOne({ id });
+    const result = await UsersModel.deleteOne({ id });
     return result.deletedCount === 1;
   },
 
   async updateConfirmation(id: string): Promise<boolean> {
-    const updatedUser = await usersCollection.updateOne(
+    const updatedUser = await UsersModel.updateOne(
       { id },
-      { $set: { "emailConfirmation.isConfirmed": true } }
+      { "emailConfirmation.isConfirmed": true }
     );
     return updatedUser.modifiedCount === 1;
   },
   async updateConfirmationCode(id: string): Promise<UserAccountDBModel | null> {
-    const updatedUser = await usersCollection.findOneAndUpdate(
+    const updatedUser = await UsersModel.findOneAndUpdate(
       { id },
       {
-        $set: { "emailConfirmation.confirmationCode": randomUUID() },
+        "emailConfirmation.confirmationCode": randomUUID(),
       },
 
       { returnDocument: "after" }
-    );
-    if (updatedUser.ok !== 1) return null;
-    return updatedUser.value;
+    ).lean();
+    if (!updatedUser) return null;
+    return updatedUser;
   },
   async clearUsers() {
-    await usersCollection.deleteMany({});
+    await UsersModel.deleteMany({});
   },
 };

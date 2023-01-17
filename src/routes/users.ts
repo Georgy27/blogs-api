@@ -1,8 +1,6 @@
 import { Request, Response, Router } from "express";
 import { usersService } from "../domain/users-service";
-import { CreateUserModel } from "../models/users-model/CreateUserModel";
 import { RequestWithBody, RequestWithParams, RequestWithQuery } from "../types";
-import { UsersDBViewModel } from "../models/users-model/UsersDBViewModel";
 import { basicAuthMiddleware } from "../middlewares/auth/basic-auth-middleware";
 import { inputValidationMiddleware } from "../middlewares/validation/input-validation-middleware";
 import { usersQueryRepository } from "../repositories/users-db-query-repository";
@@ -14,9 +12,9 @@ import {
 import { loginValidation } from "../middlewares/validation/users-middleware/loginValidation";
 import { passwordValidation } from "../middlewares/validation/users-middleware/passwordValidation";
 import { emailValidation } from "../middlewares/validation/users-middleware/emailValidation";
-import { UsersViewModel } from "../models/users-model/UsersViewModel";
 import { Pagination } from "../models/pagination.model";
 import { morgan } from "../middlewares/morgan-middleware";
+import { CreateUserModel, UsersViewModel } from "../models/users-model";
 
 export const usersRouter = Router({});
 
@@ -57,7 +55,7 @@ usersRouter.post(
   morgan("tiny"),
   async (
     req: RequestWithBody<CreateUserModel>,
-    res: Response<UsersDBViewModel>
+    res: Response<UsersViewModel>
   ) => {
     const { login, password, email } = req.body;
     const newUser = await usersService.createUserByAdmin(

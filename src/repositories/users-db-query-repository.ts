@@ -1,10 +1,9 @@
-import { UsersViewModel } from "../models/users-model/UsersViewModel";
-import { usersCollection } from "./db";
-import { Filter } from "mongodb";
 import { Pagination } from "../models/pagination.model";
-import { UserAccountDBModel } from "../models/users-model/UserAccountDBModel";
 import { mappedUsers } from "../utils/helpers";
 import { AuthViewModel } from "../models/auth-model";
+import { UserAccountDBModel, UsersViewModel } from "../models/users-model";
+import { FilterQuery } from "mongoose";
+import { UsersModel } from "../models/users-model/user-schema";
 
 export const usersQueryRepository = {
   async findUsers(
@@ -15,7 +14,7 @@ export const usersQueryRepository = {
     searchLoginTerm: string | undefined | null,
     searchEmailTerm: string | undefined | null
   ): Promise<Pagination<UsersViewModel>> {
-    const filter: Filter<UserAccountDBModel> = {
+    const filter: FilterQuery<UserAccountDBModel> = {
       $or: [
         {
           "accountData.login": { $regex: searchLoginTerm ?? "", $options: "i" },
@@ -25,16 +24,15 @@ export const usersQueryRepository = {
         },
       ],
     };
-    const users = await usersCollection
-      .find(filter, {
-        projection: { _id: false, "accountData.passwordHash": false },
-      })
+    const users = await UsersModel.find(filter, {
+      projection: { _id: false, "accountData.passwordHash": false },
+    })
       .sort({ [sortBy]: sortDirection === "asc" ? 1 : -1 })
       .skip((pageNumber - 1) * pageSize)
       .limit(pageSize)
-      .toArray();
+      .lean();
 
-    const numberOfUsers = await usersCollection.countDocuments(filter);
+    const numberOfUsers = await UsersModel.countDocuments(filter);
 
     console.log(users);
     return {
@@ -46,10 +44,7 @@ export const usersQueryRepository = {
     };
   },
   async findUserById(id: string): Promise<AuthViewModel | null> {
-    const user = await usersCollection.findOne(
-      { id },
-      { projection: { _id: false } }
-    );
+    const user = await UsersModel.findOne({ id }, { _id: false });
 
     if (user) {
       return {
@@ -63,20 +58,18 @@ export const usersQueryRepository = {
   async findByLoginOrEmail(
     loginOrEmail: string
   ): Promise<UserAccountDBModel | null> {
-    const user = await usersCollection.findOne({
-      $or: [
-        { "accountData.email": loginOrEmail },
-        { "accountData.login": loginOrEmail },
-      ],
-    });
+    const user = await UsersModel.findOne([
+      { "accountData.email": loginOrEmail },
+      { "accountData.login": loginOrEmail },
+    ]).lean();
     return user;
   },
   async findUserByConfirmationCode(
     code: string
   ): Promise<UserAccountDBModel | null> {
-    const user = await usersCollection.findOne({
+    const user = await UsersModel.findOne({
       "emailConfirmation.confirmationCode": code,
-    });
+    }).lean();
     return user;
   },
 };

@@ -10,18 +10,18 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.usersRepository = void 0;
-const db_1 = require("./db");
 const crypto_1 = require("crypto");
+const user_schema_1 = require("../models/users-model/user-schema");
 exports.usersRepository = {
     createUser(user) {
         return __awaiter(this, void 0, void 0, function* () {
-            yield db_1.usersCollection.insertOne(Object.assign({}, user));
+            yield user_schema_1.UsersModel.create(Object.assign({}, user));
             return user;
         });
     },
     createUserByAdmin(user) {
         return __awaiter(this, void 0, void 0, function* () {
-            yield db_1.usersCollection.insertOne(Object.assign({}, user));
+            yield user_schema_1.UsersModel.create(Object.assign({}, user));
             return {
                 id: user.id,
                 login: user.accountData.login,
@@ -32,29 +32,29 @@ exports.usersRepository = {
     },
     deleteUser(id) {
         return __awaiter(this, void 0, void 0, function* () {
-            const result = yield db_1.usersCollection.deleteOne({ id });
+            const result = yield user_schema_1.UsersModel.deleteOne({ id });
             return result.deletedCount === 1;
         });
     },
     updateConfirmation(id) {
         return __awaiter(this, void 0, void 0, function* () {
-            const updatedUser = yield db_1.usersCollection.updateOne({ id }, { $set: { "emailConfirmation.isConfirmed": true } });
+            const updatedUser = yield user_schema_1.UsersModel.updateOne({ id }, { "emailConfirmation.isConfirmed": true });
             return updatedUser.modifiedCount === 1;
         });
     },
     updateConfirmationCode(id) {
         return __awaiter(this, void 0, void 0, function* () {
-            const updatedUser = yield db_1.usersCollection.findOneAndUpdate({ id }, {
-                $set: { "emailConfirmation.confirmationCode": (0, crypto_1.randomUUID)() },
-            }, { returnDocument: "after" });
-            if (updatedUser.ok !== 1)
+            const updatedUser = yield user_schema_1.UsersModel.findOneAndUpdate({ id }, {
+                "emailConfirmation.confirmationCode": (0, crypto_1.randomUUID)(),
+            }, { returnDocument: "after" }).lean();
+            if (!updatedUser)
                 return null;
-            return updatedUser.value;
+            return updatedUser;
         });
     },
     clearUsers() {
         return __awaiter(this, void 0, void 0, function* () {
-            yield db_1.usersCollection.deleteMany({});
+            yield user_schema_1.UsersModel.deleteMany({});
         });
     },
 };

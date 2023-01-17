@@ -1,5 +1,5 @@
 import { emailAdapter } from "../adapters/email-adapter";
-import { UserAccountDBModel } from "../models/users-model/UserAccountDBModel";
+import { UserAccountDBModel } from "../models/users-model";
 
 export const emailsManager = {
   async sendEmailConformationMessage(user: UserAccountDBModel) {

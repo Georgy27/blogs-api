@@ -1,12 +1,10 @@
 import bcrypt from "bcrypt";
-import { UsersDBModel } from "../models/users-model/UsersDBModel";
 import { randomUUID } from "crypto";
 import { usersRepository } from "../repositories/users-db-repository";
-import { UsersDBViewModel } from "../models/users-model/UsersDBViewModel";
-import { UserAccountDBModel } from "../models/users-model/UserAccountDBModel";
 import add from "date-fns/add";
 import { emailsManager } from "../managers/emails-manager";
 import { usersQueryRepository } from "../repositories/users-db-query-repository";
+import { UserAccountDBModel, UsersViewModel } from "../models/users-model";
 
 export const usersService = {
   async createUser(
@@ -47,7 +45,7 @@ export const usersService = {
     login: string,
     password: string,
     email: string
-  ): Promise<UsersDBViewModel> {
+  ): Promise<UsersViewModel> {
     const passwordSalt = await bcrypt.genSalt(10);
     const passwordHash = await this._generateHash(password, passwordSalt);
     const newUser: UserAccountDBModel = {

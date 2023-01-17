@@ -6,7 +6,6 @@ import { usersRouter } from "../routes/users";
 import { authRouter } from "../routes/auth";
 import { commentsRouter } from "../routes/comments";
 import cookieParser from "cookie-parser";
-import useragent from "express-useragent";
 import { securityDevicesRouter } from "../routes/securityDevices";
 
 export function createServer() {
@@ -14,7 +13,6 @@ export function createServer() {
   app.set("trust proxy", true);
   app.use(express.json());
   app.use(cookieParser());
-  // app.use(useragent.express());
   // routes
   app.use("/testing/all-data", testingRouter);
   app.use("/blogs", blogsRouter);

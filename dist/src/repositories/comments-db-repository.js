@@ -10,11 +10,11 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.commentsRepository = void 0;
-const db_1 = require("./db");
+const comment_schema_1 = require("../models/comments-model/comment-schema");
 exports.commentsRepository = {
     createComment(comment) {
         return __awaiter(this, void 0, void 0, function* () {
-            yield db_1.commentsCollection.insertOne(Object.assign({}, comment));
+            yield comment_schema_1.CommentsModel.create(Object.assign({}, comment));
             return {
                 id: comment.id,
                 content: comment.content,
@@ -24,33 +24,21 @@ exports.commentsRepository = {
             };
         });
     },
-    // async createCommentFake(comment: CommentsDBModel): Promise<CommViewModel> {
-    //   await commentsCollection.insertOne({ ...comment });
-    //   return new CommViewModel(
-    //     comment.id,
-    //     comment.content,
-    //     comment.userId,
-    //     comment.userLogin,
-    //     comment.createdAt
-    //   );
-    // },
     updateComment(content, id) {
         return __awaiter(this, void 0, void 0, function* () {
-            const result = yield db_1.commentsCollection.updateOne({ id: id }, {
-                $set: { content },
-            });
+            const result = yield comment_schema_1.CommentsModel.updateOne({ id: id }, { content });
             return result.matchedCount === 1;
         });
     },
     deleteComment(id) {
         return __awaiter(this, void 0, void 0, function* () {
-            const result = yield db_1.commentsCollection.deleteOne({ id });
+            const result = yield comment_schema_1.CommentsModel.deleteOne({ id });
             return result.deletedCount === 1;
         });
     },
     clearComments() {
         return __awaiter(this, void 0, void 0, function* () {
-            yield db_1.commentsCollection.deleteMany({});
+            yield comment_schema_1.CommentsModel.deleteMany({});
         });
     },
 };

@@ -37,7 +37,7 @@ export const blogsQueryRepository = {
     const blog: BlogsDBModel | null = await BlogsModel.findOne(
       { id },
       { _id: false }
-    );
+    ).lean();
     return blog;
   },
 };

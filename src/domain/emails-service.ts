@@ -1,5 +1,5 @@
 import { emailsManager } from "../managers/emails-manager";
-import { UserAccountDBModel } from "../models/users-model/UserAccountDBModel";
+import { UserAccountDBModel } from "../models/users-model";
 
 export const emailsService = {
   async sendEmail(user: UserAccountDBModel) {
