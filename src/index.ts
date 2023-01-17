@@ -6,13 +6,15 @@ import { createServer } from "./utils/server";
 const app = createServer();
 const port = 3000;
 
+function sleep(seconds: number) {
+  return new Promise((resolve) => setTimeout(resolve, seconds * 1000));
+}
+
 const startApp = async () => {
+  await sleep(10);
   console.log(dotenv);
   console.log(process.env.PORT);
   console.log(process.env.MONGO_URL);
-  await setTimeout(() => {
-    console.log("timeout");
-  }, 10000);
   await runDb();
   app.listen(port, () => {
     console.log(`App is listening on the port ${port}`);

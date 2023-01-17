@@ -39,13 +39,14 @@ const server_1 = require("./utils/server");
 // remove app to a different folder
 const app = (0, server_1.createServer)();
 const port = 3000;
+function sleep(seconds) {
+    return new Promise((resolve) => setTimeout(resolve, seconds * 1000));
+}
 const startApp = () => __awaiter(void 0, void 0, void 0, function* () {
+    yield sleep(10);
     console.log(dotenv);
     console.log(process.env.PORT);
     console.log(process.env.MONGO_URL);
-    yield setTimeout(() => {
-        console.log("timeout");
-    }, 10000);
     yield (0, db_1.runDb)();
     app.listen(port, () => {
         console.log(`App is listening on the port ${port}`);
