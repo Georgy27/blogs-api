@@ -72,6 +72,7 @@ exports.usersService = {
                     isConfirmed: true,
                 },
             };
+            console.log(newUser);
             return users_db_repository_1.usersRepository.createUserByAdmin(newUser);
         });
     },

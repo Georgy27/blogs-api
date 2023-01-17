@@ -21,13 +21,26 @@ exports.usersRepository = {
     },
     createUserByAdmin(user) {
         return __awaiter(this, void 0, void 0, function* () {
-            yield user_schema_1.UsersModel.create(Object.assign({}, user));
-            return {
-                id: user.id,
-                login: user.accountData.login,
-                email: user.accountData.email,
-                createdAt: user.accountData.createdAt,
-            };
+            try {
+                console.log("before save");
+                yield user_schema_1.UsersModel.create(Object.assign({}, user));
+                console.log("after save");
+                return {
+                    id: user.id,
+                    login: user.accountData.login,
+                    email: user.accountData.email,
+                    createdAt: user.accountData.createdAt,
+                };
+            }
+            catch (e) {
+                console.log(e);
+                return {
+                    id: user.id,
+                    login: user.accountData.login,
+                    email: user.accountData.email,
+                    createdAt: user.accountData.createdAt,
+                };
+            }
         });
     },
     deleteUser(id) {

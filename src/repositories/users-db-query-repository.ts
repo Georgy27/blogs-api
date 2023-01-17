@@ -58,10 +58,12 @@ export const usersQueryRepository = {
   async findByLoginOrEmail(
     loginOrEmail: string
   ): Promise<UserAccountDBModel | null> {
-    const user = await UsersModel.findOne([
-      { "accountData.email": loginOrEmail },
-      { "accountData.login": loginOrEmail },
-    ]).lean();
+    const user = await UsersModel.findOne({
+      $or: [
+        { "accountData.email": loginOrEmail },
+        { "accountData.login": loginOrEmail },
+      ],
+    }).lean();
     return user;
   },
   async findUserByConfirmationCode(

@@ -8,13 +8,25 @@ export const usersRepository = {
     return user;
   },
   async createUserByAdmin(user: UserAccountDBModel): Promise<UsersViewModel> {
-    await UsersModel.create({ ...user });
-    return {
-      id: user.id,
-      login: user.accountData.login,
-      email: user.accountData.email,
-      createdAt: user.accountData.createdAt,
-    };
+    try {
+      console.log("before save");
+      await UsersModel.create({ ...user });
+      console.log("after save");
+      return {
+        id: user.id,
+        login: user.accountData.login,
+        email: user.accountData.email,
+        createdAt: user.accountData.createdAt,
+      };
+    } catch (e) {
+      console.log(e);
+      return {
+        id: user.id,
+        login: user.accountData.login,
+        email: user.accountData.email,
+        createdAt: user.accountData.createdAt,
+      };
+    }
   },
   async deleteUser(id: string) {
     const result = await UsersModel.deleteOne({ id });

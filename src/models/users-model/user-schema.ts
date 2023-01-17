@@ -5,8 +5,8 @@ const UsersSchema = new Schema<UserAccountDBModel>(
   {
     id: { type: String, required: true, unique: true },
     accountData: {
-      login: { type: String, required: true },
-      email: { type: String, required: true },
+      login: { type: String, required: true, unique: true },
+      email: { type: String, required: true, unique: true },
       passwordHash: { type: String, required: true },
       createdAt: { type: String, required: true },
     },

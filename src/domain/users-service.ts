@@ -64,6 +64,7 @@ export const usersService = {
         isConfirmed: true,
       },
     };
+    console.log(newUser);
     return usersRepository.createUserByAdmin(newUser);
   },
   async deleteUser(id: string): Promise<boolean> {

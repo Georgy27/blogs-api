@@ -58,10 +58,12 @@ exports.usersQueryRepository = {
     },
     findByLoginOrEmail(loginOrEmail) {
         return __awaiter(this, void 0, void 0, function* () {
-            const user = yield user_schema_1.UsersModel.findOne([
-                { "accountData.email": loginOrEmail },
-                { "accountData.login": loginOrEmail },
-            ]).lean();
+            const user = yield user_schema_1.UsersModel.findOne({
+                $or: [
+                    { "accountData.email": loginOrEmail },
+                    { "accountData.login": loginOrEmail },
+                ],
+            }).lean();
             return user;
         });
     },
