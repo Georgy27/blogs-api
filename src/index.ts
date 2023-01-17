@@ -1,3 +1,5 @@
+import { config } from "dotenv";
+config();
 import { runDb } from "./repositories/db";
 import { createServer } from "./utils/server";
 // remove app to a different folder
