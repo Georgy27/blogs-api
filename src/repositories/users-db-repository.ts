@@ -52,6 +52,42 @@ export const usersRepository = {
     if (!updatedUser) return null;
     return updatedUser;
   },
+  async updateUserPasswordHash(id: string, passwordHash: string) {
+    const updatedUserHash = await UsersModel.updateOne(
+      { id },
+      {
+        "accountData.passwordHash": passwordHash,
+      }
+    );
+    return updatedUserHash.modifiedCount === 1;
+  },
+  async createPasswordRecoveryCode(
+    id: string,
+    passwordRecoveryInfo: { recoveryCode: string; expirationDate: string }
+  ): Promise<UserAccountDBModel | null> {
+    const updatedUser = UsersModel.findOneAndUpdate(
+      { id },
+      {
+        passwordRecovery: passwordRecoveryInfo,
+      },
+      {
+        returnDocument: "after",
+      }
+    ).lean();
+    if (!updatedUser) return null;
+    return updatedUser;
+  },
+  async clearConfirmationCode(
+    id: string,
+    passwordRecoveryInfo: { recoveryCode: null; expirationDate: null }
+  ): Promise<UserAccountDBModel> {
+    return UsersModel.findOneAndUpdate(
+      { id },
+      {
+        passwordRecovery: passwordRecoveryInfo,
+      }
+    ).lean();
+  },
   async clearUsers() {
     await UsersModel.deleteMany({});
   },

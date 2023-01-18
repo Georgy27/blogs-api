@@ -11,10 +11,10 @@ import {
 } from "../middlewares/validation/sorting&pagination-middleware";
 import { loginValidation } from "../middlewares/validation/users-middleware/loginValidation";
 import { passwordValidation } from "../middlewares/validation/users-middleware/passwordValidation";
-import { emailValidation } from "../middlewares/validation/users-middleware/emailValidation";
 import { Pagination } from "../models/pagination.model";
 import { morgan } from "../middlewares/morgan-middleware";
 import { CreateUserModel, UsersViewModel } from "../models/users-model";
+import { emailRegistrationValidation } from "../middlewares/validation/users-middleware/emailRegistrationValidation";
 
 export const usersRouter = Router({});
 
@@ -50,7 +50,7 @@ usersRouter.post(
   basicAuthMiddleware,
   loginValidation,
   passwordValidation,
-  emailValidation,
+  emailRegistrationValidation,
   inputValidationMiddleware,
   morgan("tiny"),
   async (

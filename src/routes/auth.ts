@@ -1,11 +1,14 @@
 import { Request, Response, Router, NextFunction } from "express";
 import { RequestWithBody } from "../types";
-import { passwordValidation } from "../middlewares/validation/users-middleware/passwordValidation";
+import {
+  newPasswordValidation,
+  passwordValidation,
+} from "../middlewares/validation/users-middleware/passwordValidation";
 import { inputValidationMiddleware } from "../middlewares/validation/input-validation-middleware";
 import { usersService } from "../domain/users-service";
 import { jwtAuthMiddleware } from "../middlewares/auth/jwt-auth-middleware";
 import { loginValidation } from "../middlewares/validation/users-middleware/loginValidation";
-import { emailValidation } from "../middlewares/validation/users-middleware/emailValidation";
+import { emailRegistrationValidation } from "../middlewares/validation/users-middleware/emailRegistrationValidation";
 import { loginOrEmailValidation } from "../middlewares/validation/auth-middleware/loginOrEmailValidation";
 import { morgan } from "../middlewares/morgan-middleware";
 import { authService } from "../domain/auth-service";
@@ -15,6 +18,8 @@ import { sessionRepository } from "../repositories/sessions-db-repository";
 import { refreshTokenMiddleware } from "../middlewares/auth/refresh-token-middleware";
 import { checkRequests } from "../middlewares/auth/checkRequests-middleware";
 import { AuthRegistrationModel, AuthUserModel } from "../models/auth-model";
+import { emailValidation } from "../middlewares/validation/users-middleware/emailValidation";
+import { confirmRecoveryCode } from "../middlewares/validation/auth-middleware/recoveryCodeValidation";
 
 export const authRouter = Router({});
 
@@ -53,7 +58,7 @@ authRouter.post(
   checkRequests,
   loginValidation,
   passwordValidation,
-  emailValidation,
+  emailRegistrationValidation,
   inputValidationMiddleware,
   morgan("tiny"),
   async (req: RequestWithBody<AuthRegistrationModel>, res: Response) => {
@@ -120,6 +125,33 @@ authRouter.post(
     const userEmail = req.body.email;
     const result = await authService.resendEmail(userEmail);
     // if email could not be send (can be 500 error)
+    if (!result) return res.sendStatus(400);
+    return res.sendStatus(204);
+  }
+);
+authRouter.post(
+  "/password-recovery",
+  checkRequests,
+  emailValidation,
+  inputValidationMiddleware,
+  async (req: RequestWithBody<{ email: string }>, res: Response) => {
+    const userEmail = req.body.email;
+    await authService.passwordRecovery(userEmail);
+    return res.sendStatus(204);
+  }
+);
+authRouter.post(
+  "/new-password",
+  checkRequests,
+  newPasswordValidation,
+  confirmRecoveryCode,
+  inputValidationMiddleware,
+  async (
+    req: RequestWithBody<{ newPassword: string; recoveryCode: string }>,
+    res: Response
+  ) => {
+    const { newPassword, recoveryCode } = req.body;
+    const result = await authService.newPassword(newPassword, recoveryCode);
     if (!result) return res.sendStatus(400);
     return res.sendStatus(204);
   }

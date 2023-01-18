@@ -65,6 +65,33 @@ exports.usersRepository = {
             return updatedUser;
         });
     },
+    updateUserPasswordHash(id, passwordHash) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const updatedUserHash = yield user_schema_1.UsersModel.updateOne({ id }, {
+                "accountData.passwordHash": passwordHash,
+            });
+            return updatedUserHash.modifiedCount === 1;
+        });
+    },
+    createPasswordRecoveryCode(id, passwordRecoveryInfo) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const updatedUser = user_schema_1.UsersModel.findOneAndUpdate({ id }, {
+                passwordRecovery: passwordRecoveryInfo,
+            }, {
+                returnDocument: "after",
+            }).lean();
+            if (!updatedUser)
+                return null;
+            return updatedUser;
+        });
+    },
+    clearConfirmationCode(id, passwordRecoveryInfo) {
+        return __awaiter(this, void 0, void 0, function* () {
+            return user_schema_1.UsersModel.findOneAndUpdate({ id }, {
+                passwordRecovery: passwordRecoveryInfo,
+            }).lean();
+        });
+    },
     clearUsers() {
         return __awaiter(this, void 0, void 0, function* () {
             yield user_schema_1.UsersModel.deleteMany({});

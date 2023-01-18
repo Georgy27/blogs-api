@@ -1,23 +1,20 @@
 import { body } from "express-validator";
 import { usersQueryRepository } from "../../../repositories/users-db-query-repository";
 
-export const confirmEmail = body("code")
+export const confirmRecoveryCode = body("recoveryCode")
   .isString()
   .notEmpty()
   .custom(async (code) => {
-    const user = await usersQueryRepository.findUserByEmailConfirmationCode(
+    const user = await usersQueryRepository.findUserByPasswordConfirmationCode(
       code
     );
     if (!user) {
       throw new Error("user doesn't exist");
     }
-    if (user.emailConfirmation.isConfirmed) {
-      throw new Error("user email already confirmed");
-    }
-    if (user.emailConfirmation.confirmationCode !== code) {
+    if (user.passwordRecovery.recoveryCode !== code) {
       throw new Error("user code does not match");
     }
-    if (user.emailConfirmation.expirationDate < new Date().toISOString()) {
+    if (user.passwordRecovery.expirationDate! < new Date().toISOString()) {
       throw new Error("user code has expired");
     }
     return true;

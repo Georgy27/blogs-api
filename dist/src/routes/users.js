@@ -18,8 +18,8 @@ const users_db_query_repository_1 = require("../repositories/users-db-query-repo
 const sorting_pagination_middleware_1 = require("../middlewares/validation/sorting&pagination-middleware");
 const loginValidation_1 = require("../middlewares/validation/users-middleware/loginValidation");
 const passwordValidation_1 = require("../middlewares/validation/users-middleware/passwordValidation");
-const emailValidation_1 = require("../middlewares/validation/users-middleware/emailValidation");
 const morgan_middleware_1 = require("../middlewares/morgan-middleware");
+const emailRegistrationValidation_1 = require("../middlewares/validation/users-middleware/emailRegistrationValidation");
 exports.usersRouter = (0, express_1.Router)({});
 // routes
 exports.usersRouter.get("/", basic_auth_middleware_1.basicAuthMiddleware, sorting_pagination_middleware_1.pageSize, sorting_pagination_middleware_1.sortBy, sorting_pagination_middleware_1.pageNumberValidation, (0, morgan_middleware_1.morgan)("tiny"), (req, res) => __awaiter(void 0, void 0, void 0, function* () {
@@ -28,7 +28,7 @@ exports.usersRouter.get("/", basic_auth_middleware_1.basicAuthMiddleware, sortin
     const allUsers = yield users_db_query_repository_1.usersQueryRepository.findUsers(pageNumber, pageSize, sortBy, sortDirection, searchLoginTerm, searchEmailTerm);
     res.status(200).send(allUsers);
 }));
-exports.usersRouter.post("/", basic_auth_middleware_1.basicAuthMiddleware, loginValidation_1.loginValidation, passwordValidation_1.passwordValidation, emailValidation_1.emailValidation, input_validation_middleware_1.inputValidationMiddleware, (0, morgan_middleware_1.morgan)("tiny"), (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+exports.usersRouter.post("/", basic_auth_middleware_1.basicAuthMiddleware, loginValidation_1.loginValidation, passwordValidation_1.passwordValidation, emailRegistrationValidation_1.emailRegistrationValidation, input_validation_middleware_1.inputValidationMiddleware, (0, morgan_middleware_1.morgan)("tiny"), (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const { login, password, email } = req.body;
     const newUser = yield users_service_1.usersService.createUserByAdmin(login, password, email);
     return res.status(201).send(newUser);

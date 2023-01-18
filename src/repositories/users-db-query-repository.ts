@@ -66,11 +66,19 @@ export const usersQueryRepository = {
     }).lean();
     return user;
   },
-  async findUserByConfirmationCode(
+  async findUserByEmailConfirmationCode(
     code: string
   ): Promise<UserAccountDBModel | null> {
     const user = await UsersModel.findOne({
       "emailConfirmation.confirmationCode": code,
+    }).lean();
+    return user;
+  },
+  async findUserByPasswordConfirmationCode(
+    code: string
+  ): Promise<UserAccountDBModel | null> {
+    const user = await UsersModel.findOne({
+      "passwordRecovery.recoveryCode": code,
     }).lean();
     return user;
   },

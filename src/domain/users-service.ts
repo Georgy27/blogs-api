@@ -22,6 +22,10 @@ export const usersService = {
         passwordHash,
         createdAt: new Date().toISOString(),
       },
+      passwordRecovery: {
+        recoveryCode: null,
+        expirationDate: null,
+      },
       emailConfirmation: {
         confirmationCode: randomUUID(),
         expirationDate: add(new Date(), {
@@ -56,6 +60,10 @@ export const usersService = {
         passwordHash,
         createdAt: new Date().toISOString(),
       },
+      passwordRecovery: {
+        recoveryCode: null,
+        expirationDate: null,
+      },
       emailConfirmation: {
         confirmationCode: randomUUID(),
         expirationDate: add(new Date(), {
@@ -80,6 +88,31 @@ export const usersService = {
     } else {
       return false;
     }
+  },
+  async sendPasswordRecoveryCode(id: string) {
+    const passwordRecoveryInfo = {
+      recoveryCode: randomUUID(),
+      expirationDate: add(new Date(), {
+        minutes: 1,
+      }).toISOString(),
+    };
+    return await usersRepository.createPasswordRecoveryCode(
+      id,
+      passwordRecoveryInfo
+    );
+  },
+  async clearConfirmationCode(id: string) {
+    const passwordRecoveryInfo = {
+      recoveryCode: null,
+      expirationDate: null,
+    };
+    return await usersRepository.clearConfirmationCode(
+      id,
+      passwordRecoveryInfo
+    );
+  },
+  async updateUserPasswordHash(id: string, passwordHash: string) {
+    return await usersRepository.updateUserPasswordHash(id, passwordHash);
   },
   async updateConfirmation(id: string) {
     return await usersRepository.updateConfirmation(id);

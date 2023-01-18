@@ -16,7 +16,7 @@ const input_validation_middleware_1 = require("../middlewares/validation/input-v
 const users_service_1 = require("../domain/users-service");
 const jwt_auth_middleware_1 = require("../middlewares/auth/jwt-auth-middleware");
 const loginValidation_1 = require("../middlewares/validation/users-middleware/loginValidation");
-const emailValidation_1 = require("../middlewares/validation/users-middleware/emailValidation");
+const emailRegistrationValidation_1 = require("../middlewares/validation/users-middleware/emailRegistrationValidation");
 const loginOrEmailValidation_1 = require("../middlewares/validation/auth-middleware/loginOrEmailValidation");
 const morgan_middleware_1 = require("../middlewares/morgan-middleware");
 const auth_service_1 = require("../domain/auth-service");
@@ -25,6 +25,8 @@ const emailResendingValidation_1 = require("../middlewares/validation/auth-middl
 const sessions_db_repository_1 = require("../repositories/sessions-db-repository");
 const refresh_token_middleware_1 = require("../middlewares/auth/refresh-token-middleware");
 const checkRequests_middleware_1 = require("../middlewares/auth/checkRequests-middleware");
+const emailValidation_1 = require("../middlewares/validation/users-middleware/emailValidation");
+const recoveryCodeValidation_1 = require("../middlewares/validation/auth-middleware/recoveryCodeValidation");
 exports.authRouter = (0, express_1.Router)({});
 exports.authRouter.post("/login", checkRequests_middleware_1.checkRequests, loginOrEmailValidation_1.loginOrEmailValidation, passwordValidation_1.passwordValidation, input_validation_middleware_1.inputValidationMiddleware, (0, morgan_middleware_1.morgan)("tiny"), (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const { loginOrEmail, password } = req.body;
@@ -42,7 +44,7 @@ exports.authRouter.post("/login", checkRequests_middleware_1.checkRequests, logi
     });
     return res.status(200).send({ accessToken: tokens.accessToken });
 }));
-exports.authRouter.post("/registration", checkRequests_middleware_1.checkRequests, loginValidation_1.loginValidation, passwordValidation_1.passwordValidation, emailValidation_1.emailValidation, input_validation_middleware_1.inputValidationMiddleware, (0, morgan_middleware_1.morgan)("tiny"), (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+exports.authRouter.post("/registration", checkRequests_middleware_1.checkRequests, loginValidation_1.loginValidation, passwordValidation_1.passwordValidation, emailRegistrationValidation_1.emailRegistrationValidation, input_validation_middleware_1.inputValidationMiddleware, (0, morgan_middleware_1.morgan)("tiny"), (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const { login, password, email } = req.body;
     const newUser = yield users_service_1.usersService.createUser(login, password, email);
     if (!newUser)
@@ -80,6 +82,18 @@ exports.authRouter.post("/registration-email-resending", checkRequests_middlewar
     const userEmail = req.body.email;
     const result = yield auth_service_1.authService.resendEmail(userEmail);
     // if email could not be send (can be 500 error)
+    if (!result)
+        return res.sendStatus(400);
+    return res.sendStatus(204);
+}));
+exports.authRouter.post("/password-recovery", checkRequests_middleware_1.checkRequests, emailValidation_1.emailValidation, input_validation_middleware_1.inputValidationMiddleware, (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    const userEmail = req.body.email;
+    yield auth_service_1.authService.passwordRecovery(userEmail);
+    return res.sendStatus(204);
+}));
+exports.authRouter.post("/new-password", checkRequests_middleware_1.checkRequests, passwordValidation_1.newPasswordValidation, recoveryCodeValidation_1.confirmRecoveryCode, input_validation_middleware_1.inputValidationMiddleware, (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    const { newPassword, recoveryCode } = req.body;
+    const result = yield auth_service_1.authService.newPassword(newPassword, recoveryCode);
     if (!result)
         return res.sendStatus(400);
     return res.sendStatus(204);

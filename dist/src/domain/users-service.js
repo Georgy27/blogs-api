@@ -32,6 +32,10 @@ exports.usersService = {
                     passwordHash,
                     createdAt: new Date().toISOString(),
                 },
+                passwordRecovery: {
+                    recoveryCode: null,
+                    expirationDate: null,
+                },
                 emailConfirmation: {
                     confirmationCode: (0, crypto_1.randomUUID)(),
                     expirationDate: (0, add_1.default)(new Date(), {
@@ -64,6 +68,10 @@ exports.usersService = {
                     passwordHash,
                     createdAt: new Date().toISOString(),
                 },
+                passwordRecovery: {
+                    recoveryCode: null,
+                    expirationDate: null,
+                },
                 emailConfirmation: {
                     confirmationCode: (0, crypto_1.randomUUID)(),
                     expirationDate: (0, add_1.default)(new Date(), {
@@ -93,6 +101,31 @@ exports.usersService = {
             else {
                 return false;
             }
+        });
+    },
+    sendPasswordRecoveryCode(id) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const passwordRecoveryInfo = {
+                recoveryCode: (0, crypto_1.randomUUID)(),
+                expirationDate: (0, add_1.default)(new Date(), {
+                    minutes: 1,
+                }).toISOString(),
+            };
+            return yield users_db_repository_1.usersRepository.createPasswordRecoveryCode(id, passwordRecoveryInfo);
+        });
+    },
+    clearConfirmationCode(id) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const passwordRecoveryInfo = {
+                recoveryCode: null,
+                expirationDate: null,
+            };
+            return yield users_db_repository_1.usersRepository.clearConfirmationCode(id, passwordRecoveryInfo);
+        });
+    },
+    updateUserPasswordHash(id, passwordHash) {
+        return __awaiter(this, void 0, void 0, function* () {
+            return yield users_db_repository_1.usersRepository.updateUserPasswordHash(id, passwordHash);
         });
     },
     updateConfirmation(id) {

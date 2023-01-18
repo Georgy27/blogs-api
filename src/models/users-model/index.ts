@@ -19,6 +19,10 @@ export type UserAccountDBModel = {
     passwordHash: string;
     createdAt: string;
   };
+  passwordRecovery: {
+    recoveryCode: string | null;
+    expirationDate: string | null;
+  };
   emailConfirmation: {
     confirmationCode: string;
     expirationDate: string;

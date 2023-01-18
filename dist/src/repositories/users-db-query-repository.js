@@ -67,10 +67,18 @@ exports.usersQueryRepository = {
             return user;
         });
     },
-    findUserByConfirmationCode(code) {
+    findUserByEmailConfirmationCode(code) {
         return __awaiter(this, void 0, void 0, function* () {
             const user = yield user_schema_1.UsersModel.findOne({
                 "emailConfirmation.confirmationCode": code,
+            }).lean();
+            return user;
+        });
+    },
+    findUserByPasswordConfirmationCode(code) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const user = yield user_schema_1.UsersModel.findOne({
+                "passwordRecovery.recoveryCode": code,
             }).lean();
             return user;
         });

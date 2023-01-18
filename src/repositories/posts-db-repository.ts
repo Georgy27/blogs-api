@@ -18,6 +18,7 @@ export const postsRepository = {
 
       { title, shortDescription, content, blogId }
     );
+
     return result.matchedCount === 1;
   },
   async deletePost(id: string) {

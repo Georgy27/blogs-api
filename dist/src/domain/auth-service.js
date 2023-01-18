@@ -8,6 +8,9 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.authService = void 0;
 const users_db_query_repository_1 = require("../repositories/users-db-query-repository");
@@ -16,6 +19,7 @@ const emails_manager_1 = require("../managers/emails-manager");
 const crypto_1 = require("crypto");
 const jwt_service_1 = require("../application/jwt-service");
 const sessions_db_repository_1 = require("../repositories/sessions-db-repository");
+const bcrypt_1 = __importDefault(require("bcrypt"));
 exports.authService = {
     login(loginOrEmail, password, ip, deviceName) {
         return __awaiter(this, void 0, void 0, function* () {
@@ -38,9 +42,43 @@ exports.authService = {
             return tokens;
         });
     },
+    passwordRecovery(email) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const user = yield users_db_query_repository_1.usersQueryRepository.findByLoginOrEmail(email);
+            if (!user)
+                return null;
+            const updatedUser = yield users_service_1.usersService.sendPasswordRecoveryCode(user.id);
+            if (!updatedUser)
+                return null;
+            try {
+                yield emails_manager_1.emailsManager.sendPasswordRecoveryCode(updatedUser);
+                return true;
+            }
+            catch (error) {
+                return null;
+            }
+        });
+    },
+    newPassword(password, code) {
+        return __awaiter(this, void 0, void 0, function* () {
+            // generate new password hash
+            const passwordSalt = yield bcrypt_1.default.genSalt(10);
+            const passwordHash = yield users_service_1.usersService._generateHash(password, passwordSalt);
+            // find the user
+            const user = yield users_db_query_repository_1.usersQueryRepository.findUserByPasswordConfirmationCode(code);
+            if (!user)
+                return null;
+            // update user password hash in db
+            const updatedPasswordHash = yield users_service_1.usersService.updateUserPasswordHash(user.id, passwordHash);
+            if (!updatedPasswordHash)
+                return null;
+            // set recoveryCode and expirationCode to null
+            return yield users_service_1.usersService.clearConfirmationCode(user.id);
+        });
+    },
     confirmEmail(code) {
         return __awaiter(this, void 0, void 0, function* () {
-            const user = yield users_db_query_repository_1.usersQueryRepository.findUserByConfirmationCode(code);
+            const user = yield users_db_query_repository_1.usersQueryRepository.findUserByEmailConfirmationCode(code);
             if (!user)
                 return false;
             const updatedConfirmation = yield users_service_1.usersService.updateConfirmation(user.id);

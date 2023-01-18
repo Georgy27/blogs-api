@@ -5,6 +5,8 @@ import { usersRepository } from "../repositories/users-db-repository";
 import { randomUUID } from "crypto";
 import { jwtService } from "../application/jwt-service";
 import { sessionRepository } from "../repositories/sessions-db-repository";
+import { UserAccountDBModel } from "../models/users-model";
+import bcrypt from "bcrypt";
 
 export const authService = {
   async login(
@@ -38,8 +40,45 @@ export const authService = {
     );
     return tokens;
   },
+  async passwordRecovery(email: string) {
+    const user = await usersQueryRepository.findByLoginOrEmail(email);
+    if (!user) return null;
+
+    const updatedUser = await usersService.sendPasswordRecoveryCode(user.id);
+    if (!updatedUser) return null;
+
+    try {
+      await emailsManager.sendPasswordRecoveryCode(updatedUser);
+      return true;
+    } catch (error) {
+      return null;
+    }
+  },
+  async newPassword(password: string, code: string) {
+    // generate new password hash
+    const passwordSalt = await bcrypt.genSalt(10);
+    const passwordHash = await usersService._generateHash(
+      password,
+      passwordSalt
+    );
+    // find the user
+    const user = await usersQueryRepository.findUserByPasswordConfirmationCode(
+      code
+    );
+    if (!user) return null;
+    // update user password hash in db
+    const updatedPasswordHash = await usersService.updateUserPasswordHash(
+      user.id,
+      passwordHash
+    );
+    if (!updatedPasswordHash) return null;
+    // set recoveryCode and expirationCode to null
+    return await usersService.clearConfirmationCode(user.id);
+  },
   async confirmEmail(code: string): Promise<boolean> {
-    const user = await usersQueryRepository.findUserByConfirmationCode(code);
+    const user = await usersQueryRepository.findUserByEmailConfirmationCode(
+      code
+    );
     if (!user) return false;
     const updatedConfirmation = await usersService.updateConfirmation(user.id);
     return updatedConfirmation;

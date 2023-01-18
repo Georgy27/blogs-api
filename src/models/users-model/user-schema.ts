@@ -10,6 +10,10 @@ const UsersSchema = new Schema<UserAccountDBModel>(
       passwordHash: { type: String, required: true },
       createdAt: { type: String, required: true },
     },
+    passwordRecovery: {
+      recoveryCode: { type: String },
+      expirationDate: { type: String },
+    },
     emailConfirmation: {
       confirmationCode: { type: String, required: true },
       expirationDate: { type: String, required: true },
