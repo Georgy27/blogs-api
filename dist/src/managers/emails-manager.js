@@ -22,7 +22,7 @@ exports.emailsManager = {
     sendPasswordRecoveryCode(user) {
         return __awaiter(this, void 0, void 0, function* () {
             console.log(user.passwordRecovery.recoveryCode);
-            let message = `<h1>Thank for your registration</h1><p>To finish registration please follow the link below: <a href='https://some-front.com/confirm-registration?code=${user.passwordRecovery.recoveryCode}'>complete registration</a></p>`;
+            let message = `<h1>Thank for your registration</h1><p>To finish registration please follow the link below: <a href='https://some-front.com/password-recovery?recoveryCode=${user.passwordRecovery.recoveryCode}'>complete registration</a></p>`;
             yield email_adapter_1.emailAdapter.sendEmail(user.accountData.email, message);
         });
     },
