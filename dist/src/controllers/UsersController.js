@@ -17,6 +17,7 @@ class UsersController {
     }
     createUser(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
+            console.log("im in controller");
             const { login, password, email } = req.body;
             const newUser = yield this.usersService.createUserByAdmin(login, password, email);
             return res.status(201).send(newUser);

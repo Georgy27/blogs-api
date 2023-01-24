@@ -9,24 +9,17 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.BlogIdValidation = void 0;
+exports.blogIdValidation = void 0;
 const express_validator_1 = require("express-validator");
-class BlogIdValidation {
-    constructor(blogsQueryRepository) {
-        this.blogsQueryRepository = blogsQueryRepository;
+const composition_root_1 = require("../../../composition-root");
+exports.blogIdValidation = (0, express_validator_1.body)("blogId")
+    .isString()
+    .custom((blogId) => __awaiter(void 0, void 0, void 0, function* () {
+    const findBlogWithId = yield composition_root_1.blogsQueryRepository.findBlog(blogId);
+    if (!findBlogWithId) {
+        throw new Error("blog with this id does not exist in the DB");
     }
-    use() {
-        (0, express_validator_1.body)("blogId")
-            .isString()
-            .custom((blogId) => __awaiter(this, void 0, void 0, function* () {
-            const findBlogWithId = yield this.blogsQueryRepository.findBlog(blogId);
-            if (!findBlogWithId) {
-                throw new Error("blog with this id does not exist in the DB");
-            }
-            else {
-                return true;
-            }
-        }));
+    else {
+        return true;
     }
-}
-exports.BlogIdValidation = BlogIdValidation;
+}));

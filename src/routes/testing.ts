@@ -1,4 +1,4 @@
-import { Request, Response, Router } from "express";
+import { Router } from "express";
 import { testController } from "../composition-root";
 
 export const testingRouter = Router({});

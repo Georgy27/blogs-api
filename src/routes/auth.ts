@@ -10,27 +10,19 @@ import { checkRequests } from "../middlewares/auth/checkRequests-middleware";
 import { emailValidation } from "../middlewares/validation/users-middleware/emailValidation";
 import {
   authController,
-  confirmEmail,
-  confirmRecoveryCode,
-  emailRegistrationValidation,
-  emailResendingValidation,
   jwtAuthMiddleware,
-  loginValidation,
   refreshTokenMiddleware,
 } from "../composition-root";
+import { emailRegistrationValidation } from "../middlewares/validation/users-middleware/emailRegistrationValidation";
+import { loginValidation } from "../middlewares/validation/users-middleware/loginValidation";
+import { confirmEmail } from "../middlewares/validation/auth-middleware/confirmEmail";
+import { emailResendingValidation } from "../middlewares/validation/auth-middleware/emailResendingValidation";
+import { confirmRecoveryCode } from "../middlewares/validation/auth-middleware/recoveryCodeValidation";
 
 export const authRouter = Router({});
 const jwtMw = jwtAuthMiddleware.use.bind(jwtAuthMiddleware);
-const confirmRecoveryMw = confirmRecoveryCode.use.bind(confirmRecoveryCode);
-const confirmEmailMw = confirmEmail.use.bind(confirmEmail);
 const refreshTokenMw = refreshTokenMiddleware.use.bind(refreshTokenMiddleware);
-const loginValidationMw = loginValidation.use.bind(loginValidation);
-const emailRegistrationValidationMw = emailRegistrationValidation.use.bind(
-  emailRegistrationValidation
-);
-const emailResendingValidationMw = emailResendingValidation.use.bind(
-  emailResendingValidation
-);
+
 authRouter.post(
   "/login",
   checkRequests,
@@ -43,9 +35,9 @@ authRouter.post(
 authRouter.post(
   "/registration",
   checkRequests,
-  loginValidationMw,
+  loginValidation,
   passwordValidation,
-  emailRegistrationValidationMw,
+  emailRegistrationValidation,
   inputValidationMiddleware,
   morgan("tiny"),
   authController.register.bind(authController)
@@ -64,7 +56,7 @@ authRouter.post(
 authRouter.post(
   "/registration-confirmation",
   checkRequests,
-  confirmEmailMw,
+  confirmEmail,
   inputValidationMiddleware,
   morgan("tiny"),
   authController.registrationConfirmation.bind(authController)
@@ -72,7 +64,7 @@ authRouter.post(
 authRouter.post(
   "/registration-email-resending",
   checkRequests,
-  emailResendingValidationMw,
+  emailResendingValidation,
   inputValidationMiddleware,
   morgan("tiny"),
   authController.registrationEmailResending.bind(authController)
@@ -88,7 +80,7 @@ authRouter.post(
   "/new-password",
   checkRequests,
   newPasswordValidation,
-  confirmRecoveryMw,
+  confirmRecoveryCode,
   inputValidationMiddleware,
   authController.newPassword.bind(authController)
 );

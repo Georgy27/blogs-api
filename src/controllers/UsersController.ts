@@ -14,6 +14,7 @@ export class UsersController {
     req: RequestWithBody<CreateUserModel>,
     res: Response<UsersViewModel>
   ) {
+    console.log("im in controller");
     const { login, password, email } = req.body;
     const newUser = await this.usersService.createUserByAdmin(
       login,

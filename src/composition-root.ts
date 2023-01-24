@@ -22,18 +22,12 @@ import { EmailsManager } from "./managers/emails-manager";
 import { EmailAdapter } from "./adapters/email-adapter";
 import { AuthController } from "./controllers/AuthController";
 import { RefreshTokenMiddleware } from "./middlewares/auth/refresh-token-middleware";
-import { ConfirmRecoveryCode } from "./middlewares/validation/auth-middleware/recoveryCodeValidation";
 import { SecurityDevicesController } from "./controllers/SecurityDevicesController";
 import { SecurityDevicesService } from "./domain/securityDevices-service";
 import { TestController } from "./controllers/TestController";
-import { ConfirmEmail } from "./middlewares/validation/auth-middleware/confirmEmail";
-import { BlogIdValidation } from "./middlewares/validation/posts-middleware/blogIdValidation";
-import { LoginValidation } from "./middlewares/validation/users-middleware/loginValidation";
-import { EmailRegistrationValidation } from "./middlewares/validation/users-middleware/emailRegistrationValidation";
-import { EmailResendingValidation } from "./middlewares/validation/auth-middleware/emailResendingValidation";
 
 const blogsRepository = new BlogsRepository();
-const blogsQueryRepository = new BlogsQueryRepository();
+export const blogsQueryRepository = new BlogsQueryRepository();
 const blogsService = new BlogsService(blogsRepository);
 
 const postsRepository = new PostsRepository();
@@ -51,7 +45,7 @@ const emailAdapter = new EmailAdapter();
 const emailsManager = new EmailsManager(emailAdapter);
 
 const usersRepository = new UsersRepository();
-const usersQueryRepository = new UsersQueryRepository();
+export const usersQueryRepository = new UsersQueryRepository();
 const usersService = new UsersService(
   usersRepository,
   usersQueryRepository,
@@ -68,6 +62,7 @@ const authService = new AuthService(
   emailsManager
 );
 const securityDevicesService = new SecurityDevicesService(sessionRepository);
+
 // middlewares
 export const jwtAuthMiddleware = new JwtAuthMiddleware(
   usersQueryRepository,
@@ -78,18 +73,7 @@ export const refreshTokenMiddleware = new RefreshTokenMiddleware(
   usersQueryRepository,
   sessionRepository
 );
-export const confirmRecoveryCode = new ConfirmRecoveryCode(
-  usersQueryRepository
-);
-export const confirmEmail = new ConfirmEmail(usersQueryRepository);
-export const blogIdValidation = new BlogIdValidation(blogsQueryRepository);
-export const loginValidation = new LoginValidation(usersQueryRepository);
-export const emailRegistrationValidation = new EmailRegistrationValidation(
-  usersQueryRepository
-);
-export const emailResendingValidation = new EmailResendingValidation(
-  usersQueryRepository
-);
+
 // controllers
 export const blogsController = new BlogsController(
   blogsService,

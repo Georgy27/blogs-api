@@ -9,25 +9,18 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.EmailResendingValidation = void 0;
+exports.emailResendingValidation = void 0;
 const express_validator_1 = require("express-validator");
-class EmailResendingValidation {
-    constructor(usersQueryRepository) {
-        this.usersQueryRepository = usersQueryRepository;
+const composition_root_1 = require("../../../composition-root");
+exports.emailResendingValidation = (0, express_validator_1.body)("email")
+    .isEmail()
+    .custom((email) => __awaiter(void 0, void 0, void 0, function* () {
+    const user = yield composition_root_1.usersQueryRepository.findByLoginOrEmail(email);
+    if (!user) {
+        throw new Error("user doesn't exist");
     }
-    use() {
-        (0, express_validator_1.body)("email")
-            .isEmail()
-            .custom((email) => __awaiter(this, void 0, void 0, function* () {
-            const user = yield this.usersQueryRepository.findByLoginOrEmail(email);
-            if (!user) {
-                throw new Error("user doesn't exist");
-            }
-            if (user.emailConfirmation.isConfirmed) {
-                throw new Error("user email already confirmed");
-            }
-            return true;
-        }));
+    if (user.emailConfirmation.isConfirmed) {
+        throw new Error("user email already confirmed");
     }
-}
-exports.EmailResendingValidation = EmailResendingValidation;
+    return true;
+}));

@@ -9,28 +9,21 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.LoginValidation = void 0;
+exports.loginValidation = void 0;
 const express_validator_1 = require("express-validator");
-class LoginValidation {
-    constructor(usersQueryRepository) {
-        this.usersQueryRepository = usersQueryRepository;
+const composition_root_1 = require("../../../composition-root");
+exports.loginValidation = (0, express_validator_1.body)("login")
+    .isString()
+    .trim()
+    .notEmpty()
+    .isLength({ min: 3, max: 10 })
+    .matches("^[a-zA-Z0-9_-]*$")
+    .custom((login) => __awaiter(void 0, void 0, void 0, function* () {
+    const isUserWithLogin = yield composition_root_1.usersQueryRepository.findByLoginOrEmail(login);
+    if (isUserWithLogin) {
+        throw new Error("user with given login already exist");
     }
-    use() {
-        (0, express_validator_1.body)("login")
-            .isString()
-            .trim()
-            .notEmpty()
-            .isLength({ min: 3, max: 10 })
-            .matches("^[a-zA-Z0-9_-]*$")
-            .custom((login) => __awaiter(this, void 0, void 0, function* () {
-            const isUserWithLogin = yield this.usersQueryRepository.findByLoginOrEmail(login);
-            if (isUserWithLogin) {
-                throw new Error("user with given login already exist");
-            }
-            else {
-                return true;
-            }
-        }));
+    else {
+        return true;
     }
-}
-exports.LoginValidation = LoginValidation;
+}));

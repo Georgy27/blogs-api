@@ -11,15 +11,11 @@ import { shortDescriptionValidation } from "../middlewares/validation/posts-midd
 import { contentValidation } from "../middlewares/validation/posts-middleware/contentValidation";
 import { commentsValidation } from "../middlewares/validation/comments-middleware/content-validation";
 import { morgan } from "../middlewares/morgan-middleware";
-import {
-  blogIdValidation,
-  jwtAuthMiddleware,
-  postsController,
-} from "../composition-root";
+import { jwtAuthMiddleware, postsController } from "../composition-root";
+import { blogIdValidation } from "../middlewares/validation/posts-middleware/blogIdValidation";
 
 export const postsRouter = Router({});
 const jwtMw = jwtAuthMiddleware.use.bind(jwtAuthMiddleware);
-const blogIdMw = blogIdValidation.use.bind(blogIdValidation);
 // routes
 postsRouter.get(
   "/",
@@ -43,7 +39,7 @@ postsRouter.post(
   titleValidation,
   shortDescriptionValidation,
   contentValidation,
-  blogIdMw,
+  blogIdValidation,
   inputValidationMiddleware,
   morgan("tiny"),
   postsController.createPost.bind(postsController)
@@ -67,7 +63,7 @@ postsRouter.put(
   titleValidation,
   shortDescriptionValidation,
   contentValidation,
-  blogIdMw,
+  blogIdValidation,
   inputValidationMiddleware,
   morgan("tiny"),
   postsController.updatePost.bind(postsController)

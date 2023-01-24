@@ -8,17 +8,12 @@ import {
 } from "../middlewares/validation/sorting&pagination-middleware";
 import { passwordValidation } from "../middlewares/validation/users-middleware/passwordValidation";
 import { morgan } from "../middlewares/morgan-middleware";
-import {
-  emailRegistrationValidation,
-  loginValidation,
-  usersController,
-} from "../composition-root";
+import { usersController } from "../composition-root";
+import { emailRegistrationValidation } from "../middlewares/validation/users-middleware/emailRegistrationValidation";
+import { loginValidation } from "../middlewares/validation/users-middleware/loginValidation";
 
 export const usersRouter = Router({});
-const loginValidationMw = loginValidation.use.bind(loginValidation);
-const emailRegistrationValidationMw = emailRegistrationValidation.use.bind(
-  emailRegistrationValidation
-);
+
 // routes
 usersRouter.get(
   "/",
@@ -32,9 +27,9 @@ usersRouter.get(
 usersRouter.post(
   "/",
   basicAuthMiddleware,
-  loginValidationMw,
+  loginValidation,
   passwordValidation,
-  emailRegistrationValidationMw,
+  emailRegistrationValidation,
   inputValidationMiddleware,
   morgan("tiny"),
   usersController.createUser.bind(usersController)

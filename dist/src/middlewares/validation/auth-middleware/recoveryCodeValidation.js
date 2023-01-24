@@ -9,29 +9,22 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.ConfirmRecoveryCode = void 0;
+exports.confirmRecoveryCode = void 0;
 const express_validator_1 = require("express-validator");
-class ConfirmRecoveryCode {
-    constructor(usersQueryRepository) {
-        this.usersQueryRepository = usersQueryRepository;
+const composition_root_1 = require("../../../composition-root");
+exports.confirmRecoveryCode = (0, express_validator_1.body)("recoveryCode")
+    .isString()
+    .notEmpty()
+    .custom((code) => __awaiter(void 0, void 0, void 0, function* () {
+    const user = yield composition_root_1.usersQueryRepository.findUserByPasswordConfirmationCode(code);
+    if (!user) {
+        throw new Error("user doesn't exist");
     }
-    use() {
-        (0, express_validator_1.body)("recoveryCode")
-            .isString()
-            .notEmpty()
-            .custom((code) => __awaiter(this, void 0, void 0, function* () {
-            const user = yield this.usersQueryRepository.findUserByPasswordConfirmationCode(code);
-            if (!user) {
-                throw new Error("user doesn't exist");
-            }
-            if (user.passwordRecovery.recoveryCode !== code) {
-                throw new Error("user code does not match");
-            }
-            if (user.passwordRecovery.expirationDate < new Date().toISOString()) {
-                throw new Error("user code has expired");
-            }
-            return true;
-        }));
+    if (user.passwordRecovery.recoveryCode !== code) {
+        throw new Error("user code does not match");
     }
-}
-exports.ConfirmRecoveryCode = ConfirmRecoveryCode;
+    if (user.passwordRecovery.expirationDate < new Date().toISOString()) {
+        throw new Error("user code has expired");
+    }
+    return true;
+}));

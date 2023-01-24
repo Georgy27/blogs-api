@@ -17,6 +17,7 @@ export const inputValidationMiddleware = (
         field: param,
       });
     });
+
     return res.status(400).send({ errorsMessages: customErrorsMessages });
   } else {
     next();
