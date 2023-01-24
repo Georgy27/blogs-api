@@ -12,89 +12,91 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.authService = void 0;
-const users_db_query_repository_1 = require("../repositories/users-db-query-repository");
-const users_service_1 = require("./users-service");
-const emails_manager_1 = require("../managers/emails-manager");
+exports.AuthService = void 0;
 const crypto_1 = require("crypto");
-const jwt_service_1 = require("../application/jwt-service");
-const sessions_db_repository_1 = require("../repositories/sessions-db-repository");
 const bcrypt_1 = __importDefault(require("bcrypt"));
-exports.authService = {
+class AuthService {
+    constructor(usersService, jwtService, sessionRepository, usersQueryRepository, emailsManager) {
+        this.usersService = usersService;
+        this.jwtService = jwtService;
+        this.sessionRepository = sessionRepository;
+        this.usersQueryRepository = usersQueryRepository;
+        this.emailsManager = emailsManager;
+    }
     login(loginOrEmail, password, ip, deviceName) {
         return __awaiter(this, void 0, void 0, function* () {
-            const user = yield users_service_1.usersService.checkCredentials(loginOrEmail, password);
+            const user = yield this.usersService.checkCredentials(loginOrEmail, password);
             if (!user) {
                 return null;
             }
             const deviceId = (0, crypto_1.randomUUID)();
-            const tokens = yield jwt_service_1.jwtService.createJWT(user.id, deviceId);
-            const issuedAt = yield jwt_service_1.jwtService.getIssuedAtByRefreshToken(tokens.refreshToken);
-            yield jwt_service_1.jwtService.saveTokenToDB(ip, deviceName, issuedAt, deviceId, user.id);
+            const tokens = yield this.jwtService.createJWT(user.id, deviceId);
+            const issuedAt = yield this.jwtService.getIssuedAtByRefreshToken(tokens.refreshToken);
+            yield this.jwtService.saveTokenToDB(ip, deviceName, issuedAt, deviceId, user.id);
             return tokens;
         });
-    },
+    }
     refreshToken(userId, deviceId) {
         return __awaiter(this, void 0, void 0, function* () {
-            const tokens = yield jwt_service_1.jwtService.createJWT(userId, deviceId);
-            const issuedAt = yield jwt_service_1.jwtService.getIssuedAtByRefreshToken(tokens.refreshToken);
-            const updateLastActiveDate = yield sessions_db_repository_1.sessionRepository.updateLastActiveDate(deviceId, issuedAt);
+            const tokens = yield this.jwtService.createJWT(userId, deviceId);
+            const issuedAt = yield this.jwtService.getIssuedAtByRefreshToken(tokens.refreshToken);
+            const updateLastActiveDate = yield this.sessionRepository.updateLastActiveDate(deviceId, issuedAt);
             return tokens;
         });
-    },
+    }
     passwordRecovery(email) {
         return __awaiter(this, void 0, void 0, function* () {
-            const user = yield users_db_query_repository_1.usersQueryRepository.findByLoginOrEmail(email);
+            const user = yield this.usersQueryRepository.findByLoginOrEmail(email);
             if (!user)
                 return null;
-            const updatedUser = yield users_service_1.usersService.sendPasswordRecoveryCode(user.id);
+            const updatedUser = yield this.usersService.sendPasswordRecoveryCode(user.id);
             if (!updatedUser)
                 return null;
             try {
-                yield emails_manager_1.emailsManager.sendPasswordRecoveryCode(updatedUser);
+                yield this.emailsManager.sendPasswordRecoveryCode(updatedUser);
                 return true;
             }
             catch (error) {
                 return null;
             }
         });
-    },
+    }
     newPassword(password, code) {
         return __awaiter(this, void 0, void 0, function* () {
             // generate new password hash
             const passwordSalt = yield bcrypt_1.default.genSalt(10);
-            const passwordHash = yield users_service_1.usersService._generateHash(password, passwordSalt);
+            const passwordHash = yield this.usersService._generateHash(password, passwordSalt);
             // find the user
-            const user = yield users_db_query_repository_1.usersQueryRepository.findUserByPasswordConfirmationCode(code);
+            const user = yield this.usersQueryRepository.findUserByPasswordConfirmationCode(code);
             if (!user)
                 return null;
             // update user password hash in db
-            const updatedPasswordHash = yield users_service_1.usersService.updateUserPasswordHash(user.id, passwordHash);
+            const updatedPasswordHash = yield this.usersService.updateUserPasswordHash(user.id, passwordHash);
             if (!updatedPasswordHash)
                 return null;
             // set recoveryCode and expirationCode to null
-            return yield users_service_1.usersService.clearConfirmationCode(user.id);
+            return yield this.usersService.clearConfirmationCode(user.id);
         });
-    },
+    }
     confirmEmail(code) {
         return __awaiter(this, void 0, void 0, function* () {
-            const user = yield users_db_query_repository_1.usersQueryRepository.findUserByEmailConfirmationCode(code);
+            const user = yield this.usersQueryRepository.findUserByEmailConfirmationCode(code);
             if (!user)
                 return false;
-            const updatedConfirmation = yield users_service_1.usersService.updateConfirmation(user.id);
+            const updatedConfirmation = yield this.usersService.updateConfirmation(user.id);
             return updatedConfirmation;
         });
-    },
+    }
     resendEmail(email) {
         return __awaiter(this, void 0, void 0, function* () {
-            const user = yield users_db_query_repository_1.usersQueryRepository.findByLoginOrEmail(email);
+            const user = yield this.usersQueryRepository.findByLoginOrEmail(email);
             if (!user)
                 return false;
-            const updatedConfirmationCode = yield users_service_1.usersService.updateConfirmationCode(user.id);
+            const updatedConfirmationCode = yield this.usersService.updateConfirmationCode(user.id);
             if (!updatedConfirmationCode)
                 return false;
             try {
-                yield emails_manager_1.emailsManager.sendEmailConformationMessage(updatedConfirmationCode);
+                yield this.emailsManager.sendEmailConformationMessage(updatedConfirmationCode);
             }
             catch (error) {
                 console.log(error);
@@ -103,5 +105,6 @@ exports.authService = {
             }
             return true;
         });
-    },
-};
+    }
+}
+exports.AuthService = AuthService;

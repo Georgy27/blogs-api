@@ -9,16 +9,16 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.usersRepository = void 0;
+exports.UsersRepository = void 0;
 const crypto_1 = require("crypto");
 const user_schema_1 = require("../models/users-model/user-schema");
-exports.usersRepository = {
+class UsersRepository {
     createUser(user) {
         return __awaiter(this, void 0, void 0, function* () {
             yield user_schema_1.UsersModel.create(Object.assign({}, user));
             return user;
         });
-    },
+    }
     createUserByAdmin(user) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
@@ -42,19 +42,19 @@ exports.usersRepository = {
                 };
             }
         });
-    },
+    }
     deleteUser(id) {
         return __awaiter(this, void 0, void 0, function* () {
             const result = yield user_schema_1.UsersModel.deleteOne({ id });
             return result.deletedCount === 1;
         });
-    },
+    }
     updateConfirmation(id) {
         return __awaiter(this, void 0, void 0, function* () {
             const updatedUser = yield user_schema_1.UsersModel.updateOne({ id }, { "emailConfirmation.isConfirmed": true });
             return updatedUser.modifiedCount === 1;
         });
-    },
+    }
     updateConfirmationCode(id) {
         return __awaiter(this, void 0, void 0, function* () {
             const updatedUser = yield user_schema_1.UsersModel.findOneAndUpdate({ id }, {
@@ -64,7 +64,7 @@ exports.usersRepository = {
                 return null;
             return updatedUser;
         });
-    },
+    }
     updateUserPasswordHash(id, passwordHash) {
         return __awaiter(this, void 0, void 0, function* () {
             const updatedUserHash = yield user_schema_1.UsersModel.updateOne({ id }, {
@@ -72,7 +72,7 @@ exports.usersRepository = {
             });
             return updatedUserHash.modifiedCount === 1;
         });
-    },
+    }
     createPasswordRecoveryCode(id, passwordRecoveryInfo) {
         return __awaiter(this, void 0, void 0, function* () {
             const updatedUser = user_schema_1.UsersModel.findOneAndUpdate({ id }, {
@@ -84,17 +84,18 @@ exports.usersRepository = {
                 return null;
             return updatedUser;
         });
-    },
+    }
     clearConfirmationCode(id, passwordRecoveryInfo) {
         return __awaiter(this, void 0, void 0, function* () {
             return user_schema_1.UsersModel.findOneAndUpdate({ id }, {
                 passwordRecovery: passwordRecoveryInfo,
             }).lean();
         });
-    },
+    }
     clearUsers() {
         return __awaiter(this, void 0, void 0, function* () {
             yield user_schema_1.UsersModel.deleteMany({});
         });
-    },
-};
+    }
+}
+exports.UsersRepository = UsersRepository;

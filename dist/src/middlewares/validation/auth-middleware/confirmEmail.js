@@ -9,25 +9,53 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.confirmEmail = void 0;
+exports.ConfirmEmail = void 0;
 const express_validator_1 = require("express-validator");
-const users_db_query_repository_1 = require("../../../repositories/users-db-query-repository");
-exports.confirmEmail = (0, express_validator_1.body)("code")
-    .isString()
-    .notEmpty()
-    .custom((code) => __awaiter(void 0, void 0, void 0, function* () {
-    const user = yield users_db_query_repository_1.usersQueryRepository.findUserByEmailConfirmationCode(code);
-    if (!user) {
-        throw new Error("user doesn't exist");
+class ConfirmEmail {
+    constructor(usersQueryRepository) {
+        this.usersQueryRepository = usersQueryRepository;
     }
-    if (user.emailConfirmation.isConfirmed) {
-        throw new Error("user email already confirmed");
+    use() {
+        (0, express_validator_1.body)("code")
+            .isString()
+            .notEmpty()
+            .custom((code) => __awaiter(this, void 0, void 0, function* () {
+            const user = yield this.usersQueryRepository.findUserByEmailConfirmationCode(code);
+            if (!user) {
+                throw new Error("user doesn't exist");
+            }
+            if (user.emailConfirmation.isConfirmed) {
+                throw new Error("user email already confirmed");
+            }
+            if (user.emailConfirmation.confirmationCode !== code) {
+                throw new Error("user code does not match");
+            }
+            if (user.emailConfirmation.expirationDate < new Date().toISOString()) {
+                throw new Error("user code has expired");
+            }
+            return true;
+        }));
     }
-    if (user.emailConfirmation.confirmationCode !== code) {
-        throw new Error("user code does not match");
-    }
-    if (user.emailConfirmation.expirationDate < new Date().toISOString()) {
-        throw new Error("user code has expired");
-    }
-    return true;
-}));
+}
+exports.ConfirmEmail = ConfirmEmail;
+// export const confirmEmail = body("code")
+//   .isString()
+//   .notEmpty()
+//   .custom(async (code) => {
+//     const user = await usersQueryRepository.findUserByEmailConfirmationCode(
+//       code
+//     );
+//     if (!user) {
+//       throw new Error("user doesn't exist");
+//     }
+//     if (user.emailConfirmation.isConfirmed) {
+//       throw new Error("user email already confirmed");
+//     }
+//     if (user.emailConfirmation.confirmationCode !== code) {
+//       throw new Error("user code does not match");
+//     }
+//     if (user.emailConfirmation.expirationDate < new Date().toISOString()) {
+//       throw new Error("user code has expired");
+//     }
+//     return true;
+//   });

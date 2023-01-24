@@ -34,4 +34,22 @@ const BlogsSchema = new mongoose_1.Schema({
 }, {
     versionKey: false,
 });
+var reactionStatusEnum;
+(function (reactionStatusEnum) {
+    reactionStatusEnum["Like"] = "Like";
+    reactionStatusEnum["Dislike"] = "Dislike";
+    reactionStatusEnum["None"] = "None";
+})(reactionStatusEnum || (reactionStatusEnum = {}));
+const testSchema = new mongoose_1.Schema({
+    id: String,
+    parentType: String,
+    parentId: String,
+    status: { type: String, enum: reactionStatusEnum },
+    addedAt: String,
+    userId: String,
+    userLogin: String,
+}, {
+    versionKey: false,
+});
+// upsert in options while updating (look at how its done in device)
 exports.BlogsModel = mongoose_1.default.model("blogs", BlogsSchema);

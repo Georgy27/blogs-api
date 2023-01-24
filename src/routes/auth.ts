@@ -1,28 +1,36 @@
-import { Request, Response, Router, NextFunction } from "express";
-import { RequestWithBody } from "../types";
+import { Router } from "express";
 import {
   newPasswordValidation,
   passwordValidation,
 } from "../middlewares/validation/users-middleware/passwordValidation";
 import { inputValidationMiddleware } from "../middlewares/validation/input-validation-middleware";
-import { usersService } from "../domain/users-service";
-import { jwtAuthMiddleware } from "../middlewares/auth/jwt-auth-middleware";
-import { loginValidation } from "../middlewares/validation/users-middleware/loginValidation";
-import { emailRegistrationValidation } from "../middlewares/validation/users-middleware/emailRegistrationValidation";
 import { loginOrEmailValidation } from "../middlewares/validation/auth-middleware/loginOrEmailValidation";
 import { morgan } from "../middlewares/morgan-middleware";
-import { authService } from "../domain/auth-service";
-import { confirmEmail } from "../middlewares/validation/auth-middleware/confirmEmail";
-import { emailResendingValidation } from "../middlewares/validation/auth-middleware/emailResendingValidation";
-import { sessionRepository } from "../repositories/sessions-db-repository";
-import { refreshTokenMiddleware } from "../middlewares/auth/refresh-token-middleware";
 import { checkRequests } from "../middlewares/auth/checkRequests-middleware";
-import { AuthRegistrationModel, AuthUserModel } from "../models/auth-model";
 import { emailValidation } from "../middlewares/validation/users-middleware/emailValidation";
-import { confirmRecoveryCode } from "../middlewares/validation/auth-middleware/recoveryCodeValidation";
+import {
+  authController,
+  confirmEmail,
+  confirmRecoveryCode,
+  emailRegistrationValidation,
+  emailResendingValidation,
+  jwtAuthMiddleware,
+  loginValidation,
+  refreshTokenMiddleware,
+} from "../composition-root";
 
 export const authRouter = Router({});
-
+const jwtMw = jwtAuthMiddleware.use.bind(jwtAuthMiddleware);
+const confirmRecoveryMw = confirmRecoveryCode.use.bind(confirmRecoveryCode);
+const confirmEmailMw = confirmEmail.use.bind(confirmEmail);
+const refreshTokenMw = refreshTokenMiddleware.use.bind(refreshTokenMiddleware);
+const loginValidationMw = loginValidation.use.bind(loginValidation);
+const emailRegistrationValidationMw = emailRegistrationValidation.use.bind(
+  emailRegistrationValidation
+);
+const emailResendingValidationMw = emailResendingValidation.use.bind(
+  emailResendingValidation
+);
 authRouter.post(
   "/login",
   checkRequests,
@@ -30,138 +38,63 @@ authRouter.post(
   passwordValidation,
   inputValidationMiddleware,
   morgan("tiny"),
-  async (req: RequestWithBody<AuthUserModel>, res: Response) => {
-    const { loginOrEmail, password } = req.body;
-    const deviceName = req.headers["user-agent"];
-    if (!deviceName) return res.sendStatus(401);
-    const ip = req.ip;
-
-    const tokens = await authService.login(
-      loginOrEmail,
-      password,
-      ip,
-      deviceName
-    );
-    if (!tokens) return res.sendStatus(401);
-
-    res.cookie("refreshToken", tokens.refreshToken, {
-      maxAge: 20000,
-      httpOnly: true,
-      secure: true,
-    });
-
-    return res.status(200).send({ accessToken: tokens.accessToken });
-  }
+  authController.login.bind(authController)
 );
 authRouter.post(
   "/registration",
   checkRequests,
-  loginValidation,
+  loginValidationMw,
   passwordValidation,
-  emailRegistrationValidation,
+  emailRegistrationValidationMw,
   inputValidationMiddleware,
   morgan("tiny"),
-  async (req: RequestWithBody<AuthRegistrationModel>, res: Response) => {
-    const { login, password, email } = req.body;
-    const newUser = await usersService.createUser(login, password, email);
-    if (!newUser) return res.sendStatus(400);
-    return res.sendStatus(204);
-  }
+  authController.register.bind(authController)
 );
 authRouter.post(
   "/refresh-token",
-  refreshTokenMiddleware,
-  async (req: Request, res: Response) => {
-    const userId = req.user!.userId;
-    const deviceId = req.jwtPayload!.deviceId;
-    const tokens = await authService.refreshToken(userId, deviceId);
-
-    res.cookie("refreshToken", tokens.refreshToken, {
-      maxAge: 20000,
-      httpOnly: true,
-      secure: true,
-    });
-
-    return res.status(200).send({ accessToken: tokens.accessToken });
-  }
+  refreshTokenMw,
+  authController.refreshToken.bind(authController)
 );
 authRouter.post(
   "/logout",
-  refreshTokenMiddleware,
+  refreshTokenMw,
   morgan("tiny"),
-  async (req: Request, res: Response) => {
-    const userId = req.user!.userId;
-    const deviceId = req.jwtPayload!.deviceId;
-    const removeToken = await sessionRepository.deleteSessionByDeviceID(
-      deviceId,
-      userId
-    );
-    if (!removeToken) return res.sendStatus(401);
-    return res.clearCookie("refreshToken").status(204).send({});
-  }
+  authController.logout.bind(authController)
 );
 authRouter.post(
   "/registration-confirmation",
   checkRequests,
-  confirmEmail,
+  confirmEmailMw,
   inputValidationMiddleware,
   morgan("tiny"),
-  async (req: RequestWithBody<{ code: string }>, res: Response) => {
-    const code = req.body.code;
-    const isConfirmedEmail = await authService.confirmEmail(code);
-    if (!isConfirmedEmail) {
-      return res.sendStatus(400);
-    }
-    return res.sendStatus(204);
-  }
+  authController.registrationConfirmation.bind(authController)
 );
 authRouter.post(
   "/registration-email-resending",
   checkRequests,
-  emailResendingValidation,
+  emailResendingValidationMw,
   inputValidationMiddleware,
   morgan("tiny"),
-  async (req: RequestWithBody<{ email: string }>, res: Response) => {
-    const userEmail = req.body.email;
-    const result = await authService.resendEmail(userEmail);
-    // if email could not be send (can be 500 error)
-    if (!result) return res.sendStatus(400);
-    return res.sendStatus(204);
-  }
+  authController.registrationEmailResending.bind(authController)
 );
 authRouter.post(
   "/password-recovery",
   checkRequests,
   emailValidation,
   inputValidationMiddleware,
-  async (req: RequestWithBody<{ email: string }>, res: Response) => {
-    const userEmail = req.body.email;
-    await authService.passwordRecovery(userEmail);
-    return res.sendStatus(204);
-  }
+  authController.passwordRecovery.bind(authController)
 );
 authRouter.post(
   "/new-password",
   checkRequests,
   newPasswordValidation,
-  confirmRecoveryCode,
+  confirmRecoveryMw,
   inputValidationMiddleware,
-  async (
-    req: RequestWithBody<{ newPassword: string; recoveryCode: string }>,
-    res: Response
-  ) => {
-    const { newPassword, recoveryCode } = req.body;
-    const result = await authService.newPassword(newPassword, recoveryCode);
-    if (!result) return res.sendStatus(400);
-    return res.sendStatus(204);
-  }
+  authController.newPassword.bind(authController)
 );
 authRouter.get(
   "/me",
-  jwtAuthMiddleware,
+  jwtMw,
   morgan("tiny"),
-  async (req: Request, res: Response) => {
-    const user = await req.user;
-    return res.status(200).send(user);
-  }
+  authController.me.bind(authController)
 );

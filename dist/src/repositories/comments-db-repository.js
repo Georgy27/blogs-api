@@ -9,9 +9,9 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.commentsRepository = void 0;
+exports.CommentsRepository = void 0;
 const comment_schema_1 = require("../models/comments-model/comment-schema");
-exports.commentsRepository = {
+class CommentsRepository {
     createComment(comment) {
         return __awaiter(this, void 0, void 0, function* () {
             yield comment_schema_1.CommentsModel.create(Object.assign({}, comment));
@@ -23,22 +23,23 @@ exports.commentsRepository = {
                 createdAt: comment.createdAt,
             };
         });
-    },
+    }
     updateComment(content, id) {
         return __awaiter(this, void 0, void 0, function* () {
             const result = yield comment_schema_1.CommentsModel.updateOne({ id: id }, { content });
             return result.matchedCount === 1;
         });
-    },
+    }
     deleteComment(id) {
         return __awaiter(this, void 0, void 0, function* () {
             const result = yield comment_schema_1.CommentsModel.deleteOne({ id });
             return result.deletedCount === 1;
         });
-    },
+    }
     clearComments() {
         return __awaiter(this, void 0, void 0, function* () {
             yield comment_schema_1.CommentsModel.deleteMany({});
         });
-    },
-};
+    }
+}
+exports.CommentsRepository = CommentsRepository;

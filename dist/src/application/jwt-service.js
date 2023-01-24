@@ -12,11 +12,13 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.jwtService = void 0;
+exports.JwtService = void 0;
 const jsonwebtoken_1 = __importDefault(require("jsonwebtoken"));
 const settings_1 = require("../settings");
-const sessions_db_repository_1 = require("../repositories/sessions-db-repository");
-exports.jwtService = {
+class JwtService {
+    constructor(sessionRepository) {
+        this.sessionRepository = sessionRepository;
+    }
     createJWT(userId, deviceId) {
         return __awaiter(this, void 0, void 0, function* () {
             const accessToken = jsonwebtoken_1.default.sign({ userId }, settings_1.settings.JWT_SECRET, {
@@ -30,14 +32,14 @@ exports.jwtService = {
                 refreshToken,
             };
         });
-    },
+    }
     getIssuedAtByRefreshToken(refreshToken) {
         return __awaiter(this, void 0, void 0, function* () {
             const refreshTokenDecoded = jsonwebtoken_1.default.decode(refreshToken);
             const issuedAt = new Date(refreshTokenDecoded.iat * 1000).toISOString();
             return issuedAt;
         });
-    },
+    }
     saveTokenToDB(ip, deviceName, issuedAt, deviceId, userId) {
         return __awaiter(this, void 0, void 0, function* () {
             const tokenData = {
@@ -47,10 +49,10 @@ exports.jwtService = {
                 deviceId,
                 userId,
             };
-            yield sessions_db_repository_1.sessionRepository.saveNewSession(tokenData);
+            yield this.sessionRepository.saveNewSession(tokenData);
             return tokenData;
         });
-    },
+    }
     getUserIdByAccessToken(token) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
@@ -61,7 +63,7 @@ exports.jwtService = {
                 return null;
             }
         });
-    },
+    }
     getJWTPayloadByRefreshToken(token) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
@@ -72,5 +74,6 @@ exports.jwtService = {
                 return null;
             }
         });
-    },
-};
+    }
+}
+exports.JwtService = JwtService;

@@ -9,17 +9,24 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.emailRegistrationValidation = void 0;
+exports.EmailRegistrationValidation = void 0;
 const express_validator_1 = require("express-validator");
-const users_db_query_repository_1 = require("../../../repositories/users-db-query-repository");
-exports.emailRegistrationValidation = (0, express_validator_1.body)("email")
-    .isEmail()
-    .custom((email) => __awaiter(void 0, void 0, void 0, function* () {
-    const isUserWithEmail = yield users_db_query_repository_1.usersQueryRepository.findByLoginOrEmail(email);
-    if (isUserWithEmail) {
-        throw new Error("user with given email already exist");
+class EmailRegistrationValidation {
+    constructor(usersQueryRepository) {
+        this.usersQueryRepository = usersQueryRepository;
     }
-    else {
-        return true;
+    use() {
+        (0, express_validator_1.body)("email")
+            .isEmail()
+            .custom((email) => __awaiter(this, void 0, void 0, function* () {
+            const isUserWithEmail = yield this.usersQueryRepository.findByLoginOrEmail(email);
+            if (isUserWithEmail) {
+                throw new Error("user with given email already exist");
+            }
+            else {
+                return true;
+            }
+        }));
     }
-}));
+}
+exports.EmailRegistrationValidation = EmailRegistrationValidation;

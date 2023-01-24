@@ -9,10 +9,10 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.usersQueryRepository = void 0;
+exports.UsersQueryRepository = void 0;
 const helpers_1 = require("../utils/helpers");
 const user_schema_1 = require("../models/users-model/user-schema");
-exports.usersQueryRepository = {
+class UsersQueryRepository {
     findUsers(pageNumber, pageSize, sortBy, sortDirection, searchLoginTerm, searchEmailTerm) {
         return __awaiter(this, void 0, void 0, function* () {
             const filter = {
@@ -42,7 +42,7 @@ exports.usersQueryRepository = {
                 items: (0, helpers_1.mappedUsers)(users),
             };
         });
-    },
+    }
     findUserById(id) {
         return __awaiter(this, void 0, void 0, function* () {
             const user = yield user_schema_1.UsersModel.findOne({ id }, { _id: false });
@@ -55,7 +55,7 @@ exports.usersQueryRepository = {
             }
             return null;
         });
-    },
+    }
     findByLoginOrEmail(loginOrEmail) {
         return __awaiter(this, void 0, void 0, function* () {
             const user = yield user_schema_1.UsersModel.findOne({
@@ -66,7 +66,7 @@ exports.usersQueryRepository = {
             }).lean();
             return user;
         });
-    },
+    }
     findUserByEmailConfirmationCode(code) {
         return __awaiter(this, void 0, void 0, function* () {
             const user = yield user_schema_1.UsersModel.findOne({
@@ -74,7 +74,7 @@ exports.usersQueryRepository = {
             }).lean();
             return user;
         });
-    },
+    }
     findUserByPasswordConfirmationCode(code) {
         return __awaiter(this, void 0, void 0, function* () {
             const user = yield user_schema_1.UsersModel.findOne({
@@ -82,5 +82,6 @@ exports.usersQueryRepository = {
             }).lean();
             return user;
         });
-    },
-};
+    }
+}
+exports.UsersQueryRepository = UsersQueryRepository;

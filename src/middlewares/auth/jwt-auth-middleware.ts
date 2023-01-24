@@ -1,22 +1,24 @@
 import { NextFunction, Request, Response } from "express";
-import { jwtService } from "../../application/jwt-service";
-import { usersQueryRepository } from "../../repositories/users-db-query-repository";
+import { UsersQueryRepository } from "../../repositories/users-db-query-repository";
+import { JwtService } from "../../application/jwt-service";
 
-export const jwtAuthMiddleware = async (
-  req: Request,
-  res: Response,
-  next: NextFunction
-) => {
-  const auth = req.headers.authorization;
-  if (!auth) return res.sendStatus(401);
-  const authType = auth.split(" ")[0];
-  const token = auth.split(" ")[1];
+export class JwtAuthMiddleware {
+  constructor(
+    protected usersQueryRepository: UsersQueryRepository,
+    protected jwtService: JwtService
+  ) {}
+  async use(req: Request, res: Response, next: NextFunction) {
+    const auth = req.headers.authorization;
+    if (!auth) return res.sendStatus(401);
+    const authType = auth.split(" ")[0];
+    const token = auth.split(" ")[1];
 
-  if (authType !== "Bearer") return res.sendStatus(401);
+    if (authType !== "Bearer") return res.sendStatus(401);
 
-  const userId = await jwtService.getUserIdByAccessToken(token);
+    const userId = await this.jwtService.getUserIdByAccessToken(token);
 
-  if (!userId) return res.sendStatus(401);
-  req.user = await usersQueryRepository.findUserById(userId);
-  return next();
-};
+    if (!userId) return res.sendStatus(401);
+    req.user = await this.usersQueryRepository.findUserById(userId);
+    return next();
+  }
+}

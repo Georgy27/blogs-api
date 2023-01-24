@@ -9,14 +9,14 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.sessionRepository = void 0;
+exports.SessionRepository = void 0;
 const session_schema_1 = require("../models/sessions-model/session-schema");
-exports.sessionRepository = {
+class SessionRepository {
     saveNewSession(tokenData) {
         return __awaiter(this, void 0, void 0, function* () {
             return session_schema_1.SessionsModel.create(Object.assign({}, tokenData));
         });
-    },
+    }
     findAllActiveSessions(userId) {
         return __awaiter(this, void 0, void 0, function* () {
             const devices = yield session_schema_1.SessionsModel.find({ userId }, { _id: false }).lean();
@@ -30,23 +30,23 @@ exports.sessionRepository = {
             });
             return newDevices;
         });
-    },
+    }
     findLastActiveDate(userId, lastActiveDate) {
         return __awaiter(this, void 0, void 0, function* () {
             return session_schema_1.SessionsModel.findOne({ userId, lastActiveDate });
         });
-    },
+    }
     updateLastActiveDate(deviceId, lastActiveDate) {
         return __awaiter(this, void 0, void 0, function* () {
             const result = yield session_schema_1.SessionsModel.updateOne({ deviceId }, { lastActiveDate });
             return result.matchedCount === 1;
         });
-    },
+    }
     findDeviceById(deviceId) {
         return __awaiter(this, void 0, void 0, function* () {
             return session_schema_1.SessionsModel.findOne({ deviceId });
         });
-    },
+    }
     deleteSessionByDeviceID(deviceId, userId) {
         return __awaiter(this, void 0, void 0, function* () {
             const deletedToken = yield session_schema_1.SessionsModel.deleteOne({
@@ -55,7 +55,7 @@ exports.sessionRepository = {
             });
             return deletedToken.deletedCount === 1;
         });
-    },
+    }
     deleteAllSessionsExceptCurrent(deviceId, userId) {
         return __awaiter(this, void 0, void 0, function* () {
             return session_schema_1.SessionsModel.deleteMany({
@@ -63,5 +63,6 @@ exports.sessionRepository = {
                 deviceId: { $ne: deviceId },
             });
         });
-    },
-};
+    }
+}
+exports.SessionRepository = SessionRepository;

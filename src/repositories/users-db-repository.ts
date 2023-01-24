@@ -2,11 +2,11 @@ import { randomUUID } from "crypto";
 import { UserAccountDBModel, UsersViewModel } from "../models/users-model";
 import { UsersModel } from "../models/users-model/user-schema";
 
-export const usersRepository = {
+export class UsersRepository {
   async createUser(user: UserAccountDBModel): Promise<UserAccountDBModel> {
     await UsersModel.create({ ...user });
     return user;
-  },
+  }
   async createUserByAdmin(user: UserAccountDBModel): Promise<UsersViewModel> {
     try {
       console.log("before save");
@@ -27,11 +27,11 @@ export const usersRepository = {
         createdAt: user.accountData.createdAt,
       };
     }
-  },
+  }
   async deleteUser(id: string) {
     const result = await UsersModel.deleteOne({ id });
     return result.deletedCount === 1;
-  },
+  }
 
   async updateConfirmation(id: string): Promise<boolean> {
     const updatedUser = await UsersModel.updateOne(
@@ -39,7 +39,7 @@ export const usersRepository = {
       { "emailConfirmation.isConfirmed": true }
     );
     return updatedUser.modifiedCount === 1;
-  },
+  }
   async updateConfirmationCode(id: string): Promise<UserAccountDBModel | null> {
     const updatedUser = await UsersModel.findOneAndUpdate(
       { id },
@@ -51,7 +51,7 @@ export const usersRepository = {
     ).lean();
     if (!updatedUser) return null;
     return updatedUser;
-  },
+  }
   async updateUserPasswordHash(id: string, passwordHash: string) {
     const updatedUserHash = await UsersModel.updateOne(
       { id },
@@ -60,7 +60,7 @@ export const usersRepository = {
       }
     );
     return updatedUserHash.modifiedCount === 1;
-  },
+  }
   async createPasswordRecoveryCode(
     id: string,
     passwordRecoveryInfo: { recoveryCode: string; expirationDate: string }
@@ -76,7 +76,7 @@ export const usersRepository = {
     ).lean();
     if (!updatedUser) return null;
     return updatedUser;
-  },
+  }
   async clearConfirmationCode(
     id: string,
     passwordRecoveryInfo: { recoveryCode: null; expirationDate: null }
@@ -87,8 +87,8 @@ export const usersRepository = {
         passwordRecovery: passwordRecoveryInfo,
       }
     ).lean();
-  },
+  }
   async clearUsers() {
     await UsersModel.deleteMany({});
-  },
-};
+  }
+}

@@ -1,9 +1,9 @@
 import jwt from "jsonwebtoken";
 import { settings } from "../settings";
-import { sessionRepository } from "../repositories/sessions-db-repository";
-import { randomUUID } from "crypto";
+import { SessionRepository } from "../repositories/sessions-db-repository";
 
-export const jwtService = {
+export class JwtService {
+  constructor(protected sessionRepository: SessionRepository) {}
   async createJWT(userId: string, deviceId: string) {
     const accessToken = jwt.sign({ userId }, settings.JWT_SECRET, {
       expiresIn: "10s",
@@ -20,12 +20,12 @@ export const jwtService = {
       accessToken,
       refreshToken,
     };
-  },
+  }
   async getIssuedAtByRefreshToken(refreshToken: string) {
     const refreshTokenDecoded: any = jwt.decode(refreshToken);
     const issuedAt = new Date(refreshTokenDecoded.iat * 1000).toISOString();
     return issuedAt;
-  },
+  }
   async saveTokenToDB(
     ip: string,
     deviceName: string,
@@ -40,9 +40,9 @@ export const jwtService = {
       deviceId,
       userId,
     };
-    await sessionRepository.saveNewSession(tokenData);
+    await this.sessionRepository.saveNewSession(tokenData);
     return tokenData;
-  },
+  }
   async getUserIdByAccessToken(token: string) {
     try {
       const result: any = jwt.verify(token, settings.JWT_SECRET);
@@ -50,7 +50,7 @@ export const jwtService = {
     } catch (error) {
       return null;
     }
-  },
+  }
   async getJWTPayloadByRefreshToken(token: string) {
     try {
       const result: any = jwt.verify(token, settings.JWT_REFRESH_SECRET);
@@ -58,5 +58,5 @@ export const jwtService = {
     } catch (error) {
       return null;
     }
-  },
-};
+  }
+}

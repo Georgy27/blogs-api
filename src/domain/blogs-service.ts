@@ -1,8 +1,9 @@
 import { randomUUID } from "crypto";
-import { blogsRepository } from "../repositories/blogs-db-repository";
 import { BlogsDBModel } from "../models/blogs-model";
+import { BlogsRepository } from "../repositories/blogs-db-repository";
 
-export const blogsService = {
+export class BlogsService {
+  constructor(protected blogsRepository: BlogsRepository) {}
   async createBlog(
     name: string,
     description: string,
@@ -15,18 +16,22 @@ export const blogsService = {
       websiteUrl: websiteUrl,
       createdAt: new Date().toISOString(),
     };
-    return blogsRepository.createBlog(newBlog);
-  },
-
+    return this.blogsRepository.createBlog(newBlog);
+  }
   async updateBlog(
     blogId: string,
     name: string,
     description: string,
     websiteUrl: string
   ): Promise<boolean> {
-    return blogsRepository.updateBlog(blogId, name, description, websiteUrl);
-  },
+    return this.blogsRepository.updateBlog(
+      blogId,
+      name,
+      description,
+      websiteUrl
+    );
+  }
   async deleteBlog(id: string): Promise<boolean> {
-    return blogsRepository.deleteBlog(id);
-  },
-};
+    return this.blogsRepository.deleteBlog(id);
+  }
+}

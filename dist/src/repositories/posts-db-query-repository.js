@@ -9,9 +9,9 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.postsQueryRepository = void 0;
+exports.PostsQueryRepository = void 0;
 const post_schema_1 = require("../models/posts-model/post-schema");
-exports.postsQueryRepository = {
+class PostsQueryRepository {
     findPosts(pageNumber, pageSize, sortBy, sortDirection, blogId) {
         return __awaiter(this, void 0, void 0, function* () {
             const filter = {};
@@ -32,11 +32,12 @@ exports.postsQueryRepository = {
                 items: posts,
             };
         });
-    },
+    }
     findPost(id) {
         return __awaiter(this, void 0, void 0, function* () {
             const post = yield post_schema_1.PostsModel.findOne({ id }, { _id: false }).lean();
             return post;
         });
-    },
-};
+    }
+}
+exports.PostsQueryRepository = PostsQueryRepository;

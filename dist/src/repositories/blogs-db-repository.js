@@ -9,30 +9,31 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.blogsRepository = void 0;
+exports.BlogsRepository = void 0;
 const blog_schema_1 = require("../models/blogs-model/blog-schema");
-exports.blogsRepository = {
+class BlogsRepository {
     createBlog(newBlog) {
         return __awaiter(this, void 0, void 0, function* () {
             yield blog_schema_1.BlogsModel.create(Object.assign({}, newBlog));
             return newBlog;
         });
-    },
+    }
     updateBlog(blogId, name, description, websiteUrl) {
         return __awaiter(this, void 0, void 0, function* () {
             const result = yield blog_schema_1.BlogsModel.updateOne({ id: blogId }, { name, description, websiteUrl });
             return result.matchedCount === 1;
         });
-    },
+    }
     deleteBlog(id) {
         return __awaiter(this, void 0, void 0, function* () {
             const result = yield blog_schema_1.BlogsModel.deleteOne({ id });
             return result.deletedCount === 1;
         });
-    },
+    }
     clearBlogs() {
         return __awaiter(this, void 0, void 0, function* () {
             yield blog_schema_1.BlogsModel.deleteMany({});
         });
-    },
-};
+    }
+}
+exports.BlogsRepository = BlogsRepository;

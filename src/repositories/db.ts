@@ -9,7 +9,6 @@ if (!mongoUrl) {
 
 export async function runDb() {
   try {
-    console.log(mongoUrl);
     await mongoose.connect(mongoUrl, {
       retryWrites: true,
       w: "majority",

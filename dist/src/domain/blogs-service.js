@@ -9,10 +9,12 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.blogsService = void 0;
+exports.BlogsService = void 0;
 const crypto_1 = require("crypto");
-const blogs_db_repository_1 = require("../repositories/blogs-db-repository");
-exports.blogsService = {
+class BlogsService {
+    constructor(blogsRepository) {
+        this.blogsRepository = blogsRepository;
+    }
     createBlog(name, description, websiteUrl) {
         return __awaiter(this, void 0, void 0, function* () {
             const newBlog = {
@@ -22,17 +24,18 @@ exports.blogsService = {
                 websiteUrl: websiteUrl,
                 createdAt: new Date().toISOString(),
             };
-            return blogs_db_repository_1.blogsRepository.createBlog(newBlog);
+            return this.blogsRepository.createBlog(newBlog);
         });
-    },
+    }
     updateBlog(blogId, name, description, websiteUrl) {
         return __awaiter(this, void 0, void 0, function* () {
-            return blogs_db_repository_1.blogsRepository.updateBlog(blogId, name, description, websiteUrl);
+            return this.blogsRepository.updateBlog(blogId, name, description, websiteUrl);
         });
-    },
+    }
     deleteBlog(id) {
         return __awaiter(this, void 0, void 0, function* () {
-            return blogs_db_repository_1.blogsRepository.deleteBlog(id);
+            return this.blogsRepository.deleteBlog(id);
         });
-    },
-};
+    }
+}
+exports.BlogsService = BlogsService;

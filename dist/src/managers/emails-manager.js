@@ -9,21 +9,22 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.emailsManager = void 0;
-const email_adapter_1 = require("../adapters/email-adapter");
-exports.emailsManager = {
+exports.EmailsManager = void 0;
+class EmailsManager {
+    constructor(emailAdapter) {
+        this.emailAdapter = emailAdapter;
+    }
     sendEmailConformationMessage(user) {
         return __awaiter(this, void 0, void 0, function* () {
-            console.log(`Email Manager ${user.emailConfirmation.confirmationCode}`);
             let message = `<h1>Thank for your registration</h1><p>To finish registration please follow the link below: <a href='https://some-front.com/confirm-registration?code=${user.emailConfirmation.confirmationCode}'>complete registration</a> </p>`;
-            yield email_adapter_1.emailAdapter.sendEmail(user.accountData.email, message);
+            yield this.emailAdapter.sendEmail(user.accountData.email, message);
         });
-    },
+    }
     sendPasswordRecoveryCode(user) {
         return __awaiter(this, void 0, void 0, function* () {
-            console.log(user.passwordRecovery.recoveryCode);
             let message = `<h1>Thank for your registration</h1><p>To finish registration please follow the link below: <a href='https://some-front.com/password-recovery?recoveryCode=${user.passwordRecovery.recoveryCode}'>complete registration</a></p>`;
-            yield email_adapter_1.emailAdapter.sendEmail(user.accountData.email, message);
+            yield this.emailAdapter.sendEmail(user.accountData.email, message);
         });
-    },
-};
+    }
+}
+exports.EmailsManager = EmailsManager;

@@ -9,24 +9,27 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.securityDevicesService = void 0;
-const sessions_db_repository_1 = require("../repositories/sessions-db-repository");
-exports.securityDevicesService = {
+exports.SecurityDevicesService = void 0;
+class SecurityDevicesService {
+    constructor(sessionRepository) {
+        this.sessionRepository = sessionRepository;
+    }
     logOutDevices(deviceId, userId) {
         return __awaiter(this, void 0, void 0, function* () {
-            return sessions_db_repository_1.sessionRepository.deleteAllSessionsExceptCurrent(deviceId, userId);
+            return this.sessionRepository.deleteAllSessionsExceptCurrent(deviceId, userId);
         });
-    },
+    }
     logOutDevice(deviceId, userId) {
         return __awaiter(this, void 0, void 0, function* () {
             // find device
-            const device = yield sessions_db_repository_1.sessionRepository.findDeviceById(deviceId);
+            const device = yield this.sessionRepository.findDeviceById(deviceId);
             if (!device)
                 return 404;
             // check for user
             if (device.userId !== userId)
                 return 403;
-            return sessions_db_repository_1.sessionRepository.deleteSessionByDeviceID(deviceId, userId);
+            return this.sessionRepository.deleteSessionByDeviceID(deviceId, userId);
         });
-    },
-};
+    }
+}
+exports.SecurityDevicesService = SecurityDevicesService;

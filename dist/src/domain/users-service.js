@@ -12,14 +12,16 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.usersService = void 0;
+exports.UsersService = void 0;
 const bcrypt_1 = __importDefault(require("bcrypt"));
 const crypto_1 = require("crypto");
-const users_db_repository_1 = require("../repositories/users-db-repository");
 const add_1 = __importDefault(require("date-fns/add"));
-const emails_manager_1 = require("../managers/emails-manager");
-const users_db_query_repository_1 = require("../repositories/users-db-query-repository");
-exports.usersService = {
+class UsersService {
+    constructor(usersRepository, usersQueryRepository, emailsManager) {
+        this.usersRepository = usersRepository;
+        this.usersQueryRepository = usersQueryRepository;
+        this.emailsManager = emailsManager;
+    }
     createUser(login, password, email) {
         return __awaiter(this, void 0, void 0, function* () {
             const passwordSalt = yield bcrypt_1.default.genSalt(10);
@@ -44,9 +46,9 @@ exports.usersService = {
                     isConfirmed: false,
                 },
             };
-            const userResult = yield users_db_repository_1.usersRepository.createUser(newUser);
+            const userResult = yield this.usersRepository.createUser(newUser);
             try {
-                yield emails_manager_1.emailsManager.sendEmailConformationMessage(userResult);
+                yield this.emailsManager.sendEmailConformationMessage(userResult);
             }
             catch (error) {
                 console.log(error);
@@ -55,7 +57,7 @@ exports.usersService = {
             }
             return userResult;
         });
-    },
+    }
     createUserByAdmin(login, password, email) {
         return __awaiter(this, void 0, void 0, function* () {
             const passwordSalt = yield bcrypt_1.default.genSalt(10);
@@ -81,17 +83,17 @@ exports.usersService = {
                 },
             };
             console.log(newUser);
-            return users_db_repository_1.usersRepository.createUserByAdmin(newUser);
+            return this.usersRepository.createUserByAdmin(newUser);
         });
-    },
+    }
     deleteUser(id) {
         return __awaiter(this, void 0, void 0, function* () {
-            return users_db_repository_1.usersRepository.deleteUser(id);
+            return this.usersRepository.deleteUser(id);
         });
-    },
+    }
     checkCredentials(loginOrEmail, password) {
         return __awaiter(this, void 0, void 0, function* () {
-            const user = yield users_db_query_repository_1.usersQueryRepository.findByLoginOrEmail(loginOrEmail);
+            const user = yield this.usersQueryRepository.findByLoginOrEmail(loginOrEmail);
             if (!user)
                 return false;
             const check = yield bcrypt_1.default.compare(password, user.accountData.passwordHash);
@@ -102,7 +104,7 @@ exports.usersService = {
                 return false;
             }
         });
-    },
+    }
     sendPasswordRecoveryCode(id) {
         return __awaiter(this, void 0, void 0, function* () {
             const passwordRecoveryInfo = {
@@ -111,37 +113,38 @@ exports.usersService = {
                     minutes: 1,
                 }).toISOString(),
             };
-            return yield users_db_repository_1.usersRepository.createPasswordRecoveryCode(id, passwordRecoveryInfo);
+            return yield this.usersRepository.createPasswordRecoveryCode(id, passwordRecoveryInfo);
         });
-    },
+    }
     clearConfirmationCode(id) {
         return __awaiter(this, void 0, void 0, function* () {
             const passwordRecoveryInfo = {
                 recoveryCode: null,
                 expirationDate: null,
             };
-            return yield users_db_repository_1.usersRepository.clearConfirmationCode(id, passwordRecoveryInfo);
+            return yield this.usersRepository.clearConfirmationCode(id, passwordRecoveryInfo);
         });
-    },
+    }
     updateUserPasswordHash(id, passwordHash) {
         return __awaiter(this, void 0, void 0, function* () {
-            return yield users_db_repository_1.usersRepository.updateUserPasswordHash(id, passwordHash);
+            return yield this.usersRepository.updateUserPasswordHash(id, passwordHash);
         });
-    },
+    }
     updateConfirmation(id) {
         return __awaiter(this, void 0, void 0, function* () {
-            return yield users_db_repository_1.usersRepository.updateConfirmation(id);
+            return yield this.usersRepository.updateConfirmation(id);
         });
-    },
+    }
     updateConfirmationCode(id) {
         return __awaiter(this, void 0, void 0, function* () {
-            return yield users_db_repository_1.usersRepository.updateConfirmationCode(id);
+            return yield this.usersRepository.updateConfirmationCode(id);
         });
-    },
+    }
     _generateHash(password, salt) {
         return __awaiter(this, void 0, void 0, function* () {
             const hash = yield bcrypt_1.default.hash(password, salt);
             return hash;
         });
-    },
-};
+    }
+}
+exports.UsersService = UsersService;

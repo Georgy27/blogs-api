@@ -9,9 +9,9 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.commentsQueryRepository = void 0;
+exports.CommentsQueryRepository = void 0;
 const comment_schema_1 = require("../models/comments-model/comment-schema");
-exports.commentsQueryRepository = {
+class CommentsQueryRepository {
     findComments(pageNumber, pageSize, sortBy, sortDirection, postId) {
         return __awaiter(this, void 0, void 0, function* () {
             const comments = yield comment_schema_1.CommentsModel.find({ postId }, { _id: false, postId: false })
@@ -30,10 +30,11 @@ exports.commentsQueryRepository = {
                 items: comments,
             };
         });
-    },
+    }
     findComment(id) {
         return __awaiter(this, void 0, void 0, function* () {
             return comment_schema_1.CommentsModel.findOne({ id }, { _id: false, postId: false });
         });
-    },
-};
+    }
+}
+exports.CommentsQueryRepository = CommentsQueryRepository;

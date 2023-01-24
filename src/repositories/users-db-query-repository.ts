@@ -5,7 +5,7 @@ import { UserAccountDBModel, UsersViewModel } from "../models/users-model";
 import { FilterQuery } from "mongoose";
 import { UsersModel } from "../models/users-model/user-schema";
 
-export const usersQueryRepository = {
+export class UsersQueryRepository {
   async findUsers(
     pageNumber: number,
     pageSize: number,
@@ -42,7 +42,7 @@ export const usersQueryRepository = {
       totalCount: numberOfUsers,
       items: mappedUsers(users),
     };
-  },
+  }
   async findUserById(id: string): Promise<AuthViewModel | null> {
     const user = await UsersModel.findOne({ id }, { _id: false });
 
@@ -54,7 +54,7 @@ export const usersQueryRepository = {
       };
     }
     return null;
-  },
+  }
   async findByLoginOrEmail(
     loginOrEmail: string
   ): Promise<UserAccountDBModel | null> {
@@ -65,7 +65,7 @@ export const usersQueryRepository = {
       ],
     }).lean();
     return user;
-  },
+  }
   async findUserByEmailConfirmationCode(
     code: string
   ): Promise<UserAccountDBModel | null> {
@@ -73,7 +73,7 @@ export const usersQueryRepository = {
       "emailConfirmation.confirmationCode": code,
     }).lean();
     return user;
-  },
+  }
   async findUserByPasswordConfirmationCode(
     code: string
   ): Promise<UserAccountDBModel | null> {
@@ -81,5 +81,5 @@ export const usersQueryRepository = {
       "passwordRecovery.recoveryCode": code,
     }).lean();
     return user;
-  },
-};
+  }
+}

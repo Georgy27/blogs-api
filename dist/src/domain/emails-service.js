@@ -9,12 +9,15 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.emailsService = void 0;
-const emails_manager_1 = require("../managers/emails-manager");
-exports.emailsService = {
+exports.EmailsService = void 0;
+class EmailsService {
+    constructor(emailsManager) {
+        this.emailsManager = emailsManager;
+    }
     sendEmail(user) {
         return __awaiter(this, void 0, void 0, function* () {
-            yield emails_manager_1.emailsManager.sendEmailConformationMessage(user);
+            yield this.emailsManager.sendEmailConformationMessage(user);
         });
-    },
-};
+    }
+}
+exports.EmailsService = EmailsService;

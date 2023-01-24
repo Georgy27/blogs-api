@@ -9,32 +9,41 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.postsService = void 0;
+exports.PostsService = void 0;
 const crypto_1 = require("crypto");
-const posts_db_repository_1 = require("../repositories/posts-db-repository");
-exports.postsService = {
-    createPost(title, shortDescription, content, blogId, blogName) {
+class PostsService {
+    constructor(postsRepository, blogsQueryRepository) {
+        this.postsRepository = postsRepository;
+        this.blogsQueryRepository = blogsQueryRepository;
+    }
+    createPost(blogId, title, shortDescription, content) {
         return __awaiter(this, void 0, void 0, function* () {
+            // get blog
+            const blog = yield this.blogsQueryRepository.findBlog(blogId);
+            if (!blog)
+                return null;
+            // create a post for specified blog
             const newPost = {
                 id: (0, crypto_1.randomUUID)(),
                 title: title,
                 shortDescription: shortDescription,
                 content: content,
                 blogId: blogId,
-                blogName: blogName,
+                blogName: blog.name,
                 createdAt: new Date().toISOString(),
             };
-            return posts_db_repository_1.postsRepository.createPost(newPost);
+            return this.postsRepository.createPost(newPost);
         });
-    },
+    }
     updatePost(postId, title, shortDescription, content, blogId) {
         return __awaiter(this, void 0, void 0, function* () {
-            return posts_db_repository_1.postsRepository.updatePost(postId, title, shortDescription, content, blogId);
+            return this.postsRepository.updatePost(postId, title, shortDescription, content, blogId);
         });
-    },
+    }
     deletePost(id) {
         return __awaiter(this, void 0, void 0, function* () {
-            return posts_db_repository_1.postsRepository.deletePost(id);
+            return this.postsRepository.deletePost(id);
         });
-    },
-};
+    }
+}
+exports.PostsService = PostsService;

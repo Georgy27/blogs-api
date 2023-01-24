@@ -1,42 +1,29 @@
-import { Request, Response, Router, NextFunction } from "express";
-import { refreshTokenMiddleware } from "../middlewares/auth/refresh-token-middleware";
-import { sessionRepository } from "../repositories/sessions-db-repository";
-import { securityDevicesService } from "../domain/securityDevices-service";
-import { RequestWithParams } from "../types";
-
+import { Router } from "express";
+import {
+  refreshTokenMiddleware,
+  securityDeviceController,
+} from "../composition-root";
 export const securityDevicesRouter = Router({});
 
+const refreshTokenMw = refreshTokenMiddleware.use.bind(refreshTokenMiddleware);
 securityDevicesRouter.get(
   "/",
-  refreshTokenMiddleware,
-  async (req: Request, res: Response) => {
-    const userId = req.user!.userId;
-    const devices = await sessionRepository.findAllActiveSessions(userId);
-    return res.status(200).send(devices);
-  }
+  refreshTokenMw,
+  securityDeviceController.getAllDevicesWithActiveSession.bind(
+    securityDeviceController
+  )
 );
 securityDevicesRouter.delete(
   "/",
-  refreshTokenMiddleware,
-  async (req: Request, res: Response) => {
-    const userId = req.user!.userId;
-    const deviceId = req.jwtPayload.deviceId;
-    const terminateDevices = await securityDevicesService.logOutDevices(
-      deviceId,
-      userId
-    );
-    return res.sendStatus(204);
-  }
+  refreshTokenMw,
+  securityDeviceController.deleteAllDevicesSessionsButActive.bind(
+    securityDeviceController
+  )
 );
 securityDevicesRouter.delete(
   "/:deviceId",
-  refreshTokenMiddleware,
-  async (req: RequestWithParams<{ deviceId: string }>, res: Response) => {
-    const deviceId = req.params.deviceId;
-    const userId = req.user!.userId;
-    const result = await securityDevicesService.logOutDevice(deviceId, userId);
-    if (result === 403) return res.sendStatus(403);
-    if (result === 404) return res.sendStatus(404);
-    return res.sendStatus(204);
-  }
+  refreshTokenMw,
+  securityDeviceController.deleteDeviceSessionById.bind(
+    securityDeviceController
+  )
 );

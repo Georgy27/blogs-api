@@ -1,8 +1,9 @@
-import { emailsManager } from "../managers/emails-manager";
 import { UserAccountDBModel } from "../models/users-model";
+import { EmailsManager } from "../managers/emails-manager";
 
-export const emailsService = {
+export class EmailsService {
+  constructor(protected emailsManager: EmailsManager) {}
   async sendEmail(user: UserAccountDBModel) {
-    await emailsManager.sendEmailConformationMessage(user);
-  },
-};
+    await this.emailsManager.sendEmailConformationMessage(user);
+  }
+}

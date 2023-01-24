@@ -2,7 +2,7 @@ import { Pagination } from "../models/pagination.model";
 import { CommentViewModel } from "../models/comments-model";
 import { CommentsModel } from "../models/comments-model/comment-schema";
 
-export const commentsQueryRepository = {
+export class CommentsQueryRepository {
   async findComments(
     pageNumber: number,
     pageSize: number,
@@ -30,8 +30,8 @@ export const commentsQueryRepository = {
       totalCount: numberOfComments,
       items: comments,
     };
-  },
+  }
   async findComment(id: string): Promise<CommentViewModel | null> {
     return CommentsModel.findOne({ id }, { _id: false, postId: false });
-  },
-};
+  }
+}

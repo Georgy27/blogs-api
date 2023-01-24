@@ -22,7 +22,6 @@ if (!mongoUrl) {
 function runDb() {
     return __awaiter(this, void 0, void 0, function* () {
         try {
-            console.log(mongoUrl);
             yield mongoose_1.default.connect(mongoUrl, {
                 retryWrites: true,
                 w: "majority",

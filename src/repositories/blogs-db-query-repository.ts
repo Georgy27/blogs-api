@@ -3,7 +3,7 @@ import { BlogsDBModel, BlogsViewModel } from "../models/blogs-model";
 import { BlogsModel } from "../models/blogs-model/blog-schema";
 import { FilterQuery } from "mongoose";
 
-export const blogsQueryRepository = {
+export class BlogsQueryRepository {
   async findBlogs(
     searchNameTerm: string | undefined | null,
     pageSize: number,
@@ -31,7 +31,7 @@ export const blogsQueryRepository = {
       totalCount: numberOfBlogs,
       items: blogs,
     };
-  },
+  }
 
   async findBlog(id: string): Promise<BlogsDBModel | null> {
     const blog: BlogsDBModel | null = await BlogsModel.findOne(
@@ -39,5 +39,5 @@ export const blogsQueryRepository = {
       { _id: false }
     ).lean();
     return blog;
-  },
-};
+  }
+}

@@ -1,16 +1,19 @@
-import { jwtService } from "../application/jwt-service";
-import { sessionRepository } from "../repositories/sessions-db-repository";
+import { SessionRepository } from "../repositories/sessions-db-repository";
 
-export const securityDevicesService = {
+export class SecurityDevicesService {
+  constructor(protected sessionRepository: SessionRepository) {}
   async logOutDevices(deviceId: string, userId: string) {
-    return sessionRepository.deleteAllSessionsExceptCurrent(deviceId, userId);
-  },
+    return this.sessionRepository.deleteAllSessionsExceptCurrent(
+      deviceId,
+      userId
+    );
+  }
   async logOutDevice(deviceId: string, userId: string) {
     // find device
-    const device = await sessionRepository.findDeviceById(deviceId);
+    const device = await this.sessionRepository.findDeviceById(deviceId);
     if (!device) return 404;
     // check for user
     if (device.userId !== userId) return 403;
-    return sessionRepository.deleteSessionByDeviceID(deviceId, userId);
-  },
-};
+    return this.sessionRepository.deleteSessionByDeviceID(deviceId, userId);
+  }
+}

@@ -1,12 +1,17 @@
 import bcrypt from "bcrypt";
 import { randomUUID } from "crypto";
-import { usersRepository } from "../repositories/users-db-repository";
 import add from "date-fns/add";
-import { emailsManager } from "../managers/emails-manager";
-import { usersQueryRepository } from "../repositories/users-db-query-repository";
 import { UserAccountDBModel, UsersViewModel } from "../models/users-model";
+import { UsersRepository } from "../repositories/users-db-repository";
+import { UsersQueryRepository } from "../repositories/users-db-query-repository";
+import { EmailsManager } from "../managers/emails-manager";
 
-export const usersService = {
+export class UsersService {
+  constructor(
+    protected usersRepository: UsersRepository,
+    protected usersQueryRepository: UsersQueryRepository,
+    protected emailsManager: EmailsManager
+  ) {}
   async createUser(
     login: string,
     password: string,
@@ -34,17 +39,17 @@ export const usersService = {
         isConfirmed: false,
       },
     };
-    const userResult = await usersRepository.createUser(newUser);
+    const userResult = await this.usersRepository.createUser(newUser);
 
     try {
-      await emailsManager.sendEmailConformationMessage(userResult);
+      await this.emailsManager.sendEmailConformationMessage(userResult);
     } catch (error) {
       console.log(error);
       // await usersRepository.deleteUser(userResult.id);
       return null;
     }
     return userResult;
-  },
+  }
   async createUserByAdmin(
     login: string,
     password: string,
@@ -73,13 +78,15 @@ export const usersService = {
       },
     };
     console.log(newUser);
-    return usersRepository.createUserByAdmin(newUser);
-  },
+    return this.usersRepository.createUserByAdmin(newUser);
+  }
   async deleteUser(id: string): Promise<boolean> {
-    return usersRepository.deleteUser(id);
-  },
+    return this.usersRepository.deleteUser(id);
+  }
   async checkCredentials(loginOrEmail: string, password: string) {
-    const user = await usersQueryRepository.findByLoginOrEmail(loginOrEmail);
+    const user = await this.usersQueryRepository.findByLoginOrEmail(
+      loginOrEmail
+    );
     if (!user) return false;
     const check = await bcrypt.compare(password, user.accountData.passwordHash);
 
@@ -88,7 +95,7 @@ export const usersService = {
     } else {
       return false;
     }
-  },
+  }
   async sendPasswordRecoveryCode(id: string) {
     const passwordRecoveryInfo = {
       recoveryCode: randomUUID(),
@@ -96,32 +103,32 @@ export const usersService = {
         minutes: 1,
       }).toISOString(),
     };
-    return await usersRepository.createPasswordRecoveryCode(
+    return await this.usersRepository.createPasswordRecoveryCode(
       id,
       passwordRecoveryInfo
     );
-  },
+  }
   async clearConfirmationCode(id: string) {
     const passwordRecoveryInfo = {
       recoveryCode: null,
       expirationDate: null,
     };
-    return await usersRepository.clearConfirmationCode(
+    return await this.usersRepository.clearConfirmationCode(
       id,
       passwordRecoveryInfo
     );
-  },
+  }
   async updateUserPasswordHash(id: string, passwordHash: string) {
-    return await usersRepository.updateUserPasswordHash(id, passwordHash);
-  },
+    return await this.usersRepository.updateUserPasswordHash(id, passwordHash);
+  }
   async updateConfirmation(id: string) {
-    return await usersRepository.updateConfirmation(id);
-  },
+    return await this.usersRepository.updateConfirmation(id);
+  }
   async updateConfirmationCode(id: string) {
-    return await usersRepository.updateConfirmationCode(id);
-  },
+    return await this.usersRepository.updateConfirmationCode(id);
+  }
   async _generateHash(password: string, salt: string): Promise<string> {
     const hash = await bcrypt.hash(password, salt);
     return hash;
-  },
-};
+  }
+}

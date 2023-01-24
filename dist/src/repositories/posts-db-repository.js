@@ -9,30 +9,31 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.postsRepository = void 0;
+exports.PostsRepository = void 0;
 const post_schema_1 = require("../models/posts-model/post-schema");
-exports.postsRepository = {
+class PostsRepository {
     createPost(newPost) {
         return __awaiter(this, void 0, void 0, function* () {
             yield post_schema_1.PostsModel.create(Object.assign({}, newPost));
             return newPost;
         });
-    },
+    }
     updatePost(postId, title, shortDescription, content, blogId) {
         return __awaiter(this, void 0, void 0, function* () {
             const result = yield post_schema_1.PostsModel.updateOne({ id: postId }, { title, shortDescription, content, blogId });
             return result.matchedCount === 1;
         });
-    },
+    }
     deletePost(id) {
         return __awaiter(this, void 0, void 0, function* () {
             const result = yield post_schema_1.PostsModel.deleteOne({ id });
             return result.deletedCount === 1;
         });
-    },
+    }
     clearPosts() {
         return __awaiter(this, void 0, void 0, function* () {
             yield post_schema_1.PostsModel.deleteMany({});
         });
-    },
-};
+    }
+}
+exports.PostsRepository = PostsRepository;
