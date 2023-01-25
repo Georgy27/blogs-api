@@ -14,9 +14,10 @@ const composition_root_1 = require("../composition-root");
 const blogIdValidation_1 = require("../middlewares/validation/posts-middleware/blogIdValidation");
 exports.postsRouter = (0, express_1.Router)({});
 const jwtMw = composition_root_1.jwtAuthMiddleware.use.bind(composition_root_1.jwtAuthMiddleware);
+const getUserIdFromAccessTokenMw = composition_root_1.getUserIdFromAccessToken.use.bind(composition_root_1.getUserIdFromAccessToken);
 // routes
 exports.postsRouter.get("/", sorting_pagination_middleware_1.pageSize, sorting_pagination_middleware_1.sortBy, sorting_pagination_middleware_1.pageNumberValidation, (0, morgan_middleware_1.morgan)("tiny"), composition_root_1.postsController.getAllPosts.bind(composition_root_1.postsController));
-exports.postsRouter.get("/:postId/comments", sorting_pagination_middleware_1.pageSize, sorting_pagination_middleware_1.sortBy, sorting_pagination_middleware_1.pageNumberValidation, (0, morgan_middleware_1.morgan)("tiny"), composition_root_1.postsController.getAllCommentsForSpecifiedPost.bind(composition_root_1.postsController));
+exports.postsRouter.get("/:postId/comments", sorting_pagination_middleware_1.pageSize, sorting_pagination_middleware_1.sortBy, sorting_pagination_middleware_1.pageNumberValidation, getUserIdFromAccessTokenMw, (0, morgan_middleware_1.morgan)("tiny"), composition_root_1.postsController.getAllCommentsForSpecifiedPost.bind(composition_root_1.postsController));
 exports.postsRouter.post("/", basic_auth_middleware_1.basicAuthMiddleware, titleValidation_1.titleValidation, shortDescriptionValidation_1.shortDescriptionValidation, contentValidation_1.contentValidation, blogIdValidation_1.blogIdValidation, input_validation_middleware_1.inputValidationMiddleware, (0, morgan_middleware_1.morgan)("tiny"), composition_root_1.postsController.createPost.bind(composition_root_1.postsController));
 exports.postsRouter.post("/:postId/comments", jwtMw, content_validation_1.commentsValidation, input_validation_middleware_1.inputValidationMiddleware, (0, morgan_middleware_1.morgan)("tiny"), composition_root_1.postsController.createCommentForSpecifiedPost.bind(composition_root_1.postsController));
 exports.postsRouter.get("/:id", (0, morgan_middleware_1.morgan)("tiny"), composition_root_1.postsController.getPostById.bind(composition_root_1.postsController));

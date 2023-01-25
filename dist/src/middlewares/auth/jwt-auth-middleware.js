@@ -9,7 +9,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.JwtAuthMiddleware = void 0;
+exports.GetUserIdFromAccessToken = exports.JwtAuthMiddleware = void 0;
 class JwtAuthMiddleware {
     constructor(usersQueryRepository, jwtService) {
         this.usersQueryRepository = usersQueryRepository;
@@ -17,6 +17,7 @@ class JwtAuthMiddleware {
     }
     use(req, res, next) {
         return __awaiter(this, void 0, void 0, function* () {
+            console.log("inside middleware");
             const auth = req.headers.authorization;
             if (!auth)
                 return res.sendStatus(401);
@@ -33,3 +34,27 @@ class JwtAuthMiddleware {
     }
 }
 exports.JwtAuthMiddleware = JwtAuthMiddleware;
+class GetUserIdFromAccessToken {
+    constructor(usersQueryRepository, jwtService) {
+        this.usersQueryRepository = usersQueryRepository;
+        this.jwtService = jwtService;
+    }
+    use(req, res, next) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const auth = req.headers.authorization;
+            if (!auth) {
+                req.user = null;
+                return next();
+            }
+            const token = auth.split(" ")[1];
+            const userId = yield this.jwtService.getUserIdByAccessToken(token);
+            if (!userId) {
+                req.user = null;
+                return next();
+            }
+            req.user = yield this.usersQueryRepository.findUserById(userId);
+            return next();
+        });
+    }
+}
+exports.GetUserIdFromAccessToken = GetUserIdFromAccessToken;

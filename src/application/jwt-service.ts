@@ -6,13 +6,13 @@ export class JwtService {
   constructor(protected sessionRepository: SessionRepository) {}
   async createJWT(userId: string, deviceId: string) {
     const accessToken = jwt.sign({ userId }, settings.JWT_SECRET, {
-      expiresIn: "10s",
+      expiresIn: "10m",
     });
     const refreshToken = jwt.sign(
       { deviceId, userId },
       settings.JWT_REFRESH_SECRET,
       {
-        expiresIn: "20s",
+        expiresIn: "1h",
       }
     );
 
@@ -48,6 +48,7 @@ export class JwtService {
       const result: any = jwt.verify(token, settings.JWT_SECRET);
       return result.userId;
     } catch (error) {
+      console.log(error);
       return null;
     }
   }

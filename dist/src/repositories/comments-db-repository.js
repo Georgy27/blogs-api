@@ -15,13 +15,21 @@ class CommentsRepository {
     createComment(comment) {
         return __awaiter(this, void 0, void 0, function* () {
             yield comment_schema_1.CommentsModel.create(Object.assign({}, comment));
-            return {
-                id: comment.id,
-                content: comment.content,
-                userId: comment.userId,
-                userLogin: comment.userLogin,
-                createdAt: comment.createdAt,
-            };
+            // return {
+            //   id: comment.id,
+            //   content: comment.content,
+            //   commentatorInfo: {
+            //     userId: comment.commentatorInfo.userId,
+            //     userLogin: comment.commentatorInfo.userLogin,
+            //   },
+            //   createdAt: comment.createdAt,
+            //   likesInfo: {
+            //     likesCount: 0,
+            //     dislikesCount: 0,
+            //     myStatus: "None",
+            //   },
+            // };
+            return comment;
         });
     }
     updateComment(content, id) {

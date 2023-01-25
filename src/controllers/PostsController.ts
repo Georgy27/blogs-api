@@ -110,23 +110,29 @@ export class PostsController {
     return res.status(201).send(newComment);
   }
   async getAllCommentsForSpecifiedPost(
-    req: RequestWithParamsAndQuery<{ postId: string }, QueryPostModel>,
+    // req: RequestWithParamsAndQuery<{ postId: string }, QueryPostModel>,
+    req: any,
     res: Response<Pagination<CommentViewModel>>
   ) {
     const { sortBy, sortDirection, pageSize, pageNumber } = req.query;
+    const userId = req.user ? req.user.userId : null;
+    // find post
     const postId = req.params.postId;
     const isPost = await this.postsQueryRepository.findPost(postId);
 
     if (!isPost) {
       return res.sendStatus(404);
     }
+
     const allCommentsWithId = await this.commentsQueryRepository.findComments(
       pageNumber,
       pageSize,
       sortBy,
       sortDirection,
-      postId
+      postId,
+      userId
     );
-    res.status(200).send(allCommentsWithId);
+
+    return res.status(200).send(allCommentsWithId);
   }
 }

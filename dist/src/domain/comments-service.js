@@ -28,10 +28,18 @@ class CommentsService {
                 id: (0, crypto_1.randomUUID)(),
                 postId,
                 content: comment,
-                userId: userId,
-                userLogin: userLogin,
+                commentatorInfo: {
+                    userId: userId,
+                    userLogin: userLogin,
+                },
                 createdAt: new Date().toISOString(),
+                likesInfo: {
+                    likesCount: 0,
+                    dislikesCount: 0,
+                    myStatus: "None",
+                },
             };
+            // create comment
             return this.commentsRepository.createComment(newComment);
         });
     }
@@ -42,7 +50,7 @@ class CommentsService {
             if (!getCommentById)
                 return "404";
             // check if the comment userId matches the userId of the user that tries to delete the comment
-            if (getCommentById.userId !== userId) {
+            if (getCommentById.commentatorInfo.userId !== userId) {
                 return "403";
             }
             // update the comment
@@ -56,7 +64,7 @@ class CommentsService {
             if (!getCommentById)
                 return "404";
             // check if the comment userId matches the userId of the user that tries to delete the comment
-            if (getCommentById.userId !== userId) {
+            if (getCommentById.commentatorInfo.userId !== userId) {
                 return "403";
             }
             // delete the comment

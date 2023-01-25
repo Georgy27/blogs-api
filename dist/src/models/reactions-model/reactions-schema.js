@@ -23,15 +23,22 @@ var __importStar = (this && this.__importStar) || function (mod) {
     return result;
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.BlogsModel = void 0;
+exports.ReactionsModel = void 0;
 const mongoose_1 = __importStar(require("mongoose"));
-const BlogsSchema = new mongoose_1.Schema({
+const index_1 = require("./index");
+const ReactionsSchema = new mongoose_1.Schema({
     id: { type: String, required: true, unique: true },
-    name: { type: String, required: true },
-    description: { type: String, required: true },
-    websiteUrl: { type: String, required: true },
-    createdAt: { type: String, required: true },
+    parentType: { type: String, required: true },
+    parentId: { type: String, required: true },
+    status: {
+        type: String,
+        enum: Object.values(index_1.reactionStatusEnum),
+        required: true,
+    },
+    addedAt: { type: String, required: true },
+    userId: { type: String, required: true },
+    userLogin: { type: String, required: true },
 }, {
     versionKey: false,
 });
-exports.BlogsModel = mongoose_1.default.model("blogs", BlogsSchema);
+exports.ReactionsModel = mongoose_1.default.model("reactions", ReactionsSchema);

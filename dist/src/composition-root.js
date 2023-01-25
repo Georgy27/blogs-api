@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.testController = exports.securityDeviceController = exports.authController = exports.commentsController = exports.usersController = exports.postsController = exports.blogsController = exports.refreshTokenMiddleware = exports.jwtAuthMiddleware = exports.usersQueryRepository = exports.blogsQueryRepository = void 0;
+exports.testController = exports.securityDeviceController = exports.authController = exports.commentsController = exports.usersController = exports.postsController = exports.blogsController = exports.getUserIdFromAccessToken = exports.refreshTokenMiddleware = exports.jwtAuthMiddleware = exports.usersQueryRepository = exports.blogsQueryRepository = void 0;
 const blogs_db_repository_1 = require("./repositories/blogs-db-repository");
 const blogs_db_query_repository_1 = require("./repositories/blogs-db-query-repository");
 const blogs_service_1 = require("./domain/blogs-service");
@@ -28,12 +28,16 @@ const refresh_token_middleware_1 = require("./middlewares/auth/refresh-token-mid
 const SecurityDevicesController_1 = require("./controllers/SecurityDevicesController");
 const securityDevices_service_1 = require("./domain/securityDevices-service");
 const TestController_1 = require("./controllers/TestController");
+const reactions_db_repository_1 = require("./repositories/reactions-db-repository");
+const reactions_service_1 = require("./domain/reactions-service");
 const blogsRepository = new blogs_db_repository_1.BlogsRepository();
 exports.blogsQueryRepository = new blogs_db_query_repository_1.BlogsQueryRepository();
 const blogsService = new blogs_service_1.BlogsService(blogsRepository);
 const postsRepository = new posts_db_repository_1.PostsRepository();
 const postsQueryRepository = new posts_db_query_repository_1.PostsQueryRepository();
 const postsService = new posts_service_1.PostsService(postsRepository, exports.blogsQueryRepository);
+const reactionsRepository = new reactions_db_repository_1.ReactionsRepository();
+const reactionsService = new reactions_service_1.ReactionsService(reactionsRepository);
 const commentsRepository = new comments_db_repository_1.CommentsRepository();
 const commentsQueryRepository = new comments_db_query_repository_1.CommentsQueryRepository();
 const commentsService = new comments_service_1.CommentsService(commentsRepository, postsQueryRepository, commentsQueryRepository);
@@ -49,11 +53,12 @@ const securityDevicesService = new securityDevices_service_1.SecurityDevicesServ
 // middlewares
 exports.jwtAuthMiddleware = new jwt_auth_middleware_1.JwtAuthMiddleware(exports.usersQueryRepository, jwtService);
 exports.refreshTokenMiddleware = new refresh_token_middleware_1.RefreshTokenMiddleware(jwtService, exports.usersQueryRepository, sessionRepository);
+exports.getUserIdFromAccessToken = new jwt_auth_middleware_1.GetUserIdFromAccessToken(exports.usersQueryRepository, jwtService);
 // controllers
 exports.blogsController = new BlogsController_1.BlogsController(blogsService, exports.blogsQueryRepository, postsQueryRepository, postsService);
 exports.postsController = new PostsController_1.PostsController(postsService, postsQueryRepository, commentsService, commentsQueryRepository);
 exports.usersController = new UsersController_1.UsersController(usersService, exports.usersQueryRepository);
-exports.commentsController = new CommentsController_1.CommentsController(commentsService, commentsQueryRepository);
+exports.commentsController = new CommentsController_1.CommentsController(commentsService, commentsQueryRepository, reactionsService);
 exports.authController = new AuthController_1.AuthController(authService, usersService, sessionRepository);
 exports.securityDeviceController = new SecurityDevicesController_1.SecurityDevicesController(sessionRepository, securityDevicesService);
 exports.testController = new TestController_1.TestController(blogsRepository, postsRepository, usersRepository, commentsRepository);

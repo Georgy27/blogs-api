@@ -79,16 +79,20 @@ class PostsController {
             return res.status(201).send(newComment);
         });
     }
-    getAllCommentsForSpecifiedPost(req, res) {
+    getAllCommentsForSpecifiedPost(
+    // req: RequestWithParamsAndQuery<{ postId: string }, QueryPostModel>,
+    req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             const { sortBy, sortDirection, pageSize, pageNumber } = req.query;
+            const userId = req.user ? req.user.userId : null;
+            // find post
             const postId = req.params.postId;
             const isPost = yield this.postsQueryRepository.findPost(postId);
             if (!isPost) {
                 return res.sendStatus(404);
             }
-            const allCommentsWithId = yield this.commentsQueryRepository.findComments(pageNumber, pageSize, sortBy, sortDirection, postId);
-            res.status(200).send(allCommentsWithId);
+            const allCommentsWithId = yield this.commentsQueryRepository.findComments(pageNumber, pageSize, sortBy, sortDirection, postId, userId);
+            return res.status(200).send(allCommentsWithId);
         });
     }
 }

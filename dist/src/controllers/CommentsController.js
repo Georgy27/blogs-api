@@ -11,9 +11,10 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.CommentsController = void 0;
 class CommentsController {
-    constructor(commentsService, commentsQueryRepository) {
+    constructor(commentsService, commentsQueryRepository, reactionsService) {
         this.commentsService = commentsService;
         this.commentsQueryRepository = commentsQueryRepository;
+        this.reactionsService = reactionsService;
     }
     updateCommentById(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
@@ -31,11 +32,26 @@ class CommentsController {
     getCommentById(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             const commentId = req.params.id;
-            const getCommentById = yield this.commentsQueryRepository.findComment(commentId);
+            const userId = req.user.userId;
+            const getCommentById = yield this.commentsQueryRepository.findCommentWithLikesInfo(commentId, userId);
             if (!getCommentById) {
                 return res.sendStatus(404);
             }
             return res.status(200).send(getCommentById);
+        });
+    }
+    updateReaction(req, res) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const user = req.user;
+            const commentId = req.params.commentId;
+            const { likeStatus } = req.body;
+            // find comment
+            const comment = yield this.commentsQueryRepository.findCommentWithLikesInfo(commentId, user.userId);
+            if (!comment)
+                return res.sendStatus(404);
+            // update reaction
+            yield this.reactionsService.updateReaction("comment", commentId, user.userId, user.login, likeStatus);
+            return res.sendStatus(204);
         });
     }
     deleteCommentById(req, res) {

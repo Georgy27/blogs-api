@@ -14,25 +14,4 @@ const BlogsSchema = new Schema<BlogsDBModel>(
   }
 );
 
-enum reactionStatusEnum {
-  Like = "Like",
-  Dislike = "Dislike",
-  None = "None",
-}
-
-const testSchema = new Schema(
-  {
-    id: String,
-    parentType: String,
-    parentId: String,
-    status: { type: String, enum: reactionStatusEnum },
-    addedAt: String,
-    userId: String,
-    userLogin: String,
-  },
-  {
-    versionKey: false,
-  }
-);
-// upsert in options while updating (look at how its done in device)
 export const BlogsModel = mongoose.model<BlogsDBModel>("blogs", BlogsSchema);

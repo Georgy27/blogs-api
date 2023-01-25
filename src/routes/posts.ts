@@ -11,11 +11,18 @@ import { shortDescriptionValidation } from "../middlewares/validation/posts-midd
 import { contentValidation } from "../middlewares/validation/posts-middleware/contentValidation";
 import { commentsValidation } from "../middlewares/validation/comments-middleware/content-validation";
 import { morgan } from "../middlewares/morgan-middleware";
-import { jwtAuthMiddleware, postsController } from "../composition-root";
+import {
+  getUserIdFromAccessToken,
+  jwtAuthMiddleware,
+  postsController,
+} from "../composition-root";
 import { blogIdValidation } from "../middlewares/validation/posts-middleware/blogIdValidation";
 
 export const postsRouter = Router({});
 const jwtMw = jwtAuthMiddleware.use.bind(jwtAuthMiddleware);
+const getUserIdFromAccessTokenMw = getUserIdFromAccessToken.use.bind(
+  getUserIdFromAccessToken
+);
 // routes
 postsRouter.get(
   "/",
@@ -30,6 +37,7 @@ postsRouter.get(
   pageSize,
   sortBy,
   pageNumberValidation,
+  getUserIdFromAccessTokenMw,
   morgan("tiny"),
   postsController.getAllCommentsForSpecifiedPost.bind(postsController)
 );

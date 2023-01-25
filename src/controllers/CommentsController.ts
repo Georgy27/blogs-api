@@ -3,11 +3,13 @@ import { Response } from "express";
 import { CommentsService } from "../domain/comments-service";
 import { CommentViewModel } from "../models/comments-model";
 import { CommentsQueryRepository } from "../repositories/comments-db-query-repository";
+import { ReactionsService } from "../domain/reactions-service";
 
 export class CommentsController {
   constructor(
     protected commentsService: CommentsService,
-    protected commentsQueryRepository: CommentsQueryRepository
+    protected commentsQueryRepository: CommentsQueryRepository,
+    protected reactionsService: ReactionsService
   ) {}
   async updateCommentById(
     req: RequestWithParamsAndBody<{ commentId: string }, { content: string }>,
@@ -31,15 +33,41 @@ export class CommentsController {
     res: Response<CommentViewModel>
   ) {
     const commentId = req.params.id;
-    const getCommentById = await this.commentsQueryRepository.findComment(
-      commentId
-    );
+    const userId = req.user.userId;
+    const getCommentById =
+      await this.commentsQueryRepository.findCommentWithLikesInfo(
+        commentId,
+        userId
+      );
 
     if (!getCommentById) {
       return res.sendStatus(404);
     }
 
     return res.status(200).send(getCommentById);
+  }
+  async updateReaction(
+    req: RequestWithParams<{ commentId: string }>,
+    res: Response
+  ) {
+    const user = req.user!;
+    const commentId = req.params.commentId;
+    const { likeStatus } = req.body;
+    // find comment
+    const comment = await this.commentsQueryRepository.findCommentWithLikesInfo(
+      commentId,
+      user.userId
+    );
+    if (!comment) return res.sendStatus(404);
+    // update reaction
+    await this.reactionsService.updateReaction(
+      "comment",
+      commentId,
+      user.userId,
+      user.login,
+      likeStatus
+    );
+    return res.sendStatus(204);
   }
   async deleteCommentById(
     req: RequestWithParams<{ commentId: string }>,

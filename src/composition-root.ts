@@ -14,7 +14,10 @@ import { UsersQueryRepository } from "./repositories/users-db-query-repository";
 import { UsersService } from "./domain/users-service";
 import { UsersController } from "./controllers/UsersController";
 import { CommentsController } from "./controllers/CommentsController";
-import { JwtAuthMiddleware } from "./middlewares/auth/jwt-auth-middleware";
+import {
+  GetUserIdFromAccessToken,
+  JwtAuthMiddleware,
+} from "./middlewares/auth/jwt-auth-middleware";
 import { SessionRepository } from "./repositories/sessions-db-repository";
 import { AuthService } from "./domain/auth-service";
 import { JwtService } from "./application/jwt-service";
@@ -25,6 +28,8 @@ import { RefreshTokenMiddleware } from "./middlewares/auth/refresh-token-middlew
 import { SecurityDevicesController } from "./controllers/SecurityDevicesController";
 import { SecurityDevicesService } from "./domain/securityDevices-service";
 import { TestController } from "./controllers/TestController";
+import { ReactionsRepository } from "./repositories/reactions-db-repository";
+import { ReactionsService } from "./domain/reactions-service";
 
 const blogsRepository = new BlogsRepository();
 export const blogsQueryRepository = new BlogsQueryRepository();
@@ -33,6 +38,9 @@ const blogsService = new BlogsService(blogsRepository);
 const postsRepository = new PostsRepository();
 const postsQueryRepository = new PostsQueryRepository();
 const postsService = new PostsService(postsRepository, blogsQueryRepository);
+
+const reactionsRepository = new ReactionsRepository();
+const reactionsService = new ReactionsService(reactionsRepository);
 
 const commentsRepository = new CommentsRepository();
 const commentsQueryRepository = new CommentsQueryRepository();
@@ -73,7 +81,10 @@ export const refreshTokenMiddleware = new RefreshTokenMiddleware(
   usersQueryRepository,
   sessionRepository
 );
-
+export const getUserIdFromAccessToken = new GetUserIdFromAccessToken(
+  usersQueryRepository,
+  jwtService
+);
 // controllers
 export const blogsController = new BlogsController(
   blogsService,
@@ -93,7 +104,8 @@ export const usersController = new UsersController(
 );
 export const commentsController = new CommentsController(
   commentsService,
-  commentsQueryRepository
+  commentsQueryRepository,
+  reactionsService
 );
 export const authController = new AuthController(
   authService,

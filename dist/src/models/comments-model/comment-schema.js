@@ -25,13 +25,26 @@ var __importStar = (this && this.__importStar) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.CommentsModel = void 0;
 const mongoose_1 = __importStar(require("mongoose"));
+const reactions_model_1 = require("../reactions-model");
 const CommentsSchema = new mongoose_1.Schema({
     id: { type: String, required: true, unique: true },
     postId: { type: String, required: true },
     content: { type: String, required: true },
-    userId: { type: String, required: true },
-    userLogin: { type: String, required: true },
+    commentatorInfo: {
+        userId: { type: String, required: true },
+        userLogin: { type: String, required: true },
+    },
     createdAt: { type: String, required: true },
+    likesInfo: {
+        likesCount: { type: Number, required: true },
+        dislikesCount: { type: Number, required: true },
+        myStatus: {
+            type: String,
+            enum: Object.values(reactions_model_1.reactionStatusEnum),
+            required: true,
+            ref: "reactions",
+        },
+    },
 }, {
     versionKey: false,
 });
