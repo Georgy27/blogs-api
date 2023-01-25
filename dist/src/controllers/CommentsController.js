@@ -32,7 +32,7 @@ class CommentsController {
     getCommentById(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             const commentId = req.params.id;
-            const userId = req.user.userId;
+            const userId = req.user ? req.user.userId : null;
             const getCommentById = yield this.commentsQueryRepository.findCommentWithLikesInfo(commentId, userId);
             if (!getCommentById) {
                 return res.sendStatus(404);

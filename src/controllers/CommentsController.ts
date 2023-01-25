@@ -33,7 +33,7 @@ export class CommentsController {
     res: Response<CommentViewModel>
   ) {
     const commentId = req.params.id;
-    const userId = req.user.userId;
+    const userId = req.user ? req.user.userId : null;
     const getCommentById =
       await this.commentsQueryRepository.findCommentWithLikesInfo(
         commentId,

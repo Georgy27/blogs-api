@@ -43,6 +43,7 @@ class GetUserIdFromAccessToken {
         return __awaiter(this, void 0, void 0, function* () {
             const auth = req.headers.authorization;
             if (!auth) {
+                console.log("hello shit");
                 req.user = null;
                 return next();
             }
