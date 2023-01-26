@@ -79,9 +79,9 @@ class PostsController {
             return res.status(201).send(newComment);
         });
     }
-    getAllCommentsForSpecifiedPost(
+    getAllCommentsForSpecifiedPost(req, 
     // req: RequestWithParamsAndQuery<{ postId: string }, QueryPostModel>,
-    req, res) {
+    res) {
         return __awaiter(this, void 0, void 0, function* () {
             const { sortBy, sortDirection, pageSize, pageNumber } = req.query;
             const userId = req.user ? req.user.userId : null;

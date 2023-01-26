@@ -3,22 +3,21 @@ import { CommentsModel } from "../models/comments-model/comment-schema";
 
 export class CommentsRepository {
   async createComment(comment: CommentsDBModel): Promise<CommentViewModel> {
-    await CommentsModel.create({ ...comment });
-    // return {
-    //   id: comment.id,
-    //   content: comment.content,
-    //   commentatorInfo: {
-    //     userId: comment.commentatorInfo.userId,
-    //     userLogin: comment.commentatorInfo.userLogin,
-    //   },
-    //   createdAt: comment.createdAt,
-    //   likesInfo: {
-    //     likesCount: 0,
-    //     dislikesCount: 0,
-    //     myStatus: "None",
-    //   },
-    // };
-    return comment;
+    const newComment = await CommentsModel.create({ ...comment });
+    return {
+      id: newComment.id,
+      content: newComment.content,
+      commentatorInfo: {
+        userId: newComment.commentatorInfo.userId,
+        userLogin: newComment.commentatorInfo.userLogin,
+      },
+      createdAt: newComment.createdAt,
+      likesInfo: {
+        likesCount: 0,
+        dislikesCount: 0,
+        myStatus: "None",
+      },
+    };
   }
   async updateComment(content: string, id: string): Promise<boolean> {
     const result = await CommentsModel.updateOne(

@@ -14,22 +14,21 @@ const comment_schema_1 = require("../models/comments-model/comment-schema");
 class CommentsRepository {
     createComment(comment) {
         return __awaiter(this, void 0, void 0, function* () {
-            yield comment_schema_1.CommentsModel.create(Object.assign({}, comment));
-            // return {
-            //   id: comment.id,
-            //   content: comment.content,
-            //   commentatorInfo: {
-            //     userId: comment.commentatorInfo.userId,
-            //     userLogin: comment.commentatorInfo.userLogin,
-            //   },
-            //   createdAt: comment.createdAt,
-            //   likesInfo: {
-            //     likesCount: 0,
-            //     dislikesCount: 0,
-            //     myStatus: "None",
-            //   },
-            // };
-            return comment;
+            const newComment = yield comment_schema_1.CommentsModel.create(Object.assign({}, comment));
+            return {
+                id: newComment.id,
+                content: newComment.content,
+                commentatorInfo: {
+                    userId: newComment.commentatorInfo.userId,
+                    userLogin: newComment.commentatorInfo.userLogin,
+                },
+                createdAt: newComment.createdAt,
+                likesInfo: {
+                    likesCount: 0,
+                    dislikesCount: 0,
+                    myStatus: "None",
+                },
+            };
         });
     }
     updateComment(content, id) {

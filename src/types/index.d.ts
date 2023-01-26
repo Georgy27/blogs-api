@@ -1,5 +1,5 @@
 import { Request } from "express";
-import { AuthViewModel } from "../models/auth-model/AuthViewModel";
+import { AuthViewModel } from "../models/auth-model";
 
 export type RequestWithBody<T> = Request<{}, {}, T>;
 export type RequestWithQuery<T> = Request<{}, {}, {}, T>;

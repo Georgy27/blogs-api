@@ -17,7 +17,7 @@ export class CommentsController {
   ) {
     const commentId = req.params.commentId;
     const comment = req.body.content;
-    const userId = req.user.userId;
+    const userId = req.user!.userId;
 
     const getUpdatedComment = await this.commentsService.updateComment(
       comment,
@@ -54,10 +54,7 @@ export class CommentsController {
     const commentId = req.params.commentId;
     const { likeStatus } = req.body;
     // find comment
-    const comment = await this.commentsQueryRepository.findCommentWithLikesInfo(
-      commentId,
-      user.userId
-    );
+    const comment = await this.commentsQueryRepository.findComment(commentId);
     if (!comment) return res.sendStatus(404);
     // update reaction
     const result = await this.reactionsService.updateReaction(
@@ -75,7 +72,7 @@ export class CommentsController {
     res: Response
   ) {
     const commentId = req.params.commentId;
-    const userId = req.user.userId;
+    const userId = req.user!.userId;
 
     const getDeletedComment = await this.commentsService.deleteComment(
       commentId,

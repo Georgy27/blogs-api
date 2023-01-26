@@ -21,10 +21,8 @@ class ReactionsRepository {
                 userId: newReaction.userId,
             };
             const updatedReaction = yield reactions_schema_1.ReactionsModel.findOneAndUpdate(filter, newReaction, { upsert: true, new: true }).lean();
-            console.log(updatedReaction);
             if (!updatedReaction)
                 return null;
-            console.log(updatedReaction.status);
             return updatedReaction;
         });
     }

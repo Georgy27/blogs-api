@@ -46,7 +46,7 @@ class CommentsController {
             const commentId = req.params.commentId;
             const { likeStatus } = req.body;
             // find comment
-            const comment = yield this.commentsQueryRepository.findCommentWithLikesInfo(commentId, user.userId);
+            const comment = yield this.commentsQueryRepository.findComment(commentId);
             if (!comment)
                 return res.sendStatus(404);
             // update reaction

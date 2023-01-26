@@ -110,8 +110,8 @@ export class PostsController {
     return res.status(201).send(newComment);
   }
   async getAllCommentsForSpecifiedPost(
-    // req: RequestWithParamsAndQuery<{ postId: string }, QueryPostModel>,
     req: any,
+    // req: RequestWithParamsAndQuery<{ postId: string }, QueryPostModel>,
     res: Response<Pagination<CommentViewModel>>
   ) {
     const { sortBy, sortDirection, pageSize, pageNumber } = req.query;
