@@ -120,5 +120,6 @@ export const testController = new TestController(
   blogsRepository,
   postsRepository,
   usersRepository,
-  commentsRepository
+  commentsRepository,
+  reactionsRepository
 );

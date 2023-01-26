@@ -6,13 +6,13 @@ export class JwtService {
   constructor(protected sessionRepository: SessionRepository) {}
   async createJWT(userId: string, deviceId: string) {
     const accessToken = jwt.sign({ userId }, settings.JWT_SECRET, {
-      expiresIn: "10m",
+      expiresIn: "1h",
     });
     const refreshToken = jwt.sign(
       { deviceId, userId },
       settings.JWT_REFRESH_SECRET,
       {
-        expiresIn: "1h",
+        expiresIn: "24h",
       }
     );
 

@@ -22,10 +22,10 @@ class JwtService {
     createJWT(userId, deviceId) {
         return __awaiter(this, void 0, void 0, function* () {
             const accessToken = jsonwebtoken_1.default.sign({ userId }, settings_1.settings.JWT_SECRET, {
-                expiresIn: "10m",
+                expiresIn: "1h",
             });
             const refreshToken = jsonwebtoken_1.default.sign({ deviceId, userId }, settings_1.settings.JWT_REFRESH_SECRET, {
-                expiresIn: "1h",
+                expiresIn: "24h",
             });
             return {
                 accessToken,

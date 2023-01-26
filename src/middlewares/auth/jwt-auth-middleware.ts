@@ -33,7 +33,6 @@ export class GetUserIdFromAccessToken {
   async use(req: Request, res: Response, next: NextFunction) {
     const auth = req.headers.authorization;
     if (!auth) {
-      console.log("hello shit");
       req.user = null;
       return next();
     }

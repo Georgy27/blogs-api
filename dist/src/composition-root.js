@@ -61,4 +61,4 @@ exports.usersController = new UsersController_1.UsersController(usersService, ex
 exports.commentsController = new CommentsController_1.CommentsController(commentsService, commentsQueryRepository, reactionsService);
 exports.authController = new AuthController_1.AuthController(authService, usersService, sessionRepository);
 exports.securityDeviceController = new SecurityDevicesController_1.SecurityDevicesController(sessionRepository, securityDevicesService);
-exports.testController = new TestController_1.TestController(blogsRepository, postsRepository, usersRepository, commentsRepository);
+exports.testController = new TestController_1.TestController(blogsRepository, postsRepository, usersRepository, commentsRepository, reactionsRepository);

@@ -1,7 +1,7 @@
 import { CommentsDBModel } from "../models/comments-model";
 import {
   ReactionsDBModel,
-  reactionStatusEnum,
+  reactionStatusEnumKeys,
 } from "../models/reactions-model";
 import { randomUUID } from "crypto";
 import { ReactionsRepository } from "../repositories/reactions-db-repository";
@@ -14,7 +14,7 @@ export class ReactionsService {
     parentId: string,
     userId: string,
     userLogin: string,
-    status: reactionStatusEnum
+    status: reactionStatusEnumKeys
   ) {
     const newReaction: ReactionsDBModel = {
       id: randomUUID(),

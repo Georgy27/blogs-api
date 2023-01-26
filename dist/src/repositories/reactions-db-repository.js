@@ -14,11 +14,23 @@ const reactions_schema_1 = require("../models/reactions-model/reactions-schema")
 class ReactionsRepository {
     updateReaction(newReaction) {
         return __awaiter(this, void 0, void 0, function* () {
-            return reactions_schema_1.ReactionsModel.findOneAndUpdate({
-                id: newReaction.id,
+            console.log(newReaction);
+            const filter = {
+                // id: newReaction.id,
                 parentId: newReaction.parentId,
                 userId: newReaction.userId,
-            }, { newReaction }, { upsert: true });
+            };
+            const updatedReaction = yield reactions_schema_1.ReactionsModel.findOneAndUpdate(filter, newReaction, { upsert: true, new: true }).lean();
+            console.log(updatedReaction);
+            if (!updatedReaction)
+                return null;
+            console.log(updatedReaction.status);
+            return updatedReaction;
+        });
+    }
+    clearReactions() {
+        return __awaiter(this, void 0, void 0, function* () {
+            yield reactions_schema_1.ReactionsModel.deleteMany({});
         });
     }
 }

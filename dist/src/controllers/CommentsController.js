@@ -50,7 +50,8 @@ class CommentsController {
             if (!comment)
                 return res.sendStatus(404);
             // update reaction
-            yield this.reactionsService.updateReaction("comment", commentId, user.userId, user.login, likeStatus);
+            const result = yield this.reactionsService.updateReaction("comment", commentId, user.userId, user.login, likeStatus);
+            // if (!result) return res.sendStatus(404);
             return res.sendStatus(204);
         });
     }

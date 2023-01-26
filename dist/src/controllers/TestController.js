@@ -11,11 +11,12 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.TestController = void 0;
 class TestController {
-    constructor(blogsRepository, postsRepository, usersRepository, commentsRepository) {
+    constructor(blogsRepository, postsRepository, usersRepository, commentsRepository, reactionsRepository) {
         this.blogsRepository = blogsRepository;
         this.postsRepository = postsRepository;
         this.usersRepository = usersRepository;
         this.commentsRepository = commentsRepository;
+        this.reactionsRepository = reactionsRepository;
     }
     dropDatabase(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
@@ -23,6 +24,7 @@ class TestController {
             yield this.postsRepository.clearPosts();
             yield this.usersRepository.clearUsers();
             yield this.commentsRepository.clearComments();
+            yield this.reactionsRepository.clearReactions();
             return res.sendStatus(204);
         });
     }

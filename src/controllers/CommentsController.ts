@@ -60,13 +60,14 @@ export class CommentsController {
     );
     if (!comment) return res.sendStatus(404);
     // update reaction
-    await this.reactionsService.updateReaction(
+    const result = await this.reactionsService.updateReaction(
       "comment",
       commentId,
       user.userId,
       user.login,
       likeStatus
     );
+    // if (!result) return res.sendStatus(404);
     return res.sendStatus(204);
   }
   async deleteCommentById(
