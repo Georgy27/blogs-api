@@ -5,14 +5,17 @@ import { JwtService } from "../application/jwt-service";
 import { SessionRepository } from "../repositories/sessions-db-repository";
 import { UsersQueryRepository } from "../repositories/users-db-query-repository";
 import { EmailsManager } from "../managers/emails-manager";
+import { inject, injectable } from "inversify";
 
+@injectable()
 export class AuthService {
   constructor(
-    protected usersService: UsersService,
-    protected jwtService: JwtService,
-    protected sessionRepository: SessionRepository,
+    @inject(UsersService) protected usersService: UsersService,
+    @inject(JwtService) protected jwtService: JwtService,
+    @inject(SessionRepository) protected sessionRepository: SessionRepository,
+    @inject(UsersQueryRepository)
     protected usersQueryRepository: UsersQueryRepository,
-    protected emailsManager: EmailsManager
+    @inject(EmailsManager) protected emailsManager: EmailsManager
   ) {}
   async login(
     loginOrEmail: string,

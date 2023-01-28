@@ -4,7 +4,9 @@ import { AuthViewModel } from "../models/auth-model";
 import { UserAccountDBModel, UsersViewModel } from "../models/users-model";
 import { FilterQuery } from "mongoose";
 import { UsersModel } from "../models/users-model/user-schema";
+import { injectable } from "inversify";
 
+@injectable()
 export class UsersQueryRepository {
   async findUsers(
     pageNumber: number,

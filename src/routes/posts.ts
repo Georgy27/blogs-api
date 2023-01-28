@@ -11,18 +11,19 @@ import { shortDescriptionValidation } from "../middlewares/validation/posts-midd
 import { contentValidation } from "../middlewares/validation/posts-middleware/contentValidation";
 import { commentsValidation } from "../middlewares/validation/comments-middleware/content-validation";
 import { morgan } from "../middlewares/morgan-middleware";
+import { container } from "../composition-root";
+import { PostsController } from "../controllers/PostsController";
 import {
-  getUserIdFromAccessToken,
-  jwtAuthMiddleware,
-  postsController,
-} from "../composition-root";
-import { blogIdValidation } from "../middlewares/validation/posts-middleware/blogIdValidation";
+  GetUserIdFromAccessToken,
+  JwtAuthMiddleware,
+} from "../middlewares/auth/jwt-auth-middleware";
+import { BlogIdValidation } from "../middlewares/validation/posts-middleware/blogIdValidation";
 
 export const postsRouter = Router({});
-const jwtMw = jwtAuthMiddleware.use.bind(jwtAuthMiddleware);
-const getUserIdFromAccessTokenMw = getUserIdFromAccessToken.use.bind(
-  getUserIdFromAccessToken
-);
+const postsController = container.resolve(PostsController);
+const jwtMw = container.resolve(JwtAuthMiddleware);
+const getUserIdFromAccessTokenMw = container.resolve(GetUserIdFromAccessToken);
+const blogIdValidation = container.resolve(BlogIdValidation);
 // routes
 postsRouter.get(
   "/",
@@ -37,7 +38,7 @@ postsRouter.get(
   pageSize,
   sortBy,
   pageNumberValidation,
-  getUserIdFromAccessTokenMw,
+  getUserIdFromAccessTokenMw.use.bind(getUserIdFromAccessTokenMw),
   morgan("tiny"),
   postsController.getAllCommentsForSpecifiedPost.bind(postsController)
 );
@@ -47,14 +48,14 @@ postsRouter.post(
   titleValidation,
   shortDescriptionValidation,
   contentValidation,
-  blogIdValidation,
+  blogIdValidation.blogIdValidation.bind(blogIdValidation),
   inputValidationMiddleware,
   morgan("tiny"),
   postsController.createPost.bind(postsController)
 );
 postsRouter.post(
   "/:postId/comments",
-  jwtMw,
+  jwtMw.use.bind(jwtMw),
   commentsValidation,
   inputValidationMiddleware,
   morgan("tiny"),
@@ -71,7 +72,7 @@ postsRouter.put(
   titleValidation,
   shortDescriptionValidation,
   contentValidation,
-  blogIdValidation,
+  blogIdValidation.blogIdValidation.bind(blogIdValidation),
   inputValidationMiddleware,
   morgan("tiny"),
   postsController.updatePost.bind(postsController)

@@ -1,14 +1,16 @@
 import { NextFunction, Request, Response } from "express";
 import { UsersQueryRepository } from "../../repositories/users-db-query-repository";
 import { JwtService } from "../../application/jwt-service";
+import { inject, injectable } from "inversify";
 
+@injectable()
 export class JwtAuthMiddleware {
   constructor(
+    @inject(UsersQueryRepository)
     protected usersQueryRepository: UsersQueryRepository,
-    protected jwtService: JwtService
+    @inject(JwtService) protected jwtService: JwtService
   ) {}
   async use(req: Request, res: Response, next: NextFunction) {
-    console.log("inside middleware");
     const auth = req.headers.authorization;
     if (!auth) return res.sendStatus(401);
     const authType = auth.split(" ")[0];
@@ -24,13 +26,18 @@ export class JwtAuthMiddleware {
     return next();
   }
 }
-
+@injectable()
 export class GetUserIdFromAccessToken {
   constructor(
+    @inject(UsersQueryRepository)
     protected usersQueryRepository: UsersQueryRepository,
-    protected jwtService: JwtService
+    @inject(JwtService) protected jwtService: JwtService
   ) {}
-  async use(req: Request, res: Response, next: NextFunction) {
+  async use(
+    req: Request<any, any, any, any>,
+    res: Response,
+    next: NextFunction
+  ) {
     const auth = req.headers.authorization;
     if (!auth) {
       req.user = null;

@@ -4,10 +4,13 @@ import { Response } from "express";
 import { UsersService } from "../domain/users-service";
 import { Pagination } from "../models/pagination.model";
 import { UsersQueryRepository } from "../repositories/users-db-query-repository";
+import { inject, injectable } from "inversify";
 
+@injectable()
 export class UsersController {
   constructor(
-    protected usersService: UsersService,
+    @inject(UsersService) protected usersService: UsersService,
+    @inject(UsersQueryRepository)
     protected usersQueryRepository: UsersQueryRepository
   ) {}
   async createUser(

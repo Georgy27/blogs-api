@@ -1,14 +1,22 @@
 import { body } from "express-validator";
-import { blogsQueryRepository } from "../../../composition-root";
+import { inject, injectable } from "inversify";
+import { BlogsQueryRepository } from "../../../repositories/blogs-db-query-repository";
 
-export const blogIdValidation = body("blogId")
-  .isString()
-  .custom(async (blogId) => {
-    const findBlogWithId = await blogsQueryRepository.findBlog(blogId);
+@injectable()
+export class BlogIdValidation {
+  constructor(
+    @inject(BlogsQueryRepository)
+    protected blogsQueryRepository: BlogsQueryRepository
+  ) {}
+  blogIdValidation = body("blogId")
+    .isString()
+    .custom(async (blogId) => {
+      const findBlogWithId = await this.blogsQueryRepository.findBlog(blogId);
 
-    if (!findBlogWithId) {
-      throw new Error("blog with this id does not exist in the DB");
-    } else {
-      return true;
-    }
-  });
+      if (!findBlogWithId) {
+        throw new Error("blog with this id does not exist in the DB");
+      } else {
+        return true;
+      }
+    });
+}

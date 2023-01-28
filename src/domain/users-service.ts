@@ -5,12 +5,15 @@ import { UserAccountDBModel, UsersViewModel } from "../models/users-model";
 import { UsersRepository } from "../repositories/users-db-repository";
 import { UsersQueryRepository } from "../repositories/users-db-query-repository";
 import { EmailsManager } from "../managers/emails-manager";
+import { inject, injectable } from "inversify";
 
+@injectable()
 export class UsersService {
   constructor(
-    protected usersRepository: UsersRepository,
+    @inject(UsersRepository) protected usersRepository: UsersRepository,
+    @inject(UsersQueryRepository)
     protected usersQueryRepository: UsersQueryRepository,
-    protected emailsManager: EmailsManager
+    @inject(EmailsManager) protected emailsManager: EmailsManager
   ) {}
   async createUser(
     login: string,

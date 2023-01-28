@@ -1,6 +1,8 @@
 import { CommentsDBModel, CommentViewModel } from "../models/comments-model";
 import { CommentsModel } from "../models/comments-model/comment-schema";
+import { injectable } from "inversify";
 
+@injectable()
 export class CommentsRepository {
   async createComment(comment: CommentsDBModel): Promise<CommentViewModel> {
     const newComment = await CommentsModel.create({ ...comment });

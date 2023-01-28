@@ -8,12 +8,17 @@ import {
 } from "../middlewares/validation/sorting&pagination-middleware";
 import { passwordValidation } from "../middlewares/validation/users-middleware/passwordValidation";
 import { morgan } from "../middlewares/morgan-middleware";
-import { usersController } from "../composition-root";
-import { emailRegistrationValidation } from "../middlewares/validation/users-middleware/emailRegistrationValidation";
-import { loginValidation } from "../middlewares/validation/users-middleware/loginValidation";
+import { container } from "../composition-root";
+import { UsersController } from "../controllers/UsersController";
+import { LoginValidation } from "../middlewares/validation/users-middleware/loginValidation";
+import { EmailRegistrationValidation } from "../middlewares/validation/users-middleware/emailRegistrationValidation";
 
 export const usersRouter = Router({});
-
+const usersController = container.resolve(UsersController);
+const loginValidation = container.resolve(LoginValidation);
+const emailRegistrationValidation = container.resolve(
+  EmailRegistrationValidation
+);
 // routes
 usersRouter.get(
   "/",
@@ -27,9 +32,11 @@ usersRouter.get(
 usersRouter.post(
   "/",
   basicAuthMiddleware,
-  loginValidation,
+  loginValidation.loginValidation.bind(loginValidation),
   passwordValidation,
-  emailRegistrationValidation,
+  emailRegistrationValidation.emailRegistrationValidation.bind(
+    emailRegistrationValidation
+  ),
   inputValidationMiddleware,
   morgan("tiny"),
   usersController.createUser.bind(usersController)

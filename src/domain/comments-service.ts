@@ -3,11 +3,16 @@ import { randomUUID } from "crypto";
 import { CommentsDBModel, CommentViewModel } from "../models/comments-model";
 import { PostsQueryRepository } from "../repositories/posts-db-query-repository";
 import { CommentsQueryRepository } from "../repositories/comments-db-query-repository";
+import { inject, injectable } from "inversify";
 
+@injectable()
 export class CommentsService {
   constructor(
+    @inject(CommentsRepository)
     protected commentsRepository: CommentsRepository,
+    @inject(PostsQueryRepository)
     protected postsQueryRepository: PostsQueryRepository,
+    @inject(CommentsQueryRepository)
     protected commentsQueryRepository: CommentsQueryRepository
   ) {}
   async createComment(

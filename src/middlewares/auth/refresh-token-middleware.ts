@@ -2,12 +2,15 @@ import { NextFunction, Request, Response } from "express";
 import { JwtService } from "../../application/jwt-service";
 import { UsersQueryRepository } from "../../repositories/users-db-query-repository";
 import { SessionRepository } from "../../repositories/sessions-db-repository";
+import { inject, injectable } from "inversify";
 
+@injectable()
 export class RefreshTokenMiddleware {
   constructor(
-    protected jwtService: JwtService,
+    @inject(JwtService) protected jwtService: JwtService,
+    @inject(UsersQueryRepository)
     protected usersQueryRepository: UsersQueryRepository,
-    protected sessionRepository: SessionRepository
+    @inject(SessionRepository) protected sessionRepository: SessionRepository
   ) {}
   async use(req: Request, res: Response, next: NextFunction) {
     const { refreshToken } = req.cookies;

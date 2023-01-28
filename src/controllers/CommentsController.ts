@@ -4,12 +4,15 @@ import { CommentsService } from "../domain/comments-service";
 import { CommentViewModel } from "../models/comments-model";
 import { CommentsQueryRepository } from "../repositories/comments-db-query-repository";
 import { ReactionsService } from "../domain/reactions-service";
+import { inject, injectable } from "inversify";
 
+@injectable()
 export class CommentsController {
   constructor(
-    protected commentsService: CommentsService,
+    @inject(CommentsService) protected commentsService: CommentsService,
+    @inject(CommentsQueryRepository)
     protected commentsQueryRepository: CommentsQueryRepository,
-    protected reactionsService: ReactionsService
+    @inject(ReactionsService) protected reactionsService: ReactionsService
   ) {}
   async updateCommentById(
     req: RequestWithParamsAndBody<{ commentId: string }, { content: string }>,

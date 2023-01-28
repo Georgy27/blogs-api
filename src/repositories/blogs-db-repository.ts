@@ -1,6 +1,8 @@
 import { BlogsDBModel } from "../models/blogs-model";
 import { BlogsModel } from "../models/blogs-model/blog-schema";
+import { injectable } from "inversify";
 
+@injectable()
 export class BlogsRepository {
   async createBlog(newBlog: BlogsDBModel): Promise<BlogsDBModel> {
     await BlogsModel.create({ ...newBlog });

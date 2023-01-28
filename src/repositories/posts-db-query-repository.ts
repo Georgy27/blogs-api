@@ -1,7 +1,9 @@
 import { PostsDBModel, PostsViewModel } from "../models/posts-model";
 import { PostsModel } from "../models/posts-model/post-schema";
 import { FilterQuery } from "mongoose";
+import { injectable } from "inversify";
 
+@injectable()
 export class PostsQueryRepository {
   async findPosts(
     pageNumber: number,

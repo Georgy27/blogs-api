@@ -6,7 +6,9 @@ import {
   reactionStatusEnum,
   reactionStatusEnumKeys,
 } from "../models/reactions-model";
+import { injectable } from "inversify";
 
+@injectable()
 export class CommentsQueryRepository {
   async findComments(
     pageNumber: number,

@@ -1,7 +1,9 @@
 import { randomUUID } from "crypto";
 import { UserAccountDBModel, UsersViewModel } from "../models/users-model";
 import { UsersModel } from "../models/users-model/user-schema";
+import { injectable } from "inversify";
 
+@injectable()
 export class UsersRepository {
   async createUser(user: UserAccountDBModel): Promise<UserAccountDBModel> {
     await UsersModel.create({ ...user });

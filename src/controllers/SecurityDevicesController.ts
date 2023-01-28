@@ -2,10 +2,13 @@ import { Request, Response } from "express";
 import { SessionRepository } from "../repositories/sessions-db-repository";
 import { SecurityDevicesService } from "../domain/securityDevices-service";
 import { RequestWithParams } from "../types";
+import { inject, injectable } from "inversify";
 
+@injectable()
 export class SecurityDevicesController {
   constructor(
-    protected sessionRepository: SessionRepository,
+    @inject(SessionRepository) protected sessionRepository: SessionRepository,
+    @inject(SecurityDevicesService)
     protected securityDevicesService: SecurityDevicesService
   ) {}
   async getAllDevicesWithActiveSession(req: Request, res: Response) {

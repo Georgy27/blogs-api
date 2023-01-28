@@ -17,12 +17,16 @@ import { CommentViewModel } from "../models/comments-model";
 import { CommentsService } from "../domain/comments-service";
 import { Pagination } from "../models/pagination.model";
 import { CommentsQueryRepository } from "../repositories/comments-db-query-repository";
+import { inject, injectable } from "inversify";
 
+@injectable()
 export class PostsController {
   constructor(
-    protected postsService: PostsService,
+    @inject(PostsService) protected postsService: PostsService,
+    @inject(PostsQueryRepository)
     protected postsQueryRepository: PostsQueryRepository,
-    protected commentsService: CommentsService,
+    @inject(CommentsService) protected commentsService: CommentsService,
+    @inject(CommentsQueryRepository)
     protected commentsQueryRepository: CommentsQueryRepository
   ) {}
   async createPost(req: RequestWithBody<CreatePostModel>, res: Response) {
@@ -110,8 +114,7 @@ export class PostsController {
     return res.status(201).send(newComment);
   }
   async getAllCommentsForSpecifiedPost(
-    req: any,
-    // req: RequestWithParamsAndQuery<{ postId: string }, QueryPostModel>,
+    req: RequestWithParamsAndQuery<{ postId: string }, QueryPostModel>,
     res: Response<Pagination<CommentViewModel>>
   ) {
     const { sortBy, sortDirection, pageSize, pageNumber } = req.query;

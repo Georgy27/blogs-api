@@ -4,13 +4,17 @@ import { PostsRepository } from "../repositories/posts-db-repository";
 import { UsersRepository } from "../repositories/users-db-repository";
 import { CommentsRepository } from "../repositories/comments-db-repository";
 import { ReactionsRepository } from "../repositories/reactions-db-repository";
+import { inject, injectable } from "inversify";
 
+@injectable()
 export class TestController {
   constructor(
-    protected blogsRepository: BlogsRepository,
-    protected postsRepository: PostsRepository,
-    protected usersRepository: UsersRepository,
+    @inject(BlogsRepository) protected blogsRepository: BlogsRepository,
+    @inject(PostsRepository) protected postsRepository: PostsRepository,
+    @inject(UsersRepository) protected usersRepository: UsersRepository,
+    @inject(CommentsRepository)
     protected commentsRepository: CommentsRepository,
+    @inject(ReactionsRepository)
     protected reactionsRepository: ReactionsRepository
   ) {}
   async dropDatabase(req: Request, res: Response) {

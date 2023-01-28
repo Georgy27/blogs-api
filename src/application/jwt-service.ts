@@ -1,9 +1,13 @@
 import jwt from "jsonwebtoken";
 import { settings } from "../settings";
 import { SessionRepository } from "../repositories/sessions-db-repository";
+import { inject, injectable } from "inversify";
 
+@injectable()
 export class JwtService {
-  constructor(protected sessionRepository: SessionRepository) {}
+  constructor(
+    @inject(SessionRepository) protected sessionRepository: SessionRepository
+  ) {}
   async createJWT(userId: string, deviceId: string) {
     const accessToken = jwt.sign({ userId }, settings.JWT_SECRET, {
       expiresIn: "1h",

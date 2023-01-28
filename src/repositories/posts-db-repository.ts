@@ -1,6 +1,8 @@
 import { PostsDBModel } from "../models/posts-model";
 import { PostsModel } from "../models/posts-model/post-schema";
+import { injectable } from "inversify";
 
+@injectable()
 export class PostsRepository {
   async createPost(newPost: PostsDBModel): Promise<PostsDBModel> {
     await PostsModel.create({ ...newPost });

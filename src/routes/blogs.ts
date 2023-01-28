@@ -13,7 +13,10 @@ import { contentValidation } from "../middlewares/validation/posts-middleware/co
 import { titleValidation } from "../middlewares/validation/posts-middleware/titleValidation";
 import { shortDescriptionValidation } from "../middlewares/validation/posts-middleware/shortDescriptionValidation";
 import { morgan } from "../middlewares/morgan-middleware";
-import { blogsController } from "../composition-root";
+import { container } from "../composition-root";
+import { BlogsController } from "../controllers/BlogsController";
+
+const blogsController = container.resolve(BlogsController);
 
 export const blogsRouter = Router({});
 // routes

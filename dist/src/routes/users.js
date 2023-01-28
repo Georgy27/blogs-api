@@ -8,10 +8,14 @@ const sorting_pagination_middleware_1 = require("../middlewares/validation/sorti
 const passwordValidation_1 = require("../middlewares/validation/users-middleware/passwordValidation");
 const morgan_middleware_1 = require("../middlewares/morgan-middleware");
 const composition_root_1 = require("../composition-root");
-const emailRegistrationValidation_1 = require("../middlewares/validation/users-middleware/emailRegistrationValidation");
+const UsersController_1 = require("../controllers/UsersController");
 const loginValidation_1 = require("../middlewares/validation/users-middleware/loginValidation");
+const emailRegistrationValidation_1 = require("../middlewares/validation/users-middleware/emailRegistrationValidation");
 exports.usersRouter = (0, express_1.Router)({});
+const usersController = composition_root_1.container.resolve(UsersController_1.UsersController);
+const loginValidation = composition_root_1.container.resolve(loginValidation_1.LoginValidation);
+const emailRegistrationValidation = composition_root_1.container.resolve(emailRegistrationValidation_1.EmailRegistrationValidation);
 // routes
-exports.usersRouter.get("/", basic_auth_middleware_1.basicAuthMiddleware, sorting_pagination_middleware_1.pageSize, sorting_pagination_middleware_1.sortBy, sorting_pagination_middleware_1.pageNumberValidation, (0, morgan_middleware_1.morgan)("tiny"), composition_root_1.usersController.getAllUsers.bind(composition_root_1.usersController));
-exports.usersRouter.post("/", basic_auth_middleware_1.basicAuthMiddleware, loginValidation_1.loginValidation, passwordValidation_1.passwordValidation, emailRegistrationValidation_1.emailRegistrationValidation, input_validation_middleware_1.inputValidationMiddleware, (0, morgan_middleware_1.morgan)("tiny"), composition_root_1.usersController.createUser.bind(composition_root_1.usersController));
-exports.usersRouter.delete("/:id", basic_auth_middleware_1.basicAuthMiddleware, (0, morgan_middleware_1.morgan)("tiny"), composition_root_1.usersController.deleteUserById.bind(composition_root_1.usersController));
+exports.usersRouter.get("/", basic_auth_middleware_1.basicAuthMiddleware, sorting_pagination_middleware_1.pageSize, sorting_pagination_middleware_1.sortBy, sorting_pagination_middleware_1.pageNumberValidation, (0, morgan_middleware_1.morgan)("tiny"), usersController.getAllUsers.bind(usersController));
+exports.usersRouter.post("/", basic_auth_middleware_1.basicAuthMiddleware, loginValidation.loginValidation.bind(loginValidation), passwordValidation_1.passwordValidation, emailRegistrationValidation.emailRegistrationValidation.bind(emailRegistrationValidation), input_validation_middleware_1.inputValidationMiddleware, (0, morgan_middleware_1.morgan)("tiny"), usersController.createUser.bind(usersController));
+exports.usersRouter.delete("/:id", basic_auth_middleware_1.basicAuthMiddleware, (0, morgan_middleware_1.morgan)("tiny"), usersController.deleteUserById.bind(usersController));

@@ -2,7 +2,9 @@ import { Pagination } from "../models/pagination.model";
 import { BlogsDBModel, BlogsViewModel } from "../models/blogs-model";
 import { BlogsModel } from "../models/blogs-model/blog-schema";
 import { FilterQuery } from "mongoose";
+import { injectable } from "inversify";
 
+@injectable()
 export class BlogsQueryRepository {
   async findBlogs(
     searchNameTerm: string | undefined | null,

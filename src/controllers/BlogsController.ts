@@ -21,13 +21,17 @@ import { BlogsQueryRepository } from "../repositories/blogs-db-query-repository"
 import { PostsViewModel } from "../models/posts-model";
 import { PostsQueryRepository } from "../repositories/posts-db-query-repository";
 import { PostsService } from "../domain/posts-service";
+import { inject, injectable } from "inversify";
 
+@injectable()
 export class BlogsController {
   constructor(
-    protected blogsService: BlogsService,
+    @inject(BlogsService) protected blogsService: BlogsService,
+    @inject(BlogsQueryRepository)
     protected blogsQueryRepository: BlogsQueryRepository,
+    @inject(PostsQueryRepository)
     protected postsQueryRepository: PostsQueryRepository,
-    protected postsService: PostsService
+    @inject(PostsService) protected postsService: PostsService
   ) {}
   async createBlog(req: RequestWithBody<CreateBlogModel>, res: Response) {
     const { name, description, websiteUrl } = req.body;

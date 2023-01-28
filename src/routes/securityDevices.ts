@@ -1,29 +1,30 @@
 import { Router } from "express";
-import {
-  refreshTokenMiddleware,
-  securityDeviceController,
-} from "../composition-root";
+import { container } from "../composition-root";
+import { SecurityDevicesController } from "../controllers/SecurityDevicesController";
+import { RefreshTokenMiddleware } from "../middlewares/auth/refresh-token-middleware";
 export const securityDevicesRouter = Router({});
 
-const refreshTokenMw = refreshTokenMiddleware.use.bind(refreshTokenMiddleware);
+const securityDevicesController = container.resolve(SecurityDevicesController);
+const refreshTokenMw = container.resolve(RefreshTokenMiddleware);
+
 securityDevicesRouter.get(
   "/",
-  refreshTokenMw,
-  securityDeviceController.getAllDevicesWithActiveSession.bind(
-    securityDeviceController
+  refreshTokenMw.use.bind(refreshTokenMw),
+  securityDevicesController.getAllDevicesWithActiveSession.bind(
+    securityDevicesController
   )
 );
 securityDevicesRouter.delete(
   "/",
-  refreshTokenMw,
-  securityDeviceController.deleteAllDevicesSessionsButActive.bind(
-    securityDeviceController
+  refreshTokenMw.use.bind(refreshTokenMw),
+  securityDevicesController.deleteAllDevicesSessionsButActive.bind(
+    securityDevicesController
   )
 );
 securityDevicesRouter.delete(
   "/:deviceId",
-  refreshTokenMw,
-  securityDeviceController.deleteDeviceSessionById.bind(
-    securityDeviceController
+  refreshTokenMw.use.bind(refreshTokenMw),
+  securityDevicesController.deleteDeviceSessionById.bind(
+    securityDevicesController
   )
 );

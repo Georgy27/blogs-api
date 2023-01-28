@@ -4,12 +4,14 @@ import { Request, Response } from "express";
 import { AuthService } from "../domain/auth-service";
 import { UsersService } from "../domain/users-service";
 import { SessionRepository } from "../repositories/sessions-db-repository";
+import { inject, injectable } from "inversify";
 
+@injectable()
 export class AuthController {
   constructor(
-    protected authService: AuthService,
-    protected usersService: UsersService,
-    protected sessionRepository: SessionRepository
+    @inject(AuthService) protected authService: AuthService,
+    @inject(UsersService) protected usersService: UsersService,
+    @inject(SessionRepository) protected sessionRepository: SessionRepository
   ) {}
 
   async login(req: RequestWithBody<AuthUserModel>, res: Response) {

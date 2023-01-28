@@ -1,14 +1,17 @@
-import { CommentsDBModel } from "../models/comments-model";
 import {
   ReactionsDBModel,
   reactionStatusEnumKeys,
 } from "../models/reactions-model";
 import { randomUUID } from "crypto";
 import { ReactionsRepository } from "../repositories/reactions-db-repository";
+import { inject, injectable } from "inversify";
 
+@injectable()
 export class ReactionsService {
-  constructor(protected reactionsRepository: ReactionsRepository) {}
-  // async updateReaction(comment: CommentsDBModel) {
+  constructor(
+    @inject(ReactionsRepository)
+    protected reactionsRepository: ReactionsRepository
+  ) {}
   async updateReaction(
     parentType: string,
     parentId: string,

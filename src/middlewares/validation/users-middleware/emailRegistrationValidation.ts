@@ -1,16 +1,22 @@
 import { body } from "express-validator";
-import { usersQueryRepository } from "../../../composition-root";
+import { inject, injectable } from "inversify";
+import { UsersQueryRepository } from "../../../repositories/users-db-query-repository";
 
-export const emailRegistrationValidation = body("email")
-  .isEmail()
-  .custom(async (email) => {
-    console.log("in custom");
-    const isUserWithEmail = await usersQueryRepository.findByLoginOrEmail(
-      email
-    );
-    if (isUserWithEmail) {
-      throw new Error("user with given email already exist");
-    } else {
-      return true;
-    }
-  });
+@injectable()
+export class EmailRegistrationValidation {
+  constructor(
+    @inject(UsersQueryRepository)
+    protected usersQueryRepository: UsersQueryRepository
+  ) {}
+  emailRegistrationValidation = body("email")
+    .isEmail()
+    .custom(async (email) => {
+      const isUserWithEmail =
+        await this.usersQueryRepository.findByLoginOrEmail(email);
+      if (isUserWithEmail) {
+        throw new Error("user with given email already exist");
+      } else {
+        return true;
+      }
+    });
+}

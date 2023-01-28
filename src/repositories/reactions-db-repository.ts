@@ -1,6 +1,8 @@
 import { ReactionsDBModel } from "../models/reactions-model";
 import { ReactionsModel } from "../models/reactions-model/reactions-schema";
+import { injectable } from "inversify";
 
+@injectable()
 export class ReactionsRepository {
   async updateReaction(newReaction: ReactionsDBModel) {
     console.log(newReaction);

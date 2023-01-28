@@ -2,10 +2,13 @@ import { randomUUID } from "crypto";
 import { PostsDBModel } from "../models/posts-model";
 import { PostsRepository } from "../repositories/posts-db-repository";
 import { BlogsQueryRepository } from "../repositories/blogs-db-query-repository";
+import { inject, injectable } from "inversify";
 
+@injectable()
 export class PostsService {
   constructor(
-    protected postsRepository: PostsRepository,
+    @inject(PostsRepository) protected postsRepository: PostsRepository,
+    @inject(BlogsQueryRepository)
     protected blogsQueryRepository: BlogsQueryRepository
   ) {}
   async createPost(

@@ -1,6 +1,8 @@
 import { SessionsDBModel, SessionsViewModel } from "../models/sessions-model";
 import { SessionsModel } from "../models/sessions-model/session-schema";
+import { injectable } from "inversify";
 
+@injectable()
 export class SessionRepository {
   async saveNewSession(tokenData: SessionsDBModel) {
     return SessionsModel.create({ ...tokenData });

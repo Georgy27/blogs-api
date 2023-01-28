@@ -1,7 +1,11 @@
 import { SessionRepository } from "../repositories/sessions-db-repository";
+import { inject, injectable } from "inversify";
 
+@injectable()
 export class SecurityDevicesService {
-  constructor(protected sessionRepository: SessionRepository) {}
+  constructor(
+    @inject(SessionRepository) protected sessionRepository: SessionRepository
+  ) {}
   async logOutDevices(deviceId: string, userId: string) {
     return this.sessionRepository.deleteAllSessionsExceptCurrent(
       deviceId,

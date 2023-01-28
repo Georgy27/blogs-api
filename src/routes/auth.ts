@@ -8,21 +8,29 @@ import { loginOrEmailValidation } from "../middlewares/validation/auth-middlewar
 import { morgan } from "../middlewares/morgan-middleware";
 import { checkRequests } from "../middlewares/auth/checkRequests-middleware";
 import { emailValidation } from "../middlewares/validation/users-middleware/emailValidation";
-import {
-  authController,
-  jwtAuthMiddleware,
-  refreshTokenMiddleware,
-} from "../composition-root";
-import { emailRegistrationValidation } from "../middlewares/validation/users-middleware/emailRegistrationValidation";
-import { loginValidation } from "../middlewares/validation/users-middleware/loginValidation";
-import { confirmEmail } from "../middlewares/validation/auth-middleware/confirmEmail";
-import { emailResendingValidation } from "../middlewares/validation/auth-middleware/emailResendingValidation";
-import { confirmRecoveryCode } from "../middlewares/validation/auth-middleware/recoveryCodeValidation";
+
+import { container } from "../composition-root";
+import { AuthController } from "../controllers/AuthController";
+import { JwtAuthMiddleware } from "../middlewares/auth/jwt-auth-middleware";
+import { RefreshTokenMiddleware } from "../middlewares/auth/refresh-token-middleware";
+import { ConfirmEmail } from "../middlewares/validation/auth-middleware/confirmEmail";
+import { EmailResendingValidation } from "../middlewares/validation/auth-middleware/emailResendingValidation";
+import { ConfirmRecoveryCode } from "../middlewares/validation/auth-middleware/recoveryCodeValidation";
+import { LoginValidation } from "../middlewares/validation/users-middleware/loginValidation";
+import { EmailRegistrationValidation } from "../middlewares/validation/users-middleware/emailRegistrationValidation";
 
 export const authRouter = Router({});
-const jwtMw = jwtAuthMiddleware.use.bind(jwtAuthMiddleware);
-const refreshTokenMw = refreshTokenMiddleware.use.bind(refreshTokenMiddleware);
 
+const authController = container.resolve(AuthController);
+const jwtMw = container.resolve(JwtAuthMiddleware);
+const refreshTokenMw = container.resolve(RefreshTokenMiddleware);
+const confirmEmail = container.resolve(ConfirmEmail);
+const emailResendingValidation = container.resolve(EmailResendingValidation);
+const confirmRecoveryCode = container.resolve(ConfirmRecoveryCode);
+const loginValidation = container.resolve(LoginValidation);
+const emailRegistrationValidation = container.resolve(
+  EmailRegistrationValidation
+);
 authRouter.post(
   "/login",
   checkRequests,
@@ -35,28 +43,30 @@ authRouter.post(
 authRouter.post(
   "/registration",
   checkRequests,
-  loginValidation,
+  loginValidation.loginValidation.bind(loginValidation),
   passwordValidation,
-  emailRegistrationValidation,
+  emailRegistrationValidation.emailRegistrationValidation.bind(
+    emailRegistrationValidation
+  ),
   inputValidationMiddleware,
   morgan("tiny"),
   authController.register.bind(authController)
 );
 authRouter.post(
   "/refresh-token",
-  refreshTokenMw,
+  refreshTokenMw.use.bind(refreshTokenMw),
   authController.refreshToken.bind(authController)
 );
 authRouter.post(
   "/logout",
-  refreshTokenMw,
+  refreshTokenMw.use.bind(refreshTokenMw),
   morgan("tiny"),
   authController.logout.bind(authController)
 );
 authRouter.post(
   "/registration-confirmation",
   checkRequests,
-  confirmEmail,
+  confirmEmail.confirmEmail.bind(confirmEmail),
   inputValidationMiddleware,
   morgan("tiny"),
   authController.registrationConfirmation.bind(authController)
@@ -64,7 +74,9 @@ authRouter.post(
 authRouter.post(
   "/registration-email-resending",
   checkRequests,
-  emailResendingValidation,
+  emailResendingValidation.emailResendingValidation.bind(
+    emailResendingValidation
+  ),
   inputValidationMiddleware,
   morgan("tiny"),
   authController.registrationEmailResending.bind(authController)
@@ -80,13 +92,13 @@ authRouter.post(
   "/new-password",
   checkRequests,
   newPasswordValidation,
-  confirmRecoveryCode,
+  confirmRecoveryCode.confirmRecoveryCode.bind(confirmRecoveryCode),
   inputValidationMiddleware,
   authController.newPassword.bind(authController)
 );
 authRouter.get(
   "/me",
-  jwtMw,
+  jwtMw.use.bind(jwtMw),
   morgan("tiny"),
   authController.me.bind(authController)
 );
