@@ -18,6 +18,7 @@ import {
   JwtAuthMiddleware,
 } from "../middlewares/auth/jwt-auth-middleware";
 import { BlogIdValidation } from "../middlewares/validation/posts-middleware/blogIdValidation";
+import { likeStatusValidation } from "../middlewares/validation/comments-middleware/likeStatus-validation";
 
 export const postsRouter = Router({});
 const postsController = container.resolve(PostsController);
@@ -30,6 +31,7 @@ postsRouter.get(
   pageSize,
   sortBy,
   pageNumberValidation,
+  getUserIdFromAccessTokenMw.use.bind(getUserIdFromAccessTokenMw),
   morgan("tiny"),
   postsController.getAllPosts.bind(postsController)
 );
@@ -63,6 +65,7 @@ postsRouter.post(
 );
 postsRouter.get(
   "/:id",
+  getUserIdFromAccessTokenMw.use.bind(getUserIdFromAccessTokenMw),
   morgan("tiny"),
   postsController.getPostById.bind(postsController)
 );
@@ -76,6 +79,13 @@ postsRouter.put(
   inputValidationMiddleware,
   morgan("tiny"),
   postsController.updatePost.bind(postsController)
+);
+postsRouter.put(
+  "/:postId/like-status",
+  jwtMw.use.bind(jwtMw),
+  likeStatusValidation,
+  inputValidationMiddleware,
+  postsController.updateReaction.bind(postsController)
 );
 postsRouter.delete(
   "/:id",

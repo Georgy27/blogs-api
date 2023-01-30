@@ -87,11 +87,12 @@ let BlogsController = class BlogsController {
             const { sortBy, sortDirection } = req.query;
             const { pageSize, pageNumber } = req.query;
             const blogId = req.params.blogId;
+            const user = req.user ? req.user : null;
             const getBlogById = yield this.blogsQueryRepository.findBlog(blogId);
             if (!getBlogById) {
                 return res.sendStatus(404);
             }
-            const allPostsWithId = yield this.postsQueryRepository.findPosts(pageNumber, pageSize, sortBy, sortDirection, blogId);
+            const allPostsWithId = yield this.postsQueryRepository.findPosts(pageNumber, pageSize, sortBy, sortDirection, user, blogId);
             res.status(200).send(allPostsWithId);
         });
     }

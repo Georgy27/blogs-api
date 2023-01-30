@@ -21,7 +21,7 @@ export class PostsService {
     const blog = await this.blogsQueryRepository.findBlog(blogId);
     if (!blog) return null;
     // create a post for specified blog
-    const newPost = {
+    const newPost: PostsDBModel = {
       id: randomUUID(),
       title: title,
       shortDescription: shortDescription,
@@ -29,6 +29,12 @@ export class PostsService {
       blogId: blogId,
       blogName: blog.name,
       createdAt: new Date().toISOString(),
+      extendedLikesInfo: {
+        likesCount: 0,
+        dislikesCount: 0,
+        myStatus: "None",
+        newestLikes: [],
+      },
     };
     return this.postsRepository.createPost(newPost);
   }

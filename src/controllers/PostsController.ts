@@ -18,6 +18,7 @@ import { CommentsService } from "../domain/comments-service";
 import { Pagination } from "../models/pagination.model";
 import { CommentsQueryRepository } from "../repositories/comments-db-query-repository";
 import { inject, injectable } from "inversify";
+import { ReactionsService } from "../domain/reactions-service";
 
 @injectable()
 export class PostsController {
@@ -27,7 +28,8 @@ export class PostsController {
     protected postsQueryRepository: PostsQueryRepository,
     @inject(CommentsService) protected commentsService: CommentsService,
     @inject(CommentsQueryRepository)
-    protected commentsQueryRepository: CommentsQueryRepository
+    protected commentsQueryRepository: CommentsQueryRepository,
+    @inject(ReactionsService) protected reactionsService: ReactionsService
   ) {}
   async createPost(req: RequestWithBody<CreatePostModel>, res: Response) {
     const { title, shortDescription, content, blogId } = req.body;
@@ -66,23 +68,49 @@ export class PostsController {
   async getAllPosts(req: RequestWithQuery<QueryPostModel>, res: Response) {
     const { sortBy, sortDirection } = req.query;
     const { pageSize, pageNumber } = req.query;
+    const user = req.user ? req.user : null;
     const allPosts = await this.postsQueryRepository.findPosts(
       pageNumber,
       pageSize,
       sortBy,
-      sortDirection
+      sortDirection,
+      user
     );
     res.status(200).send(allPosts);
   }
   async getPostById(req: RequestWithParams<{ id: string }>, res: Response) {
     const postId = req.params.id;
-    const getPost = await this.postsQueryRepository.findPost(postId);
+    const user = req.user ? req.user : null;
+    const getPost = await this.postsQueryRepository.findPostWithLikesInfo(
+      postId,
+      user
+    );
 
     if (!getPost) {
       return res.sendStatus(404);
     } else {
       return res.status(200).send(getPost);
     }
+  }
+  async updateReaction(
+    req: RequestWithParams<{ postId: string }>,
+    res: Response
+  ) {
+    const user = req.user!;
+    const postId = req.params.postId;
+    const { likeStatus } = req.body;
+    // find post
+    const post = await this.postsQueryRepository.findPost(postId);
+    if (!post) return res.sendStatus(404);
+    // update reaction
+    const result = await this.reactionsService.updateReaction(
+      "post",
+      postId,
+      user.userId,
+      user.login,
+      likeStatus
+    );
+    return res.sendStatus(204);
   }
   async deletePostById(req: RequestWithParams<{ id: string }>, res: Response) {
     const postId = req.params.id;

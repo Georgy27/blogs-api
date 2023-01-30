@@ -107,6 +107,7 @@ export class BlogsController {
     const { sortBy, sortDirection } = req.query;
     const { pageSize, pageNumber } = req.query;
     const blogId = req.params.blogId;
+    const user = req.user ? req.user : null;
     const getBlogById = await this.blogsQueryRepository.findBlog(blogId);
 
     if (!getBlogById) {
@@ -117,6 +118,7 @@ export class BlogsController {
       pageSize,
       sortBy,
       sortDirection,
+      user,
       blogId
     );
     res.status(200).send(allPostsWithId);

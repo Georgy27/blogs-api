@@ -46,6 +46,12 @@ let PostsService = class PostsService {
                 blogId: blogId,
                 blogName: blog.name,
                 createdAt: new Date().toISOString(),
+                extendedLikesInfo: {
+                    likesCount: 0,
+                    dislikesCount: 0,
+                    myStatus: "None",
+                    newestLikes: [],
+                },
             };
             return this.postsRepository.createPost(newPost);
         });

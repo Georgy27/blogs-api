@@ -27,12 +27,14 @@ const posts_service_1 = require("../domain/posts-service");
 const comments_service_1 = require("../domain/comments-service");
 const comments_db_query_repository_1 = require("../repositories/comments-db-query-repository");
 const inversify_1 = require("inversify");
+const reactions_service_1 = require("../domain/reactions-service");
 let PostsController = class PostsController {
-    constructor(postsService, postsQueryRepository, commentsService, commentsQueryRepository) {
+    constructor(postsService, postsQueryRepository, commentsService, commentsQueryRepository, reactionsService) {
         this.postsService = postsService;
         this.postsQueryRepository = postsQueryRepository;
         this.commentsService = commentsService;
         this.commentsQueryRepository = commentsQueryRepository;
+        this.reactionsService = reactionsService;
     }
     createPost(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
@@ -59,20 +61,36 @@ let PostsController = class PostsController {
         return __awaiter(this, void 0, void 0, function* () {
             const { sortBy, sortDirection } = req.query;
             const { pageSize, pageNumber } = req.query;
-            const allPosts = yield this.postsQueryRepository.findPosts(pageNumber, pageSize, sortBy, sortDirection);
+            const user = req.user ? req.user : null;
+            const allPosts = yield this.postsQueryRepository.findPosts(pageNumber, pageSize, sortBy, sortDirection, user);
             res.status(200).send(allPosts);
         });
     }
     getPostById(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             const postId = req.params.id;
-            const getPost = yield this.postsQueryRepository.findPost(postId);
+            const user = req.user ? req.user : null;
+            const getPost = yield this.postsQueryRepository.findPostWithLikesInfo(postId, user);
             if (!getPost) {
                 return res.sendStatus(404);
             }
             else {
                 return res.status(200).send(getPost);
             }
+        });
+    }
+    updateReaction(req, res) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const user = req.user;
+            const postId = req.params.postId;
+            const { likeStatus } = req.body;
+            // find post
+            const post = yield this.postsQueryRepository.findPost(postId);
+            if (!post)
+                return res.sendStatus(404);
+            // update reaction
+            const result = yield this.reactionsService.updateReaction("post", postId, user.userId, user.login, likeStatus);
+            return res.sendStatus(204);
         });
     }
     deletePostById(req, res) {
@@ -117,9 +135,11 @@ PostsController = __decorate([
     __param(1, (0, inversify_1.inject)(posts_db_query_repository_1.PostsQueryRepository)),
     __param(2, (0, inversify_1.inject)(comments_service_1.CommentsService)),
     __param(3, (0, inversify_1.inject)(comments_db_query_repository_1.CommentsQueryRepository)),
+    __param(4, (0, inversify_1.inject)(reactions_service_1.ReactionsService)),
     __metadata("design:paramtypes", [posts_service_1.PostsService,
         posts_db_query_repository_1.PostsQueryRepository,
         comments_service_1.CommentsService,
-        comments_db_query_repository_1.CommentsQueryRepository])
+        comments_db_query_repository_1.CommentsQueryRepository,
+        reactions_service_1.ReactionsService])
 ], PostsController);
 exports.PostsController = PostsController;

@@ -18,8 +18,10 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.PostsQueryRepository = void 0;
 const post_schema_1 = require("../models/posts-model/post-schema");
 const inversify_1 = require("inversify");
+const reactions_schema_1 = require("../models/reactions-model/reactions-schema");
+const reactions_model_1 = require("../models/reactions-model");
 let PostsQueryRepository = class PostsQueryRepository {
-    findPosts(pageNumber, pageSize, sortBy, sortDirection, blogId) {
+    findPosts(pageNumber, pageSize, sortBy, sortDirection, user, blogId) {
         return __awaiter(this, void 0, void 0, function* () {
             const filter = {};
             if (blogId) {
@@ -30,13 +32,17 @@ let PostsQueryRepository = class PostsQueryRepository {
                 .skip((pageNumber - 1) * pageSize)
                 .limit(pageSize)
                 .lean();
+            console.log(posts);
+            const postsWithLikesInfo = yield Promise.all(posts.map((post) => __awaiter(this, void 0, void 0, function* () {
+                return this.addLikesInfoToPosts(post, user);
+            })));
             const numberOfPosts = yield post_schema_1.PostsModel.count(filter);
             return {
                 pagesCount: Math.ceil(numberOfPosts / pageSize),
                 page: pageNumber,
                 pageSize: pageSize,
                 totalCount: numberOfPosts,
-                items: posts,
+                items: postsWithLikesInfo,
             };
         });
     }
@@ -44,6 +50,72 @@ let PostsQueryRepository = class PostsQueryRepository {
         return __awaiter(this, void 0, void 0, function* () {
             const post = yield post_schema_1.PostsModel.findOne({ id }, { _id: false }).lean();
             return post;
+        });
+    }
+    findPostWithLikesInfo(id, user) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const post = yield post_schema_1.PostsModel.findOne({ id }, { _id: false }).lean();
+            if (!post)
+                return null;
+            return this.addLikesInfoToPosts(post, user);
+        });
+    }
+    addLikesInfoToPosts(post, user) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const likes = yield reactions_schema_1.ReactionsModel.countDocuments({
+                parentId: post.id,
+                status: reactions_model_1.reactionStatusEnum.Like,
+            });
+            console.log(likes);
+            const dislikes = yield reactions_schema_1.ReactionsModel.countDocuments({
+                parentId: post.id,
+                status: reactions_model_1.reactionStatusEnum.Dislike,
+            });
+            const newestLikes = yield reactions_schema_1.ReactionsModel.find({
+                parentId: post.id,
+                status: reactions_model_1.reactionStatusEnum.Like,
+            })
+                .sort({
+                addedAt: "desc",
+            })
+                .limit(3);
+            const mappedNewestLikes = newestLikes.map((likes) => {
+                return {
+                    addedAt: likes.addedAt,
+                    userId: likes.userId,
+                    login: likes.userLogin,
+                };
+            });
+            let myStatus = "None";
+            if (!user) {
+                myStatus = "None";
+            }
+            else {
+                const myStatusFromDb = yield reactions_schema_1.ReactionsModel.findOne({ parentId: post.id, userId: user.userId }, { _id: 0 }).lean();
+                if (myStatusFromDb) {
+                    myStatus = myStatusFromDb.status;
+                }
+            }
+            return {
+                id: post.id,
+                title: post.title,
+                shortDescription: post.shortDescription,
+                content: post.content,
+                blogId: post.blogId,
+                blogName: post.blogName,
+                createdAt: post.createdAt,
+                extendedLikesInfo: {
+                    likesCount: likes,
+                    dislikesCount: dislikes,
+                    myStatus: myStatus,
+                    newestLikes: mappedNewestLikes,
+                },
+            };
+            // post.extendedLikesInfo.likesCount = likes;
+            // post.extendedLikesInfo.dislikesCount = dislikes;
+            // post.extendedLikesInfo.myStatus = myStatus;
+            // post.extendedLikesInfo.newestLikes = mappedNewestLikes;
+            // return post;
         });
     }
 };

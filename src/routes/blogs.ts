@@ -15,8 +15,10 @@ import { shortDescriptionValidation } from "../middlewares/validation/posts-midd
 import { morgan } from "../middlewares/morgan-middleware";
 import { container } from "../composition-root";
 import { BlogsController } from "../controllers/BlogsController";
+import { GetUserIdFromAccessToken } from "../middlewares/auth/jwt-auth-middleware";
 
 const blogsController = container.resolve(BlogsController);
+const getUserIdFromAccessTokenMw = container.resolve(GetUserIdFromAccessToken);
 
 export const blogsRouter = Router({});
 // routes
@@ -33,6 +35,7 @@ blogsRouter.get(
   pageSize,
   sortBy,
   pageNumberValidation,
+  getUserIdFromAccessTokenMw.use.bind(getUserIdFromAccessTokenMw),
   morgan("tiny"),
   blogsController.getAllPostsForSpecifiedBlog.bind(blogsController)
 );

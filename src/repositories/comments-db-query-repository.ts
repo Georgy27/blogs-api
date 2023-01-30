@@ -69,16 +69,14 @@ export class CommentsQueryRepository {
   ) {
     const likes = await ReactionsModel.countDocuments({
       parentId: comment.id,
-      status: "Like",
+      status: reactionStatusEnum.Like,
     });
-    console.log(likes);
     const dislikes = await ReactionsModel.countDocuments({
       parentId: comment.id,
       status: reactionStatusEnum.Dislike,
     });
     let myStatus: reactionStatusEnumKeys = "None";
     if (userId) {
-      // console.log("I am user");
       const myStatusFromDb = await ReactionsModel.findOne(
         { parentId: comment.id, userId: userId },
         { _id: 0 }

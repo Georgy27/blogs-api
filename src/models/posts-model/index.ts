@@ -1,9 +1,21 @@
+import { reactionStatusEnumKeys } from "../reactions-model";
+
 export type CreatePostModel = {
   title: string;
   shortDescription: string;
   content: string;
   blogId: string;
 };
+export interface ExtendedLikesInfoModel {
+  likesCount: number;
+  dislikesCount: number;
+  myStatus: reactionStatusEnumKeys;
+  newestLikes: {
+    addedAt: string;
+    userId: string;
+    login: string;
+  }[];
+}
 export interface PostsDBModel {
   id: string;
   title: string;
@@ -12,6 +24,7 @@ export interface PostsDBModel {
   blogId: string;
   blogName: string;
   createdAt: string;
+  extendedLikesInfo: ExtendedLikesInfoModel;
 }
 export interface PostsViewModel {
   pagesCount: number;

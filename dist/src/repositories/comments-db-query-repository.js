@@ -61,16 +61,14 @@ let CommentsQueryRepository = class CommentsQueryRepository {
         return __awaiter(this, void 0, void 0, function* () {
             const likes = yield reactions_schema_1.ReactionsModel.countDocuments({
                 parentId: comment.id,
-                status: "Like",
+                status: reactions_model_1.reactionStatusEnum.Like,
             });
-            console.log(likes);
             const dislikes = yield reactions_schema_1.ReactionsModel.countDocuments({
                 parentId: comment.id,
                 status: reactions_model_1.reactionStatusEnum.Dislike,
             });
             let myStatus = "None";
             if (userId) {
-                // console.log("I am user");
                 const myStatusFromDb = yield reactions_schema_1.ReactionsModel.findOne({ parentId: comment.id, userId: userId }, { _id: 0 }).lean();
                 if (myStatusFromDb) {
                     myStatus = myStatusFromDb.status;
